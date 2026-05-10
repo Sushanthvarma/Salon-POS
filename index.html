@@ -880,6 +880,41 @@ select.input{appearance:none;-webkit-appearance:none;background-image:url("data:
 .emi-bar-fill{height:100%;border-radius:2px;background:var(--champagne);transition:width .5s;}
 .emi-actions{display:flex;justify-content:flex-end;margin-top:14px;gap:8px;align-items:center;}
 
+/* CAPEX (Capital Expenditure) */
+.capex-kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px;}
+.capex-kpi{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;padding:14px 16px;}
+.capex-kpi-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+.capex-kpi-value{font-family:var(--serif);font-size:22px;color:var(--ink);margin-top:4px;font-weight:500;}
+.capex-kpi-sub{font-size:11.5px;color:var(--muted);margin-top:4px;}
+.capex-kpi.full{grid-column:span 2;background:linear-gradient(135deg,#fbf5ec,#fff8ec);}
+.capex-toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.capex-toolbar button{flex:1;min-width:140px;padding:10px 12px;font-size:13px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:600;cursor:pointer;}
+.capex-toolbar button.primary{background:var(--terracotta);color:#fff;border-color:var(--terracotta);}
+.capex-toolbar button:hover{transform:translateY(-1px);box-shadow:var(--shadow-soft);}
+.capex-cat-chips{display:flex;gap:6px;overflow-x:auto;margin:0 -18px 14px;padding:0 18px 6px;-webkit-overflow-scrolling:touch;}
+.capex-cat-chip{flex:none;padding:7px 14px;border-radius:18px;font-size:12px;background:var(--surface);border:1px solid var(--line-soft);color:var(--ink);cursor:pointer;white-space:nowrap;font-weight:500;}
+.capex-cat-chip.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.capex-cat-chip .pill-amt{margin-left:6px;color:var(--muted);font-size:11px;}
+.capex-cat-chip.active .pill-amt{color:rgba(255,255,255,.75);}
+.capex-list{display:flex;flex-direction:column;gap:8px;}
+.capex-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:background .15s;}
+.capex-card:hover{background:var(--surface-2);}
+.capex-card .cap-cat-tag{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--terracotta);font-weight:700;margin-bottom:4px;}
+.capex-card .cap-item{font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.35;}
+.capex-card .cap-meta{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5;}
+.capex-card .cap-amount{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);text-align:right;flex-shrink:0;}
+.capex-card .cap-amount-sub{font-size:10.5px;color:var(--muted);margin-top:2px;letter-spacing:.04em;}
+.capex-card.kind-deposit{border-left:3px solid #6c8ebf;}
+.capex-card.kind-expense{border-left:3px solid #b8956a;}
+.capex-card.kind-asset{border-left:3px solid #7cb342;}
+.capex-section-title{font-family:var(--serif);font-size:18px;color:var(--ink);font-weight:500;margin:24px 0 10px;display:flex;justify-content:space-between;align-items:baseline;}
+.capex-section-title .add-link{font-size:12px;color:var(--terracotta);font-weight:600;cursor:pointer;letter-spacing:.02em;font-family:var(--sans);}
+.capex-templates{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:8px;}
+.capex-template{background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px;font-size:12px;text-align:center;cursor:pointer;color:var(--ink);transition:all .15s;font-weight:500;}
+.capex-template:hover{background:var(--surface-2);border-style:solid;border-color:var(--champagne);}
+.capex-template.added{opacity:.5;}
+.capex-empty{text-align:center;padding:30px 16px;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:14px;}
+
 /* TOAST */
 .save-toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--ink);color:#FFF;padding:12px 22px;border-radius:30px;font-size:13px;z-index:200;box-shadow:var(--shadow-float);opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap;letter-spacing:.02em;}
 .save-toast.visible{opacity:1;}
@@ -1707,6 +1742,7 @@ img, video, canvas, svg{max-width:100%;height:auto;}
             <div class="admin-nav-section-title">Finance</div>
             <div class="admin-nav-stack">
               <button class="admin-tab" data-atab="expenses" onclick="setAdminTab('expenses')">Expenses</button>
+              <button class="admin-tab" data-atab="capex" onclick="setAdminTab('capex')">Capital Expenditure</button>
               <button class="admin-tab" data-atab="advances" onclick="setAdminTab('advances')">Advances</button>
               <button class="admin-tab" data-atab="emi" onclick="setAdminTab('emi')">EMI</button>
             </div>
@@ -1731,6 +1767,7 @@ img, video, canvas, svg{max-width:100%;height:auto;}
     <div id="admin-tab-attendance" style="display:none"></div>
     <div id="admin-tab-sales" style="display:none"></div>
     <div id="admin-tab-expenses" style="display:none"></div>
+    <div id="admin-tab-capex" style="display:none"></div>
     <div id="admin-tab-payroll" style="display:none"></div>
     <div id="admin-tab-advances" style="display:none"></div>
     <div id="admin-tab-emi" style="display:none"></div>
@@ -2015,6 +2052,118 @@ img, video, canvas, svg{max-width:100%;height:auto;}
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════
+     MODAL: ADD / EDIT CAPEX (Capital Expenditure)
+     ═══════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-capex">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="capex-modal-title">Add Capital Expenditure</div>
+    <div class="modal-field">
+      <label class="modal-label">Category</label>
+      <select class="modal-input" id="capex-category" onchange="onCapexCategoryChange()"></select>
+      <div class="muted-text" id="capex-cat-hint" style="font-size:11px;margin-top:4px;line-height:1.4"></div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Item / Description</label>
+      <input type="text" class="modal-input" id="capex-item" placeholder="e.g. Takara Belmont styling chair (×4)">
+    </div>
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div class="modal-field" style="flex:1;">
+        <label class="modal-label">Purchase Date</label>
+        <input type="date" class="modal-input" id="capex-date">
+      </div>
+      <div class="modal-field" style="flex:1;">
+        <label class="modal-label">Amount (₹)</label>
+        <input type="number" class="modal-input" id="capex-amount" placeholder="50000" inputmode="numeric">
+      </div>
+    </div>
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div class="modal-field" style="flex:1;">
+        <label class="modal-label">Vendor / Supplier</label>
+        <input type="text" class="modal-input" id="capex-vendor" placeholder="Optional">
+      </div>
+      <div class="modal-field" style="flex:1;">
+        <label class="modal-label">Invoice / Bill #</label>
+        <input type="text" class="modal-input" id="capex-invoice" placeholder="Optional">
+      </div>
+    </div>
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div class="modal-field" style="flex:1;">
+        <label class="modal-label">Payment Mode</label>
+        <select class="modal-input" id="capex-payment">
+          <option value="Cash">Cash</option>
+          <option value="UPI">UPI</option>
+          <option value="Card">Card</option>
+          <option value="Bank Transfer">Bank Transfer</option>
+          <option value="Cheque">Cheque</option>
+          <option value="Loan / EMI">Loan / EMI</option>
+        </select>
+      </div>
+      <div class="modal-field" style="flex:1;">
+        <label class="modal-label">Linked EMI (optional)</label>
+        <select class="modal-input" id="capex-emi">
+          <option value="">— None —</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div class="modal-field" style="flex:1;">
+        <label class="modal-label">Useful Life (months)</label>
+        <input type="number" class="modal-input" id="capex-dep" placeholder="60" inputmode="numeric" min="0">
+        <div class="muted-text" style="font-size:11px;margin-top:4px;">Used for monthly depreciation. 0 = no depreciation.</div>
+      </div>
+      <div class="modal-field" style="flex:1;">
+        <label class="modal-label">Quantity</label>
+        <input type="number" class="modal-input" id="capex-qty" placeholder="1" inputmode="numeric" min="1" value="1">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Notes</label>
+      <textarea class="modal-input" id="capex-notes" rows="2" placeholder="Warranty period, model number, where installed…"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('modal-capex')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCapex()">Save</button>
+    </div>
+    <button class="btn btn-secondary" id="capex-delete-btn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteCapex()">Delete this entry</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL: ADD CUSTOM CAPEX CATEGORY
+     ═══════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-capex-cat">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add Custom CapEx Category</div>
+    <div class="modal-field">
+      <label class="modal-label">Category Name</label>
+      <input type="text" class="modal-input" id="capex-cat-name" placeholder="e.g. Generator / Power Backup">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Type</label>
+      <select class="modal-input" id="capex-cat-kind">
+        <option value="asset">Depreciable Asset</option>
+        <option value="expense">One-time Expense (license, soft launch)</option>
+        <option value="deposit">Refundable Deposit</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Default Useful Life (months)</label>
+      <input type="number" class="modal-input" id="capex-cat-dep" placeholder="60" value="60">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Hint / Examples</label>
+      <input type="text" class="modal-input" id="capex-cat-hint-input" placeholder="What kinds of items go here?">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('modal-capex-cat')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCapexCategory()">Save Category</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast & Sync Pill -->
 <div class="save-toast" id="save-toast"></div>
 <div class="sync-pill" id="sync-pill"></div>
@@ -2169,6 +2318,7 @@ const COL = {
   AUDIT:         'audit',          // append-only audit log of admin actions
   CUSTOMERS:     'customers',      // customer DB keyed by last-5-digits of phone
   APPOINTMENTS:  'appointments',   // upcoming/past appointments (calendar bookings)
+  CAPEX:         'capex',          // one-time capital expenditure / setup investments
 };
 
 const DEFAULTS = {
@@ -2235,6 +2385,49 @@ const DEFAULTS = {
   },
   // Menu version — bump this when DEFAULTS.services changes to force-refresh stale local caches.
   servicesVersion: 'v2026-04-full-menu',
+  // ── CAPEX (Capital Expenditure) ──
+  // Industry-standard categories for a salon/spa. `dep` is suggested useful-life
+  // in months for straight-line depreciation. `kind` separates real depreciable
+  // assets from refundable deposits, one-off licenses, and pre-launch costs.
+  // Admins can add their own categories from the CapEx tab.
+  capexCategories: [
+    { name:'Interior & Civil Work',          kind:'asset',    dep:120, hint:'False ceiling, partitions, flooring, plumbing, electrical' },
+    { name:'Furniture & Reception',          kind:'asset',    dep:96,  hint:'Reception desk, waiting sofa, magazine rack, lockers' },
+    { name:'Salon Stations & Mirrors',       kind:'asset',    dep:96,  hint:'Styling chairs, mirrors, station tables, trolleys' },
+    { name:'Hair Equipment',                 kind:'asset',    dep:60,  hint:'Hair dryers, steamers, climazon, wash basins, straighteners' },
+    { name:'Spa & Massage Equipment',        kind:'asset',    dep:60,  hint:'Massage tables, hot stone warmer, towel warmer, steam machine' },
+    { name:'Beauty / Facial Equipment',      kind:'asset',    dep:60,  hint:'Facial machine, microdermabrasion, wax warmer, manicure/pedicure stations, UV lamp' },
+    { name:'HVAC / Air Conditioning',        kind:'asset',    dep:84,  hint:'AC units, exhaust fans, ventilation' },
+    { name:'Lighting',                       kind:'asset',    dep:60,  hint:'Decorative + task lighting, ring lights, dimmers' },
+    { name:'Water & Laundry',                kind:'asset',    dep:60,  hint:'Geyser, RO purifier, washing machine, dryer' },
+    { name:'Sterilization & Hygiene',        kind:'asset',    dep:60,  hint:'Autoclave, UV cabinet, sanitizer dispensers' },
+    { name:'POS, IT & CCTV',                 kind:'asset',    dep:36,  hint:'Billing PC, printer, tablet, router, CCTV, biometric, barcode' },
+    { name:'Audio Visual',                   kind:'asset',    dep:48,  hint:'Speakers, TV, music player, soundbar' },
+    { name:'Branding & Signage',             kind:'asset',    dep:48,  hint:'Outdoor signboard, indoor branding, frames, hoardings' },
+    { name:'Initial Inventory (Opening Stock)', kind:'asset', dep:12,  hint:'Starter products, towels, capes, linen — written off in year one' },
+    { name:'Licenses & Permits',             kind:'expense',  dep:12,  hint:'Trade license, GST, shop & establishment, fire NOC, music license' },
+    { name:'Professional Fees',              kind:'expense',  dep:0,   hint:'Architect, interior designer, consultant, CA, legal' },
+    { name:'Soft Launch & Marketing',        kind:'expense',  dep:0,   hint:'Opening event, photoshoot, launch ads' },
+    { name:'Refundable Deposits',            kind:'deposit',  dep:0,   hint:'Rent deposit, electricity, water deposit (refundable, not depreciated)' },
+  ],
+  // Quick-add templates for recurring monthly fixed expenses (added into
+  // config.fixedExpenses on click). Amount is just a starter — admin edits.
+  recurringTemplates: [
+    { name:'Rent',                       amount:0 },
+    { name:'Electricity',                amount:0 },
+    { name:'Water',                      amount:0 },
+    { name:'Internet & Wi-Fi',           amount:0 },
+    { name:'Phone / Mobile',             amount:0 },
+    { name:'Music License Subscription', amount:0 },
+    { name:'POS / Software Subscription',amount:0 },
+    { name:'Insurance Premium',          amount:0 },
+    { name:'AMC — AC',                   amount:0 },
+    { name:'AMC — Equipment',            amount:0 },
+    { name:'Accountant Retainer',        amount:0 },
+    { name:'Pest Control',               amount:0 },
+    { name:'Security / Housekeeping',    amount:0 },
+    { name:'Towel Laundry',              amount:0 },
+  ],
   services: {
     // ─── MEN'S SERVICES ───
     "Men · Hair Essentials": [
@@ -2936,6 +3129,9 @@ let state = {
   apptEditingId: null,  // when editing an existing appointment
   apptCheckoutId: null, // appointment that fed the active billing cart (for completion link)
   apptRemindedIds: {},  // local set of reminder IDs already fired this session
+  capex: [],            // live cache of all CapEx docs (subscribed)
+  capexEditingId: null, // when editing an existing CapEx item
+  capexFilter: 'all',   // category filter on CapEx tab
 };
 
 function loadConfig() {
@@ -3402,6 +3598,12 @@ function subscribeLiveCollections() {
       if (d.appointment && typeof d.appointment === 'object') {
         config.appointment = Object.assign({}, DEFAULTS.appointment, config.appointment, d.appointment);
       }
+      if (Array.isArray(d.capexCategories) && d.capexCategories.length) {
+        config.capexCategories = d.capexCategories;
+      }
+      if (Array.isArray(d.recurringTemplates)) {
+        config.recurringTemplates = d.recurringTemplates;
+      }
       if (JSON.stringify(config) !== before) {
         saveConfig();
         rerenderActive();
@@ -3480,6 +3682,16 @@ function subscribeLiveCollections() {
     },
     err => console.warn('appointments snapshot error:', err && err.code)
   ));
+
+  // CapEx — live cache of capital expenditure entries.
+  liveUnsubs.push(db.collection(COL.CAPEX).onSnapshot(
+    snap => {
+      state.capex = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (state.screen === 'admin' && state.adminTab === 'capex') renderAdminCapex();
+      if (state.screen === 'admin' && state.adminTab === 'dashboard') renderAdminDashboard();
+    },
+    err => console.warn('capex snapshot error:', err && err.code)
+  ));
 }
 
 // Re-render whichever screen is currently active so live updates reflect.
@@ -3497,6 +3709,8 @@ function rerenderActive() {
     } else if (state.adminTab === 'expenses') {
       // refresh just the fixed expenses portion via full re-render
       renderAdminExpenses();
+    } else if (state.adminTab === 'capex') {
+      renderAdminCapex();
     } else if (state.adminTab === 'payroll') {
       renderAdminPayroll();
     }
@@ -6234,7 +6448,7 @@ function setAdminTab(t) {
   closeAdminNavMenu();
 
   state.adminTab = t;
-  ['dashboard','analytics','sales','customers','attendance','expenses','payroll','advances','emi','setup','team','security'].forEach(n => {
+  ['dashboard','analytics','sales','customers','attendance','expenses','capex','payroll','advances','emi','setup','team','security'].forEach(n => {
     const el = document.getElementById('admin-tab-' + n);
     if (el) el.style.display = (n === t) ? '' : 'none';
   });
@@ -6244,6 +6458,7 @@ function setAdminTab(t) {
   if (t === 'customers') renderAdminCustomers();
   if (t === 'attendance') renderAdminAttendance();
   if (t === 'expenses') renderAdminExpenses();
+  if (t === 'capex') renderAdminCapex();
   if (t === 'payroll') renderAdminPayroll();
   if (t === 'advances') renderAdminAdvances();
   if (t === 'emi') renderAdminEMI();
@@ -6282,6 +6497,8 @@ const ADMIN_HERO_META = {
                img:'https://images.pexels.com/photos/3993210/pexels-photo-3993210.jpeg?auto=compress&cs=tinysrgb&w=1280' },
   expenses:  { eyebrow:'Expenses',   title:'Where the money goes',       sub:'Fixed costs & variable spending',
                img:'https://images.pexels.com/photos/210600/pexels-photo-210600.jpeg?auto=compress&cs=tinysrgb&w=1280' },
+  capex:     { eyebrow:'Capital Expenditure', title:'Your investment in the salon', sub:'Setup costs, equipment, deposits & depreciation',
+               img:'https://images.pexels.com/photos/3993210/pexels-photo-3993210.jpeg?auto=compress&cs=tinysrgb&w=1280' },
   payroll:   { eyebrow:'Payroll',    title:'Take care of your team',     sub:'Salaries, commissions, attendance',
                img:'https://images.pexels.com/photos/3992872/pexels-photo-3992872.jpeg?auto=compress&cs=tinysrgb&w=1280' },
   advances:  { eyebrow:'Advances',   title:'Staff cash advances',        sub:'Auto-deducted from next salary',
@@ -10949,6 +11166,384 @@ setInterval(() => {
   // Also keep the live Today's strip fresh for time-based "Soon" badges.
   if (state.screen === 'staff') renderStaffApptStrip();
 }, 60 * 1000);
+
+/* ════════════════════════════════════════════════════
+   CAPEX MODULE — Capital Expenditure tracking
+   ----------------------------------------------------
+   One-time setup investments (interior, equipment, deposits,
+   licenses, soft-launch). Calculates total invested, monthly
+   straight-line depreciation, refundable deposits, and gives
+   admin a quick-add UI for industry-standard salon categories
+   plus the ability to register custom categories.
+═════════════════════════════════════════════════════ */
+
+function _capexCats() {
+  const arr = Array.isArray(config.capexCategories) && config.capexCategories.length
+    ? config.capexCategories
+    : DEFAULTS.capexCategories;
+  return arr.map(c => Object.assign({ kind:'asset', dep:60, hint:'' }, c));
+}
+
+function _capexCat(name) {
+  return _capexCats().find(c => c.name === name) || { name, kind:'asset', dep:60, hint:'' };
+}
+
+function _capexMonthsElapsed(purchaseDate, asOf) {
+  if (!purchaseDate) return 0;
+  const a = new Date(purchaseDate), b = new Date(asOf || todayISO());
+  if (isNaN(a) || isNaN(b)) return 0;
+  let m = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
+  if (b.getDate() < a.getDate()) m -= 1;
+  return Math.max(0, m);
+}
+
+/**
+ * Returns { totalInvested, depreciableAssets, oneOffExpenses, refundableDeposits,
+ *           monthlyDepreciation, accumulatedDepreciation, netBookValue,
+ *           byCategory: { [catName]: { amount, count } }, count }
+ * Computed across the entire CapEx ledger, asOf today.
+ */
+function computeCapexSummary() {
+  const items = state.capex || [];
+  const cats  = _capexCats();
+  const today = todayISO();
+  const byCategory = {};
+  cats.forEach(c => { byCategory[c.name] = { amount:0, count:0, kind:c.kind }; });
+  let totalInvested = 0, depreciableAssets = 0, oneOffExpenses = 0, refundableDeposits = 0;
+  let monthlyDepreciation = 0, accumulatedDepreciation = 0;
+  items.forEach(it => {
+    const amt = parseFloat(it.amount) || 0;
+    const cat = _capexCat(it.category);
+    const kind = it.kind || cat.kind || 'asset';
+    totalInvested += amt;
+    if (!byCategory[it.category]) byCategory[it.category] = { amount:0, count:0, kind };
+    byCategory[it.category].amount += amt;
+    byCategory[it.category].count++;
+    if (kind === 'deposit')  refundableDeposits += amt;
+    else if (kind === 'expense') oneOffExpenses += amt;
+    else {
+      depreciableAssets += amt;
+      const dep = parseInt(it.depreciationMonths != null ? it.depreciationMonths : cat.dep, 10) || 0;
+      if (dep > 0) {
+        const monthly = amt / dep;
+        monthlyDepreciation += monthly;
+        const elapsed = Math.min(dep, _capexMonthsElapsed(it.date, today));
+        accumulatedDepreciation += monthly * elapsed;
+      }
+    }
+  });
+  const netBookValue = depreciableAssets - accumulatedDepreciation + refundableDeposits;
+  return {
+    totalInvested, depreciableAssets, oneOffExpenses, refundableDeposits,
+    monthlyDepreciation, accumulatedDepreciation, netBookValue,
+    byCategory, count: items.length,
+  };
+}
+
+function renderAdminCapex() {
+  const host = document.getElementById('admin-tab-capex');
+  if (!host) return;
+  const sum = computeCapexSummary();
+  const cats = _capexCats();
+  const filter = state.capexFilter || 'all';
+  const items = (state.capex || [])
+    .filter(it => filter === 'all' ? true : it.category === filter)
+    .sort((a,b) => String(b.date || '').localeCompare(String(a.date || '')));
+
+  // KPI cards
+  const kpis = `
+    <div class="capex-kpis">
+      <div class="capex-kpi full">
+        <div class="capex-kpi-label">Total Invested</div>
+        <div class="capex-kpi-value">₹${fmt(sum.totalInvested)}</div>
+        <div class="capex-kpi-sub">${sum.count} entries · across ${Object.values(sum.byCategory).filter(c => c.amount > 0).length} categories</div>
+      </div>
+      <div class="capex-kpi">
+        <div class="capex-kpi-label">Depreciable Assets</div>
+        <div class="capex-kpi-value">₹${fmt(sum.depreciableAssets)}</div>
+        <div class="capex-kpi-sub">Equipment, furniture, fit-out</div>
+      </div>
+      <div class="capex-kpi">
+        <div class="capex-kpi-label">Refundable Deposits</div>
+        <div class="capex-kpi-value">₹${fmt(sum.refundableDeposits)}</div>
+        <div class="capex-kpi-sub">Recoverable on exit</div>
+      </div>
+      <div class="capex-kpi">
+        <div class="capex-kpi-label">Monthly Depreciation</div>
+        <div class="capex-kpi-value">₹${fmt(sum.monthlyDepreciation)}</div>
+        <div class="capex-kpi-sub">Straight-line, current rate</div>
+      </div>
+      <div class="capex-kpi">
+        <div class="capex-kpi-label">Net Book Value</div>
+        <div class="capex-kpi-value">₹${fmt(sum.netBookValue)}</div>
+        <div class="capex-kpi-sub">Assets − accumulated dep + deposits</div>
+      </div>
+    </div>
+  `;
+
+  const toolbar = `
+    <div class="capex-toolbar">
+      <button class="primary" onclick="openCapexModal()">+ Add Capital Expense</button>
+      <button onclick="openModal('modal-capex-cat')">+ Custom Category</button>
+      <button onclick="exportCapexCSV()">Export CSV</button>
+    </div>
+  `;
+
+  // Category chips
+  const chipAll = `<div class="capex-cat-chip ${filter==='all'?'active':''}" onclick="setCapexFilter('all')">All <span class="pill-amt">₹${fmt(sum.totalInvested)}</span></div>`;
+  const chips = cats.map(c => {
+    const data = sum.byCategory[c.name] || { amount:0, count:0 };
+    if (filter === 'all' && data.amount === 0) return ''; // hide empty in "all"
+    return `<div class="capex-cat-chip ${filter===c.name?'active':''}" onclick="setCapexFilter('${escAttr(c.name)}')">${esc(c.name)} <span class="pill-amt">₹${fmt(data.amount)}</span></div>`;
+  }).join('');
+
+  // List
+  let listHtml = '';
+  if (!items.length) {
+    listHtml = `<div class="capex-empty">${filter==='all' ? 'No capital expenditure recorded yet.<br><span style="font-size:11px;">Tap “+ Add Capital Expense” to start tracking your investment.</span>' : 'No items in this category.'}</div>`;
+  } else {
+    listHtml = '<div class="capex-list">' + items.map(it => {
+      const cat = _capexCat(it.category);
+      const kind = it.kind || cat.kind || 'asset';
+      const dep = parseInt(it.depreciationMonths != null ? it.depreciationMonths : cat.dep, 10) || 0;
+      const amt = parseFloat(it.amount) || 0;
+      let depSub = '';
+      if (kind === 'asset' && dep > 0) {
+        const elapsed = Math.min(dep, _capexMonthsElapsed(it.date, todayISO()));
+        const monthly = amt / dep;
+        const acc = monthly * elapsed;
+        depSub = `· ${dep}mo dep · ${elapsed}mo elapsed`;
+      } else if (kind === 'deposit') depSub = '· refundable';
+      else if (kind === 'expense')   depSub = '· one-time expense';
+      const meta = [
+        it.date,
+        it.vendor || '',
+        it.invoiceNo ? '#' + it.invoiceNo : '',
+        it.payment || '',
+        depSub,
+      ].filter(Boolean).join(' · ');
+      return `
+        <div class="capex-card kind-${esc(kind)}" onclick="openCapexModal('${it.id}')">
+          <div style="flex:1;min-width:0;">
+            <div class="cap-cat-tag">${esc(it.category || 'Uncategorised')}</div>
+            <div class="cap-item">${esc(it.item || '—')}</div>
+            <div class="cap-meta">${esc(meta)}</div>
+            ${it.notes ? `<div class="cap-meta" style="margin-top:4px;font-style:italic;">${esc(it.notes)}</div>` : ''}
+          </div>
+          <div>
+            <div class="cap-amount">₹${fmt(amt)}</div>
+            <div class="cap-amount-sub">${esc(kind === 'deposit' ? 'DEPOSIT' : kind === 'expense' ? 'EXPENSE' : 'ASSET')}</div>
+          </div>
+        </div>
+      `;
+    }).join('') + '</div>';
+  }
+
+  // Recurring templates (one-click add to fixed expenses)
+  const existing = new Set((config.fixedExpenses || []).map(f => String(f.name || '').toLowerCase()));
+  const tpls = (config.recurringTemplates || DEFAULTS.recurringTemplates || []);
+  const templatesHtml = `
+    <div class="capex-section-title">Quick-add Recurring Monthly Expenses</div>
+    <div class="muted-text" style="margin-bottom:10px;font-size:12px;">Tap to add to your monthly fixed expenses (you can edit the amount in the Expenses tab afterwards).</div>
+    <div class="capex-templates">
+      ${tpls.map(t => {
+        const added = existing.has(String(t.name).toLowerCase());
+        return `<div class="capex-template ${added?'added':''}" ${added?'':`onclick="quickAddRecurring('${escAttr(t.name)}', ${t.amount||0})"`} title="${added?'Already added':'Add to monthly fixed expenses'}">${added?'✓ ':'+ '}${esc(t.name)}</div>`;
+      }).join('')}
+    </div>
+  `;
+
+  host.innerHTML = `
+    ${kpis}
+    ${toolbar}
+    <div class="capex-cat-chips">${chipAll}${chips}</div>
+    ${listHtml}
+    ${templatesHtml}
+  `;
+}
+
+function setCapexFilter(name) {
+  state.capexFilter = name;
+  renderAdminCapex();
+}
+
+function openCapexModal(id) {
+  state.capexEditingId = id || null;
+  const cats = _capexCats();
+  const sel = document.getElementById('capex-category');
+  sel.innerHTML = cats.map(c => `<option value="${escAttr(c.name)}">${esc(c.name)}</option>`).join('');
+  // Linked EMI dropdown
+  const emiSel = document.getElementById('capex-emi');
+  emiSel.innerHTML = '<option value="">— None —</option>' +
+    (config.emi || []).map(e => `<option value="${escAttr(e.id)}">${esc(e.name)} · ₹${fmt(e.totalAmount||0)}</option>`).join('');
+  const titleEl = document.getElementById('capex-modal-title');
+  const delBtn = document.getElementById('capex-delete-btn');
+  if (id) {
+    const it = (state.capex || []).find(x => x.id === id);
+    if (!it) { toast('CapEx item not found'); return; }
+    sel.value = it.category;
+    document.getElementById('capex-item').value = it.item || '';
+    document.getElementById('capex-date').value = it.date || todayISO();
+    document.getElementById('capex-amount').value = it.amount || '';
+    document.getElementById('capex-vendor').value = it.vendor || '';
+    document.getElementById('capex-invoice').value = it.invoiceNo || '';
+    document.getElementById('capex-payment').value = it.payment || 'Cash';
+    document.getElementById('capex-emi').value = it.linkedEmiId || '';
+    document.getElementById('capex-dep').value = it.depreciationMonths != null ? it.depreciationMonths : (_capexCat(it.category).dep || 0);
+    document.getElementById('capex-qty').value = it.quantity || 1;
+    document.getElementById('capex-notes').value = it.notes || '';
+    if (titleEl) titleEl.textContent = 'Edit Capital Expense';
+    if (delBtn) delBtn.style.display = '';
+  } else {
+    const firstCat = cats[0] || { name:'', dep:60 };
+    sel.value = firstCat.name;
+    document.getElementById('capex-item').value = '';
+    document.getElementById('capex-date').value = todayISO();
+    document.getElementById('capex-amount').value = '';
+    document.getElementById('capex-vendor').value = '';
+    document.getElementById('capex-invoice').value = '';
+    document.getElementById('capex-payment').value = 'Cash';
+    document.getElementById('capex-emi').value = '';
+    document.getElementById('capex-dep').value = firstCat.dep || 60;
+    document.getElementById('capex-qty').value = 1;
+    document.getElementById('capex-notes').value = '';
+    if (titleEl) titleEl.textContent = 'Add Capital Expense';
+    if (delBtn) delBtn.style.display = 'none';
+  }
+  onCapexCategoryChange();
+  openModal('modal-capex');
+}
+
+function onCapexCategoryChange() {
+  const sel = document.getElementById('capex-category');
+  if (!sel) return;
+  const cat = _capexCat(sel.value);
+  const hint = document.getElementById('capex-cat-hint');
+  if (hint) hint.textContent = cat.hint ? cat.hint + (cat.kind === 'deposit' ? ' (refundable, not depreciated)' : cat.kind === 'expense' ? ' (one-time expense)' : '') : '';
+  // Auto-fill suggested depreciation only when adding a new entry
+  if (!state.capexEditingId) {
+    const depEl = document.getElementById('capex-dep');
+    if (depEl) depEl.value = cat.kind === 'asset' ? (cat.dep || 60) : 0;
+  }
+}
+
+async function saveCapex() {
+  const category = document.getElementById('capex-category').value;
+  const item     = String(document.getElementById('capex-item').value || '').trim();
+  const date     = document.getElementById('capex-date').value;
+  const amount   = parseFloat(document.getElementById('capex-amount').value) || 0;
+  const vendor   = String(document.getElementById('capex-vendor').value || '').trim();
+  const invoiceNo= String(document.getElementById('capex-invoice').value || '').trim();
+  const payment  = document.getElementById('capex-payment').value;
+  const linkedEmiId = document.getElementById('capex-emi').value;
+  const dep      = parseInt(document.getElementById('capex-dep').value, 10) || 0;
+  const qty      = parseInt(document.getElementById('capex-qty').value, 10) || 1;
+  const notes    = String(document.getElementById('capex-notes').value || '').trim();
+  if (!category) { toast('Pick a category'); return; }
+  if (!item)     { toast('Item / description is required'); return; }
+  if (!date)     { toast('Purchase date is required'); return; }
+  if (!(amount > 0)) { toast('Amount must be greater than 0'); return; }
+  const cat = _capexCat(category);
+  const payload = {
+    category, item, date, amount,
+    vendor, invoiceNo, payment, linkedEmiId,
+    depreciationMonths: dep, quantity: qty, notes,
+    kind: cat.kind || 'asset',
+    updatedAt: new Date().toISOString(),
+  };
+  try {
+    if (state.capexEditingId) {
+      await db.collection(COL.CAPEX).doc(state.capexEditingId).set(payload, { merge: true });
+      logAudit('capex.update', COL.CAPEX + '/' + state.capexEditingId, { category, amount });
+      toast('Capital expense updated');
+    } else {
+      payload.createdAt = new Date().toISOString();
+      const newId = await fbAppendDoc(COL.CAPEX, payload);
+      if (!newId) { toast('Save failed — check connection'); return; }
+      logAudit('capex.create', COL.CAPEX + '/' + newId, { category, amount });
+      toast('Capital expense recorded ✓');
+    }
+    closeModal('modal-capex');
+    state.capexEditingId = null;
+    renderAdminCapex();
+  } catch (e) {
+    console.error('capex save failed', e);
+    toast('Save failed — try again');
+  }
+}
+
+async function deleteCapex() {
+  const id = state.capexEditingId;
+  if (!id) return;
+  if (!confirm('Delete this capital expense entry permanently?')) return;
+  try {
+    await db.collection(COL.CAPEX).doc(id).delete();
+    logAudit('capex.delete', COL.CAPEX + '/' + id);
+    toast('Entry deleted');
+    closeModal('modal-capex');
+    state.capexEditingId = null;
+    renderAdminCapex();
+  } catch (e) { console.error(e); toast('Delete failed'); }
+}
+
+async function saveCapexCategory() {
+  const name = String(document.getElementById('capex-cat-name').value || '').trim();
+  const kind = document.getElementById('capex-cat-kind').value || 'asset';
+  const dep  = parseInt(document.getElementById('capex-cat-dep').value, 10) || 0;
+  const hint = String(document.getElementById('capex-cat-hint-input').value || '').trim();
+  if (!name) { toast('Category name is required'); return; }
+  const cats = _capexCats();
+  if (cats.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+    toast('Category already exists'); return;
+  }
+  const next = cats.concat([{ name, kind, dep, hint }]);
+  config.capexCategories = next;
+  saveConfig();
+  await fbSetConfig({ capexCategories: next });
+  toast('Category added ✓');
+  closeModal('modal-capex-cat');
+  renderAdminCapex();
+}
+
+async function quickAddRecurring(name, amount) {
+  if (!name) return;
+  const exists = (config.fixedExpenses || []).some(f => String(f.name || '').toLowerCase() === name.toLowerCase());
+  if (exists) { toast('Already added'); return; }
+  const id = uid();
+  const row = { id, name, amount: parseFloat(amount) || 0, active: true };
+  try {
+    await db.collection(COL.FIXED).doc(id).set(row);
+    logAudit('fixed.create', COL.FIXED + '/' + id, { name });
+    toast('Added to monthly expenses ✓');
+    renderAdminCapex();
+  } catch (e) { console.error(e); toast('Add failed'); }
+}
+
+function exportCapexCSV() {
+  const items = state.capex || [];
+  if (!items.length) { toast('No CapEx data to export'); return; }
+  const headers = ['Date','Category','Kind','Item','Vendor','Invoice','Payment','Amount','DepreciationMonths','Quantity','Notes'];
+  const rows = items.map(it => {
+    const cat = _capexCat(it.category);
+    return [
+      it.date || '', it.category || '', it.kind || cat.kind || '', it.item || '',
+      it.vendor || '', it.invoiceNo || '', it.payment || '', parseFloat(it.amount) || 0,
+      it.depreciationMonths != null ? it.depreciationMonths : (cat.dep || 0),
+      it.quantity || 1, (it.notes || '').replace(/[\r\n]+/g, ' '),
+    ];
+  });
+  const csv = [headers, ...rows].map(r => r.map(v => {
+    const s = String(v == null ? '' : v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `capex-${todayISO()}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 // ── START ──
 init();

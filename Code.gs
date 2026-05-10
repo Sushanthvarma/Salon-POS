@@ -29,6 +29,7 @@ const TABS = {
   ATTENDANCE:    'Attendance',
   FOOTFALL:      'Footfall',
   APPOINTMENTS:  'Appointments',
+  CAPEX:         'CapEx',
 };
 
 const HEADERS = {
@@ -43,6 +44,7 @@ const HEADERS = {
   Attendance:    ['id','date','staffName','checkIn'],
   Footfall:      ['date','count'],
   Appointments:  ['id','date','startTime','endTime','durationMins','customerName','customerPhone','customerId','servicesText','staffNamesText','notes','status','linkedTransactionId','billedTotal','reminderSent','updatedAt'],
+  CapEx:         ['id','date','category','kind','item','vendor','invoiceNo','payment','amount','depreciationMonths','quantity','linkedEmiId','notes','updatedAt'],
 };
 
 /* ========== ENTRY POINTS ========== */
@@ -61,6 +63,7 @@ function route_(e) {
     if (action === 'getExpenses')      return ok_({ expenses:     getRowsForMonth_(TABS.EXPENSES,     p.month) });
     if (action === 'getSalaries')      return ok_({ salaries:     readTab_(TABS.SALARIES) });
     if (action === 'getAppointments')  return ok_({ appointments: getAppointmentsForRange_(p.from, p.to) });
+    if (action === 'getCapex')         return ok_({ capex: readTab_(TABS.CAPEX) });
 
     if (action === 'write') {
       const payloadRaw = p.payload || '';
@@ -102,6 +105,8 @@ function handleWrite_(payload, providedKey) {
   if (sub === 'saveConfig')         return saveConfig_(payload.config);
   if (sub === 'logAppointment')     return upsertAppointment_(payload.row);
   if (sub === 'deleteAppointment')  return deleteAppointmentRow_(payload.id);
+  if (sub === 'logCapex')           return upsertCapex_(payload.row);
+  if (sub === 'deleteCapex')        return deleteCapexRow_(payload.id);
 
   throw new Error('Unknown write sub-action: ' + sub);
 }
@@ -389,6 +394,55 @@ function getAppointmentsForRange_(from, to) {
     if (to   && d > to)   return false;
     return true;
   });
+}
+
+/* ========== CAPEX (Capital Expenditure) ========== */
+function upsertCapex_(row) {
+  if (!row || !row.id) throw new Error('CapEx row missing id');
+  const sh = ensureTab_(TABS.CAPEX, HEADERS.CapEx);
+  const headers = HEADERS.CapEx;
+  const flat = {
+    id:                  row.id || '',
+    date:                row.date || '',
+    category:            row.category || '',
+    kind:                row.kind || 'asset',
+    item:                row.item || '',
+    vendor:              row.vendor || '',
+    invoiceNo:           row.invoiceNo || '',
+    payment:             row.payment || '',
+    amount:              parseFloat(row.amount) || 0,
+    depreciationMonths:  parseInt(row.depreciationMonths) || 0,
+    quantity:            parseInt(row.quantity) || 1,
+    linkedEmiId:         row.linkedEmiId || '',
+    notes:               row.notes || '',
+    updatedAt:           row.updatedAt || new Date().toISOString(),
+  };
+  const data = sh.getDataRange().getValues();
+  const idIdx = headers.indexOf('id');
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idIdx]) === String(row.id)) {
+      const out = headers.map(h => flat[h] !== undefined ? flat[h] : data[i][headers.indexOf(h)] || '');
+      sh.getRange(i + 1, 1, 1, headers.length).setValues([out]);
+      return { updated: 1, id: row.id };
+    }
+  }
+  const out = headers.map(h => flat[h] !== undefined ? flat[h] : '');
+  sh.appendRow(out);
+  return { appended: 1, id: row.id };
+}
+
+function deleteCapexRow_(id) {
+  if (!id) throw new Error('CapEx id required');
+  const sh = ensureTab_(TABS.CAPEX, HEADERS.CapEx);
+  const data = sh.getDataRange().getValues();
+  const idIdx = HEADERS.CapEx.indexOf('id');
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idIdx]) === String(id)) {
+      sh.deleteRow(i + 1);
+      return { deleted: 1, id: id };
+    }
+  }
+  return { deleted: 0, id: id };
 }
 
 /* ========== RESPONSE WRAPPERS ========== */
