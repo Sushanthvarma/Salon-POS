@@ -2258,25 +2258,30 @@ img, video, canvas, svg{max-width:100%;height:auto;}
 <div class="modal-backdrop" id="modal-edit-tx-datetime">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Edit Transaction Date &amp; Time</div>
-    <div class="muted-text" style="font-size:12px;margin-bottom:14px;line-height:1.5;">
-      Use this only to correct a wrong date/time on a previously saved bill. Requires admin PIN and a reason. Both the source day and the new day must be unlocked.
+    <div class="modal-title">Edit Date &amp; Time</div>
+    <div class="muted-text" style="font-size:12px;margin:-6px 0 16px;line-height:1.55;">
+      Correct the date or time for a previously saved bill. Requires admin PIN and a reason. Both source and target days must be unlocked.
     </div>
-    <div class="modal-field">
-      <label class="modal-label">Bill Reference</label>
-      <input type="text" class="modal-input" id="edit-tx-ref" readonly style="background:var(--surface-alt,#f6f1e9);color:var(--muted);">
+
+    <div class="erp-card" style="margin-bottom:18px;padding:12px 14px;">
+      <div class="erp-label">Bill</div>
+      <div class="erp-value" id="edit-tx-ref-label" style="font-size:18px;">—</div>
+      <div class="erp-sub" id="edit-tx-current">Currently filed as: —</div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="modal-field">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="modal-field" style="margin-bottom:10px;">
         <label class="modal-label">New Date</label>
         <input type="date" class="modal-input" id="edit-tx-date">
       </div>
-      <div class="modal-field">
+      <div class="modal-field" style="margin-bottom:10px;">
         <label class="modal-label">New Time</label>
         <input type="time" class="modal-input" id="edit-tx-time">
       </div>
     </div>
-    <div class="muted-text" id="edit-tx-current" style="font-size:12px;margin:-6px 0 14px;"></div>
+
+    <button class="btn btn-secondary" style="width:100%;margin-bottom:18px;font-size:12px;padding:10px 14px;" onclick="setEditTxToNow()">Set to Now (IST)</button>
+
     <div class="modal-btns">
       <button class="btn btn-secondary" onclick="closeModal('modal-edit-tx-datetime')">Cancel</button>
       <button class="btn btn-primary" onclick="confirmEditTransactionDateTime()">Save Changes</button>
@@ -7104,15 +7109,25 @@ function editTransactionDateTime(txId, currentDate, currentTime) {
     return `${String(h).padStart(2, '0')}:${mi}`;
   })();
   window.__editTxCtx = { id: txId, currentDate, currentTime: currentTime || '' };
-  const refEl = document.getElementById('edit-tx-ref');
-  if (refEl) refEl.value = `Bill ${String(txId).slice(-6).toUpperCase()}`;
+  const refEl = document.getElementById('edit-tx-ref-label');
+  if (refEl) refEl.textContent = `#${String(txId).slice(-6).toUpperCase()}`;
   const dEl = document.getElementById('edit-tx-date');
   if (dEl) dEl.value = currentDate || todayISO();
   const tEl = document.getElementById('edit-tx-time');
   if (tEl) tEl.value = time24 || '';
   const curEl = document.getElementById('edit-tx-current');
-  if (curEl) curEl.textContent = `Currently filed as: ${currentDate || '—'} ${currentTime || ''}`.trim();
+  if (curEl) curEl.textContent = `Currently filed as: ${currentDate || '—'}${currentTime ? ' · ' + currentTime : ''}`;
   openModal('modal-edit-tx-datetime');
+}
+
+function setEditTxToNow() {
+  const dEl = document.getElementById('edit-tx-date');
+  const tEl = document.getElementById('edit-tx-time');
+  if (dEl) dEl.value = todayISO();
+  if (tEl) {
+    const d = nowIST();
+    tEl.value = `${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')}`;
+  }
 }
 
 async function confirmEditTransactionDateTime() {
