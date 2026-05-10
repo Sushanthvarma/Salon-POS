@@ -4385,7 +4385,7 @@ function renderStaffDashboard() {
     if (summaryHost) summaryHost.innerHTML = '';
     return;
   }
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const today = todayISO(); // IST calendar date — matches transaction stamping
   let cPresent = 0, cHalf = 0, cLeave = 0, cPending = 0;
   const cards = config.staff.map(s => {
     const att = (s.attendance || []).find(a => a.date === today) || {};
@@ -4554,7 +4554,7 @@ function _attCtx(staffName) {
   if (idx === -1) return null;
   const staff = config.staff[idx];
   if (!staff.attendance) staff.attendance = [];
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayISO(); // IST — never UTC, otherwise check-ins after IST midnight log to yesterday
   let rec = staff.attendance.find(a => a.date === today);
   if (!rec) {
     rec = { date: today, checkInTime: null, checkOutTime: null, isHalfDay: false };
@@ -4570,7 +4570,8 @@ function _attStampAudit(rec) {
 }
 
 function _attNowStr() {
-  return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  // IST 12-hour clock — same format used on transactions so reports stay consistent.
+  return nowTimeIST();
 }
 
 function _attTimeToMins(s) {
