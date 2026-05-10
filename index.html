@@ -1114,6 +1114,101 @@ img, video, canvas, svg{max-width:100%;height:auto;}
     border-width:0.5px;
   }
 }
+
+/* ──────────────────────────────────────────────
+   APPOINTMENTS — calendar, slots & booking modal
+────────────────────────────────────────────── */
+.appt-toolbar{display:flex;align-items:center;gap:10px;padding:14px 18px 8px;flex-wrap:wrap;}
+.appt-toolbar .appt-date-input{flex:1;min-width:160px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:14px;color:var(--ink);font-family:inherit;}
+.appt-nav-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.appt-nav-btn:active{background:var(--surface-2);}
+.appt-cta{background:var(--ink);color:#FFF;border:none;padding:11px 18px;border-radius:10px;font-weight:600;font-size:13px;letter-spacing:.02em;cursor:pointer;}
+.appt-cta:active{background:#000;transform:scale(.98);}
+.appt-summary{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 12px;font-size:12px;color:var(--muted);}
+.appt-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line-soft);font-weight:500;}
+.appt-chip strong{color:var(--ink);}
+.appt-chip.full{background:#FEF2F2;color:#991B1B;border-color:#FCA5A5;}
+.appt-chip.busy{background:#FEF3C7;color:#92400E;border-color:#FCD34D;}
+.appt-chip.free{background:#ECFDF5;color:#065F46;border-color:#6EE7B7;}
+.appt-section-title{font-size:11px;letter-spacing:.16em;color:var(--muted);font-weight:600;text-transform:uppercase;padding:14px 18px 6px;}
+.appt-list{padding:4px 14px 80px;display:flex;flex-direction:column;gap:8px;}
+.appt-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:var(--shadow-card);}
+.appt-card.status-completed{opacity:.62;}
+.appt-card.status-cancelled{opacity:.5;background:#FAFAFA;border-style:dashed;}
+.appt-card.status-noshow{background:#FFF7ED;border-color:#FED7AA;}
+.appt-card.status-inprogress{border-color:var(--success);box-shadow:0 0 0 2px rgba(16,185,129,.15);}
+.appt-time{flex-shrink:0;width:64px;text-align:center;border-right:1px solid var(--line-soft);padding-right:10px;}
+.appt-time-start{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);line-height:1;}
+.appt-time-end{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.04em;}
+.appt-body{flex:1;min-width:0;}
+.appt-body .appt-name{font-weight:600;font-size:14.5px;color:var(--ink);}
+.appt-body .appt-phone{font-size:12px;color:var(--muted);margin-top:2px;}
+.appt-body .appt-svcs{font-size:12.5px;color:var(--ink);margin-top:6px;line-height:1.45;}
+.appt-body .appt-svcs .room-mark{display:inline-block;font-size:10px;background:var(--champagne-bg);color:var(--terracotta);padding:1px 6px;border-radius:6px;margin-left:4px;letter-spacing:.04em;font-weight:600;text-transform:uppercase;}
+.appt-staff-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.appt-staff-tag{font-size:10.5px;background:var(--surface-2);color:var(--ink);padding:3px 8px;border-radius:999px;letter-spacing:.02em;border:1px solid var(--line-soft);}
+.appt-status-pill{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:999px;text-transform:uppercase;}
+.appt-status-pill.booked{background:var(--surface-2);color:var(--ink);}
+.appt-status-pill.inprogress{background:#ECFDF5;color:#065F46;}
+.appt-status-pill.completed{background:#F1F5F9;color:#475569;}
+.appt-status-pill.cancelled{background:#FEF2F2;color:#991B1B;}
+.appt-status-pill.noshow{background:#FFF7ED;color:#9A3412;}
+.appt-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.appt-actions button{font-size:11.5px;font-weight:600;padding:6px 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;letter-spacing:.02em;}
+.appt-actions button.primary{background:var(--ink);color:#FFF;border-color:var(--ink);}
+.appt-actions button.danger{color:var(--danger);border-color:#FCA5A5;background:#FEF2F2;}
+.appt-actions button.success{color:#065F46;border-color:#6EE7B7;background:#ECFDF5;}
+.appt-empty{text-align:center;padding:30px 20px;color:var(--muted);font-size:13px;background:var(--surface);border:1px dashed var(--line);border-radius:14px;}
+
+/* Slot grid */
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;padding:10px 0;}
+.slot-cell{padding:9px 4px;text-align:center;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--line-soft);background:var(--surface);color:var(--ink);transition:all .15s;}
+.slot-cell.unavailable{background:#FEF2F2;color:#991B1B;border-color:#FCA5A5;cursor:not-allowed;opacity:.7;}
+.slot-cell.partial{background:#FEF3C7;color:#92400E;border-color:#FCD34D;}
+.slot-cell.selected{background:var(--ink);color:#FFF;border-color:var(--ink);transform:scale(1.04);}
+.slot-cell.past{background:#FAFAFA;color:#9CA3AF;border-style:dashed;cursor:not-allowed;}
+
+/* Cart per-item staff selector */
+.cart-item-staff-row{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;}
+.cart-item-staff-row label{color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;flex-shrink:0;}
+.cart-item-staff-row select{flex:1;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:12.5px;font-family:inherit;color:var(--ink);min-width:0;}
+
+/* Receipt staff splits panel */
+.staff-splits-panel{background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:12px 14px;margin:-14px 0 20px;}
+.staff-splits-panel .splits-title{font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:8px;}
+.staff-splits-panel .split-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid var(--line-soft);font-size:13px;}
+.staff-splits-panel .split-row:first-of-type{border-top:none;}
+.staff-splits-panel .split-row .split-staff{font-weight:600;color:var(--ink);}
+.staff-splits-panel .split-row .split-amount{color:var(--muted);font-size:12.5px;}
+
+/* Today's appointments strip on staff dashboard */
+.staff-appt-strip{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;padding:14px 16px;margin-bottom:14px;}
+.staff-appt-strip .strip-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.staff-appt-strip .strip-title{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+.staff-appt-strip .strip-link{font-size:12px;font-weight:600;color:var(--terracotta);background:none;border:none;cursor:pointer;letter-spacing:.02em;}
+.staff-appt-strip .next-appt{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line-soft);}
+.staff-appt-strip .next-appt:first-of-type{border-top:none;padding-top:0;}
+.staff-appt-strip .next-appt-time{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);width:56px;flex-shrink:0;}
+.staff-appt-strip .next-appt-meta{flex:1;min-width:0;}
+.staff-appt-strip .next-appt-name{font-weight:600;font-size:13px;color:var(--ink);}
+.staff-appt-strip .next-appt-svc{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.staff-appt-strip .next-appt-soon{font-size:10px;font-weight:700;color:var(--danger);letter-spacing:.08em;text-transform:uppercase;}
+
+/* Booking modal helpers */
+.appt-svc-picker{max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:6px;}
+.appt-svc-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:13px;}
+.appt-svc-row:hover{background:var(--surface-2);}
+.appt-svc-row input[type=checkbox]{width:16px;height:16px;flex-shrink:0;}
+.appt-svc-row .svc-meta{flex:1;min-width:0;}
+.appt-svc-row .svc-meta .svc-name{font-weight:500;color:var(--ink);}
+.appt-svc-row .svc-meta .svc-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.appt-svc-search{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:6px;background:var(--surface);}
+.appt-selected-svc{background:var(--surface);border:1px solid var(--line-soft);border-radius:10px;padding:8px 10px;margin-bottom:6px;display:flex;flex-direction:column;gap:6px;}
+.appt-selected-svc .row1{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.appt-selected-svc .svc-title{font-weight:600;font-size:13px;color:var(--ink);flex:1;min-width:0;}
+.appt-selected-svc .svc-mins{font-size:11px;color:var(--muted);flex-shrink:0;}
+.appt-selected-svc .remove-x{background:none;border:none;color:var(--danger);font-size:18px;cursor:pointer;padding:0 4px;}
+.appt-selected-svc select{padding:6px 8px;border:1px solid var(--line);border-radius:8px;font-size:12.5px;background:var(--surface);font-family:inherit;}
 </style>
 </head>
 <body>
@@ -1366,6 +1461,13 @@ img, video, canvas, svg{max-width:100%;height:auto;}
     </button>
   </div>
 
+  <div class="staff-section" style="padding-top:0;">
+    <div id="staff-appt-strip-host"></div>
+    <button class="new-bill-cta" style="background:var(--surface);color:var(--ink);border:1px solid var(--ink);box-shadow:none;" onclick="showScreen('appointments')">
+      📅 Appointments &amp; Calendar
+    </button>
+  </div>
+
   <div class="staff-section">
     <div class="section-title">Today's Attendance</div>
     <div id="att-summary-strip" class="att-summary"></div>
@@ -1536,6 +1638,27 @@ img, video, canvas, svg{max-width:100%;height:auto;}
     <div class="confirm-subtitle" id="confirm-sub">Bill saved · Counter ready for next customer.</div>
     <button class="btn btn-primary" style="min-width:220px" onclick="resetAndGoHome()">New Customer</button>
   </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN: APPOINTMENTS (calendar + booking)
+     ═══════════════════════════════════════════════════ -->
+<section class="screen" id="screen-appointments">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('staff')">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back
+    </button>
+    <div class="brand-tag">Appointments</div>
+    <div style="width:44px"></div>
+  </div>
+  <div class="appt-toolbar">
+    <button class="appt-nav-btn" onclick="shiftApptDate(-1)" aria-label="Previous day">‹</button>
+    <input type="date" id="appt-date-input" class="appt-date-input" onchange="setApptDate(this.value)">
+    <button class="appt-nav-btn" onclick="shiftApptDate(1)" aria-label="Next day">›</button>
+    <button class="appt-cta" onclick="openApptBooking()">+ Book</button>
+  </div>
+  <div class="appt-summary" id="appt-summary"></div>
+  <div id="appt-list-host"></div>
 </section>
 
 <!-- ═══════════════════════════════════════════════════
@@ -1926,6 +2049,59 @@ img, video, canvas, svg{max-width:100%;height:auto;}
 </div>
 
 <!-- ═══════════════════════════════════════════════════
+     MODAL: BOOK / EDIT APPOINTMENT
+     ═══════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-appointment">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="appt-modal-title">Book Appointment</div>
+    <div class="muted-text" style="font-size:12px;margin:-6px 0 12px;">Customer phone, services & time slot. Conflicts (room limits / overlapping) are blocked automatically.</div>
+
+    <div class="modal-field">
+      <label class="modal-label">Customer Phone (10-digit) *</label>
+      <input type="tel" class="modal-input" id="appt-phone" maxlength="10" placeholder="e.g. 9876543210" inputmode="numeric" oninput="onApptPhoneInput(this.value)">
+      <div class="muted-text" style="font-size:11px;margin-top:4px;" id="appt-phone-hint">Returning customer? Name will auto-fill.</div>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">Customer Name</label>
+      <input type="text" class="modal-input" id="appt-name" placeholder="Walk-in name">
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">Date *</label>
+      <input type="date" class="modal-input" id="appt-mod-date">
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">Services *</label>
+      <input type="text" class="appt-svc-search" id="appt-svc-search" placeholder="Search services to add…" oninput="renderApptSvcPicker(this.value)">
+      <div class="appt-svc-picker" id="appt-svc-picker"></div>
+      <div id="appt-selected-svcs" style="margin-top:8px;"></div>
+      <div class="muted-text" style="font-size:11px;margin-top:6px;" id="appt-duration-hint">Total duration: 0 min</div>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">Start Time *</label>
+      <div class="muted-text" style="font-size:11px;margin-bottom:6px;">Green = open, amber = partial (room near full), red = blocked. Past slots disabled for today.</div>
+      <div class="slot-grid" id="appt-slot-grid"></div>
+      <div class="muted-text" style="font-size:11px;margin-top:6px;" id="appt-slot-hint">Pick services first to see available start times.</div>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">Notes (optional)</label>
+      <textarea class="modal-input" id="appt-notes" rows="2" placeholder="Allergies, preferences, special requests…"></textarea>
+    </div>
+
+    <div class="modal-btns" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-secondary" onclick="closeModal('modal-appointment')">Cancel</button>
+      <button class="btn btn-secondary" id="appt-delete-btn" onclick="deleteAppointment()" style="color:var(--danger);display:none;">Cancel Booking</button>
+      <button class="btn btn-primary" onclick="saveAppointment()" style="flex:1;min-width:120px;">Save Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
      JAVASCRIPT
      ═══════════════════════════════════════════════════ -->
 <!-- Firebase SDK (compat v10) -->
@@ -1990,6 +2166,7 @@ const COL = {
   ADVANCES:      'advances',       // staff cash advances (deducted from salary)
   AUDIT:         'audit',          // append-only audit log of admin actions
   CUSTOMERS:     'customers',      // customer DB keyed by last-5-digits of phone
+  APPOINTMENTS:  'appointments',   // upcoming/past appointments (calendar bookings)
 };
 
 const DEFAULTS = {
@@ -2035,6 +2212,25 @@ const DEFAULTS = {
   // Quick-shortcut slots 1–9 → service name (admin-configurable).
   // Shape: { '1': 'Haircut (Adult)', '2': 'Spa Pedicure (Premium)', … }
   serviceShortcuts: {},
+  // Appointment booking settings — used by the Appointments screen.
+  // massageRooms     : how many parallel massage / spa rooms exist (hard cap on parallel room-bound bookings)
+  // bufferMinutes    : turnaround gap added between back-to-back bookings on the SAME room
+  // slotMinutes      : grid granularity (start times snap to multiples of this)
+  // openingTime      : earliest bookable slot (HH:MM, 24h)
+  // closingTime      : latest slot END time (HH:MM, 24h)
+  // reminderLeadMinutes : how many minutes before start to surface a reminder
+  // roomKeywords     : service name keywords that need a private room (case-insensitive)
+  // chairCapacity    : how many parallel non-room services (cuts, threading, color) can run
+  appointment: {
+    massageRooms:        2,
+    bufferMinutes:       10,
+    slotMinutes:         15,
+    openingTime:         '10:00',
+    closingTime:         '21:00',
+    reminderLeadMinutes: 15,
+    chairCapacity:       4,
+    roomKeywords: ['massage','spa','facial','pedicure','manicure','threading','wax','bleach','clean up','cleanup','straighten','keratin','d-tan','de-tan','detan'],
+  },
   // Menu version — bump this when DEFAULTS.services changes to force-refresh stale local caches.
   servicesVersion: 'v2026-04-full-menu',
   services: {
@@ -2732,6 +2928,12 @@ let state = {
   txInFlight: false,    // guard against double-submit on receipt screen
   expInFlight: false,   // guard for expense save
   _svcCollapsed: {},    // Setup tab: which service categories are collapsed
+  appointments: [],     // live cache of all appointment docs (subscribed)
+  apptDate: todayISO(), // selected date on appointments screen
+  apptDraft: null,      // in-progress booking form data
+  apptEditingId: null,  // when editing an existing appointment
+  apptCheckoutId: null, // appointment that fed the active billing cart (for completion link)
+  apptRemindedIds: {},  // local set of reminder IDs already fired this session
 };
 
 function loadConfig() {
@@ -3195,6 +3397,9 @@ function subscribeLiveCollections() {
       if (Array.isArray(d.supervisorEmails))  config.supervisorEmails = d.supervisorEmails;
       if (Array.isArray(d.staffEmails))       config.staffEmails      = d.staffEmails;
       config.supervisorPermissions = getNormalizedSupervisorPermissions(d.supervisorPermissions || config.supervisorPermissions);
+      if (d.appointment && typeof d.appointment === 'object') {
+        config.appointment = Object.assign({}, DEFAULTS.appointment, config.appointment, d.appointment);
+      }
       if (JSON.stringify(config) !== before) {
         saveConfig();
         rerenderActive();
@@ -3260,6 +3465,19 @@ function subscribeLiveCollections() {
     },
     err => console.warn('emi snapshot error:', err && err.code)
   ));
+
+  // Appointments — live calendar of bookings (all dates; usually small).
+  liveUnsubs.push(db.collection(COL.APPOINTMENTS).onSnapshot(
+    snap => {
+      state.appointments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      // Re-render any visible appointment surfaces
+      if (state.screen === 'appointments') renderAppointmentsScreen();
+      if (state.screen === 'staff') renderStaffApptStrip();
+      // Fire reminders for upcoming bookings (idempotent per session).
+      checkAppointmentReminders();
+    },
+    err => console.warn('appointments snapshot error:', err && err.code)
+  ));
 }
 
 // Re-render whichever screen is currently active so live updates reflect.
@@ -3303,7 +3521,7 @@ function showSync(status) {
 let _navSuppressHistory = false;   // set true when navigating because of popstate
 function showScreen(name) {
   // Guard sensitive screens — must be signed-in & authorized
-  const protectedScreens = ['landing','staff','home','cart','payment','receipt','confirm','admin'];
+  const protectedScreens = ['landing','staff','home','cart','payment','receipt','confirm','admin','appointments'];
   if (protectedScreens.includes(name)) {
     if (!currentUser || !currentUser.role) {
       name = currentUser ? 'no-access' : 'auth';
@@ -3323,6 +3541,7 @@ function showScreen(name) {
   if (name === 'receipt') renderReceipt();
   if (name === 'staff') renderStaffDashboard();
   if (name === 'landing') renderLanding();
+  if (name === 'appointments') renderAppointmentsScreen();
   // Push to browser history so the device back button navigates within the app.
   // Skip when this navigation was itself triggered by a popstate event.
   // Skip transient screens that should never appear in history.
@@ -3355,6 +3574,7 @@ function _backTargetForScreen(name) {
     case 'receipt':  return 'landing';
     case 'admin':    return 'landing';
     case 'staff':    return 'landing';
+    case 'appointments': return 'staff';
     case 'no-access':return 'auth';
     default:         return null; // landing / auth → no further back
   }
@@ -3403,6 +3623,8 @@ window.addEventListener('popstate', (ev) => {
 function renderReceipt() {
   const el = document.getElementById('receipt-total');
   if (el) el.textContent = '₹' + grandTotal().toLocaleString('en-IN');
+  // Build / update the multi-staff split panel under the staff dropdown.
+  renderReceiptStaffPanel();
 }
 
 /* Brand strip → go to landing (Home).
@@ -3424,7 +3646,7 @@ function updateBrandStrip(screen) {
   if (!strip) return;
   // Brand strip on every screen EXCEPT loading, setup, auth, no-access (those
   // have their own large branding).
-  const showOn = ['landing','staff','home','cart','payment','receipt','confirm','admin'];
+  const showOn = ['landing','staff','home','cart','payment','receipt','confirm','admin','appointments'];
   const shouldShow = showOn.includes(screen) && currentUser;
   strip.classList.toggle('visible', shouldShow);
   if (!shouldShow) return;
@@ -3440,6 +3662,7 @@ function updateBrandStrip(screen) {
     receipt:  'Send Receipt',
     confirm:  'Saved',
     admin:    'Admin · ERP',
+    appointments: 'Appointments',
   };
   document.getElementById('brand-strip-tag').textContent = tagMap[screen] || 'Salon ERP';
 
@@ -3813,6 +4036,9 @@ function renderStaffDashboard() {
     o.value = s.name; o.textContent = s.name;
     sel.appendChild(o);
   });
+
+  // Today's appointments strip
+  renderStaffApptStrip();
 }
 
 /* ==========================================================
@@ -5262,7 +5488,7 @@ function addToCart(cat, idx) {
   if (!svc) { console.warn('addToCart: missing service', cat, idx); return; }
   const existing = state.cart.find(i => i.name === svc.name);
   if (existing) existing.qty++;
-  else state.cart.push({ id: uid(), name: svc.name, price: svc.price, qty: 1 });
+  else state.cart.push({ id: uid(), name: svc.name, price: svc.price, qty: 1, staffName: '' });
   updateCartFloat();
   refreshServiceAddIndicators();
 }
@@ -5297,6 +5523,16 @@ function renderCart() {
   const listEl = document.getElementById('cart-list');
   listEl.innerHTML = '';
   let totalMins = 0;
+  const staffNames = (config.staff || [])
+    .map(s => (s.name || '').trim())
+    .filter(Boolean);
+  const buildStaffOpts = (selected) => {
+    const sel = String(selected || '');
+    const opts = staffNames.map(n =>
+      `<option value="${escAttr(n)}"${n === sel ? ' selected' : ''}>${esc(n)}</option>`
+    ).join('');
+    return `<option value=""${sel ? '' : ' selected'}>— who served this —</option>${opts}`;
+  };
   state.cart.forEach(item => {
     const meta = getServiceMeta(item.name);
     totalMins += (meta.mins || 0) * item.qty;
@@ -5314,6 +5550,12 @@ function renderCart() {
         <div class="cart-item-tags">
           ${dur ? `<span class="cart-item-tag">⏱ ${dur} per session</span>` : ''}
           <span class="cart-item-tag muted">₹${item.price.toLocaleString('en-IN')} × ${item.qty}</span>
+        </div>
+        <div class="cart-item-staff-row">
+          <label>Staff</label>
+          <select onchange="setCartItemStaff('${item.id}', this.value)">
+            ${buildStaffOpts(item.staffName)}
+          </select>
         </div>
         <div class="cart-item-controls">
           <div class="qty-group">
@@ -5507,15 +5749,33 @@ async function finaliseTransaction(phone) {
   if (!state.cart.length) { toast('Cart is empty'); return; }
 
   // MANDATORY: which staff served this customer (for commission/payroll).
-  const staffName = (document.getElementById('receipt-staff').value || '').trim();
-  if (!staffName) {
-    toast('Please select the staff who served this customer');
+  // Multi-staff bills (different stylists per service) carry a per-item
+  // staffName on each cart entry. The receipt-staff <select> acts as a
+  // FALLBACK / single-staff override — used to fill any items without a
+  // per-item assignment, and as the legacy `staffName` for top-line reports.
+  const fallbackStaff = (document.getElementById('receipt-staff').value || '').trim();
+  const itemsMissingStaff = (state.cart || []).filter(i => !(i.staffName || '').trim());
+  if (itemsMissingStaff.length && !fallbackStaff) {
+    toast('Pick a staff for every service (or use the dropdown for one staff)');
     const sel = document.getElementById('receipt-staff');
     if (sel) {
       sel.style.borderColor = 'var(--danger)';
       sel.focus();
       setTimeout(() => { sel.style.borderColor = ''; }, 2000);
     }
+    return;
+  }
+  // Normalise per-item staff: fall back to the dropdown for any unassigned item.
+  state.cart.forEach(i => {
+    if (!(i.staffName || '').trim()) i.staffName = fallbackStaff;
+  });
+  // Compute per-staff splits (amount = pre-GST taxable share, commission per their %).
+  const staffSplits = computeStaffSplits(state.cart, subtotal(), discountAmount());
+  // Primary staff = top contributor (largest amount). Used for legacy `staffName`.
+  const primary = staffSplits.slice().sort((a, b) => b.amount - a.amount)[0] || null;
+  const staffName = primary ? primary.staffName : fallbackStaff;
+  if (!staffName) {
+    toast('Please select the staff who served this customer');
     return;
   }
   state.txInFlight = true;
@@ -5533,10 +5793,11 @@ async function finaliseTransaction(phone) {
 
   // Look up staff record (for commission % + staffId stamp)
   const staffRec = (config.staff || []).find(s => String(s.name) === staffName);
-  const commissionPct = staffRec ? (parseFloat(staffRec.commissionPct) || 0) : 0;
-  // Commission is computed on the post-discount, pre-GST amount (taxable).
-  const taxable = sub - disc;
-  const commissionAmount = commissionPct > 0 ? Math.round(taxable * commissionPct / 100) : 0;
+  // Aggregate commission across all contributing staff for the legacy field
+  // (so existing "txn.commissionAmount" displays continue to show the bill total).
+  const commissionAmount = staffSplits.reduce((s, sp) => s + (sp.commissionAmount || 0), 0);
+  // For backwards-compatible `commissionPct` (single value), use the primary staff's %.
+  const commissionPct = primary ? primary.commissionPct : (staffRec ? (parseFloat(staffRec.commissionPct) || 0) : 0);
 
   // Customer info — name from form, ID = last 5 digits of phone (10-digit Indian #).
   const _custNameEl = document.getElementById('customer-name');
@@ -5550,7 +5811,7 @@ async function finaliseTransaction(phone) {
     date: state.todayStr,
     time: timeStr,
     services: state.cart.map(i => `${i.name}${i.qty > 1 ? ' ×' + i.qty : ''}`).join(', '),
-    items: state.cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+    items: state.cart.map(i => ({ name: i.name, qty: i.qty, price: i.price, staffName: i.staffName || '' })),
     subtotal: sub,
     discount: disc,
     discountLabel: state.discount ? (state.discount.label || '') : '',
@@ -5561,6 +5822,7 @@ async function finaliseTransaction(phone) {
     staffName: staffName,
     commissionPct,
     commissionAmount,
+    staffSplits,
     durationMins:   totalDurMins,
     customerId:     customerId,
     customerName:   customerName,
@@ -5587,6 +5849,14 @@ async function finaliseTransaction(phone) {
       lastTotal: total,
       lastServices: txRow.services,
     }).catch(e => console.warn('customer upsert failed:', e));
+  }
+
+  // If this bill came from an appointment, mark the booking completed and link
+  // the new transaction id back so the calendar shows the bill reference.
+  if (state.apptCheckoutId) {
+    completeAppointmentAfterCheckout(state.apptCheckoutId, newId, total)
+      .catch(e => console.warn('appt completion failed:', e));
+    state.apptCheckoutId = null;
   }
 
   // Send WhatsApp if phone provided
@@ -5627,6 +5897,7 @@ function resetAndGoHome() {
   state.discount = null;
   state.paymentMethod = 'UPI';
   state.txInFlight = false;
+  state.apptCheckoutId = null;
   const phEl = document.getElementById('customer-phone'); if (phEl) phEl.value = '';
   const nmEl = document.getElementById('customer-name');  if (nmEl) nmEl.value = '';
   const stEl = document.getElementById('receipt-staff');  if (stEl) stEl.value = '';
@@ -7557,6 +7828,17 @@ async function renderAdminPayroll() {
   const commByStaff = {};
   const salesByStaff = {};
   txs.forEach(t => {
+    if (Array.isArray(t.staffSplits) && t.staffSplits.length) {
+      // Multi-staff bill — credit each contributor with their service-share
+      // for both commission AND attributed sales.
+      t.staffSplits.forEach(sp => {
+        const k = String(sp.staffName || '');
+        if (!k) return;
+        commByStaff[k] = (commByStaff[k] || 0) + (parseFloat(sp.commissionAmount) || 0);
+        salesByStaff[k] = (salesByStaff[k] || 0) + (parseFloat(sp.amount) || 0);
+      });
+      return;
+    }
     const k = String(t.staffName || '');
     if (!k) return;
     commByStaff[k] = (commByStaff[k] || 0) + (parseFloat(t.commissionAmount) || 0);
@@ -9016,6 +9298,38 @@ function renderSetupShop(host) {
       <label class="setting-label">Expense Categories (one per line)</label>
       <textarea id="set-exp-cats" rows="7" placeholder="Product Purchase - Hair Care\nUtilities\nMarketing">${esc(categoriesText)}</textarea>
     </div>
+
+    <div class="admin-section-title" style="margin-top:24px;">Appointments &amp; Calendar</div>
+    <div class="setting-row">
+      <label class="setting-label">Number of Massage / Treatment Rooms</label>
+      <input type="number" id="set-appt-rooms" min="1" max="20" value="${parseInt((config.appointment||{}).massageRooms,10) || DEFAULTS.appointment.massageRooms}">
+      <div class="muted-text" style="font-size:11px;margin-top:4px;">Hard cap on parallel room-bound bookings (massages, spas, facials).</div>
+    </div>
+    <div class="setting-row">
+      <label class="setting-label">Buffer / Turnaround Between Bookings (min)</label>
+      <input type="number" id="set-appt-buffer" min="0" max="60" value="${parseInt((config.appointment||{}).bufferMinutes,10) || DEFAULTS.appointment.bufferMinutes}">
+    </div>
+    <div class="setting-row">
+      <label class="setting-label">Slot Granularity (min)</label>
+      <input type="number" id="set-appt-slot" min="5" max="60" value="${parseInt((config.appointment||{}).slotMinutes,10) || DEFAULTS.appointment.slotMinutes}">
+    </div>
+    <div class="setting-row">
+      <label class="setting-label">Opening Time</label>
+      <input type="time" id="set-appt-open" value="${escAttr((config.appointment||{}).openingTime || DEFAULTS.appointment.openingTime)}">
+    </div>
+    <div class="setting-row">
+      <label class="setting-label">Closing Time</label>
+      <input type="time" id="set-appt-close" value="${escAttr((config.appointment||{}).closingTime || DEFAULTS.appointment.closingTime)}">
+    </div>
+    <div class="setting-row">
+      <label class="setting-label">Reminder Lead Time (min before slot)</label>
+      <input type="number" id="set-appt-lead" min="0" max="240" value="${parseInt((config.appointment||{}).reminderLeadMinutes,10) || DEFAULTS.appointment.reminderLeadMinutes}">
+    </div>
+    <div class="setting-row">
+      <label class="setting-label">Concurrent Chair Capacity (haircuts, threading…)</label>
+      <input type="number" id="set-appt-chairs" min="1" max="20" value="${parseInt((config.appointment||{}).chairCapacity,10) || DEFAULTS.appointment.chairCapacity}">
+    </div>
+
     <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="saveShopSettings()">Save Settings →</button>
   `;
 }
@@ -9042,6 +9356,20 @@ async function saveShopSettings() {
   const cats = catsRaw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   config.expenseCategories = cats.length ? cats : (DEFAULTS.expenseCategories || ['Miscellaneous']);
   config.receiptFooter = document.getElementById('set-footer').value.trim();
+  // Appointment settings
+  const apptCfg = Object.assign({}, DEFAULTS.appointment, config.appointment || {});
+  const _val = (id, def) => {
+    const el = document.getElementById(id);
+    return el && el.value !== '' ? el.value : def;
+  };
+  apptCfg.massageRooms        = Math.max(1, parseInt(_val('set-appt-rooms',  apptCfg.massageRooms),  10) || apptCfg.massageRooms);
+  apptCfg.bufferMinutes       = Math.max(0, parseInt(_val('set-appt-buffer', apptCfg.bufferMinutes), 10) || 0);
+  apptCfg.slotMinutes         = Math.max(5, parseInt(_val('set-appt-slot',   apptCfg.slotMinutes),   10) || apptCfg.slotMinutes);
+  apptCfg.openingTime         = String(_val('set-appt-open',  apptCfg.openingTime));
+  apptCfg.closingTime         = String(_val('set-appt-close', apptCfg.closingTime));
+  apptCfg.reminderLeadMinutes = Math.max(0, parseInt(_val('set-appt-lead',   apptCfg.reminderLeadMinutes), 10) || 0);
+  apptCfg.chairCapacity       = Math.max(1, parseInt(_val('set-appt-chairs', apptCfg.chairCapacity), 10) || apptCfg.chairCapacity);
+  config.appointment = apptCfg;
   saveConfig();
   await fbSetConfig({
     shopName: config.shopName,
@@ -9052,6 +9380,7 @@ async function saveShopSettings() {
     expenseCategories: config.expenseCategories,
     qrImage: config.qrImage,
     receiptFooter: config.receiptFooter,
+    appointment: apptCfg,
   });
   toast('Settings saved ✓');
 }
@@ -9743,6 +10072,16 @@ function computeNetPayableForStaffMonth(staffRec, ym, txs, advances) {
   const base = parseFloat(staffRec.salary) || 0;
   const paidLeaves = parseFloat(staffRec.paidLeaves) || 0;
   const commByStaff = (txs || []).reduce((acc, t) => {
+    // Multi-staff bills carry per-staff commission in `staffSplits` — use those
+    // when present so each contributing stylist is credited correctly.
+    if (Array.isArray(t.staffSplits) && t.staffSplits.length) {
+      t.staffSplits.forEach(sp => {
+        const k = String(sp.staffName || '');
+        if (!k) return;
+        acc[k] = (acc[k] || 0) + (parseFloat(sp.commissionAmount) || 0);
+      });
+      return acc;
+    }
     const k = String(t.staffName || '');
     if (!k) return acc;
     acc[k] = (acc[k] || 0) + (parseFloat(t.commissionAmount) || 0);
@@ -9864,8 +10203,754 @@ if ('serviceWorker' in navigator) {
 window.addEventListener('online',  () => showSync('ok'));
 window.addEventListener('offline', () => showSync('error'));
 
+/* ════════════════════════════════════════════════════
+   APPOINTMENTS MODULE
+   ----------------------------------------------------
+   Booking flow, slot availability, room-capacity rules,
+   reminders, and checkout-from-appointment hand-off.
+   Integrates with the existing cart/billing pipeline so
+   that a checkout from an appointment creates a normal
+   transaction AND closes the booking with a link back.
+═════════════════════════════════════════════════════ */
+
+/* ─── small time helpers ─── */
+function _apptCfg() {
+  return Object.assign({}, DEFAULTS.appointment, config.appointment || {});
+}
+function _hhmmToMins(hhmm) {
+  const m = String(hhmm || '').match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+}
+function _minsToHHMM(mins) {
+  if (mins == null || isNaN(mins)) return '';
+  mins = ((mins % 1440) + 1440) % 1440;
+  const h = Math.floor(mins / 60), m = mins % 60;
+  return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+}
+function _fmtTime12(hhmm) {
+  const t = _hhmmToMins(hhmm);
+  if (t == null) return hhmm || '';
+  let h = Math.floor(t / 60), m = t % 60;
+  const ap = h >= 12 ? 'PM' : 'AM';
+  h = h % 12; if (h === 0) h = 12;
+  return h + (m ? ':' + String(m).padStart(2, '0') : '') + ' ' + ap;
+}
+
+/* ─── room / chair classification ─── */
+function serviceNeedsRoom(name) {
+  const cfg = _apptCfg();
+  const kws = (cfg.roomKeywords || []).map(k => String(k).toLowerCase());
+  const n = String(name || '').toLowerCase();
+  return kws.some(k => k && n.includes(k));
+}
+
+/* ─── cart per-item staff handling ─── */
+function setCartItemStaff(itemId, staffName) {
+  const i = (state.cart || []).find(x => x.id === itemId);
+  if (!i) return;
+  i.staffName = (staffName || '').trim();
+  // No re-render needed; preserve scroll position.
+}
+
+/**
+ * Compute commission splits across staff for a given cart.
+ * Each cart item carries its own staffName. Discount is applied
+ * proportionally to each item's price share.
+ * Returns an array of { staffId, staffName, items[], amount, commissionPct, commissionAmount }.
+ */
+function computeStaffSplits(cart, sub, disc) {
+  if (!cart || !cart.length) return [];
+  const safeSub = sub > 0 ? sub : 1;
+  const byStaff = {};
+  cart.forEach(item => {
+    const sn = (item.staffName || '').trim();
+    if (!sn) return;
+    const lineSub = (item.price || 0) * (item.qty || 1);
+    const lineDiscShare = disc > 0 ? Math.round(disc * lineSub / safeSub) : 0;
+    const lineTaxable = Math.max(0, lineSub - lineDiscShare);
+    if (!byStaff[sn]) {
+      const rec = (config.staff || []).find(s => String(s.name) === sn);
+      byStaff[sn] = {
+        staffId: rec ? (rec.id || '') : '',
+        staffName: sn,
+        commissionPct: rec ? (parseFloat(rec.commissionPct) || 0) : 0,
+        items: [],
+        amount: 0,
+        commissionAmount: 0,
+      };
+    }
+    byStaff[sn].items.push({ name: item.name, qty: item.qty, price: item.price });
+    byStaff[sn].amount += lineTaxable;
+  });
+  Object.values(byStaff).forEach(sp => {
+    sp.commissionAmount = sp.commissionPct > 0
+      ? Math.round(sp.amount * sp.commissionPct / 100)
+      : 0;
+  });
+  return Object.values(byStaff);
+}
+
+/* ─── receipt: staff splits panel + auto-fill from cart ─── */
+function renderReceiptStaffPanel() {
+  const sel = document.getElementById('receipt-staff');
+  if (!sel) return;
+  // Auto-pick the most-common staff in the cart as the dropdown default
+  // (acts as fallback for any items without a per-item assignment).
+  const cartStaff = (state.cart || []).map(i => (i.staffName || '').trim()).filter(Boolean);
+  if (cartStaff.length && !sel.value) {
+    const counts = {};
+    cartStaff.forEach(n => { counts[n] = (counts[n] || 0) + 1; });
+    const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+    if (top) sel.value = top[0];
+  }
+  // Build / replace splits panel
+  let panel = document.getElementById('staff-splits-panel');
+  const splits = computeStaffSplits(state.cart || [], subtotal(), discountAmount());
+  // Only show panel when there's >1 distinct staff with assignments.
+  const distinctStaff = new Set(splits.map(s => s.staffName));
+  if (distinctStaff.size > 1) {
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.id = 'staff-splits-panel';
+      panel.className = 'staff-splits-panel';
+      sel.closest('.input-group').insertAdjacentElement('afterend', panel);
+    }
+    panel.style.display = '';
+    panel.innerHTML =
+      `<div class="splits-title">Commission Split (${splits.length} staff)</div>` +
+      splits.map(sp => `
+        <div class="split-row">
+          <div>
+            <div class="split-staff">${esc(sp.staffName)}</div>
+            <div class="split-amount">${sp.items.length} service${sp.items.length === 1 ? '' : 's'} · ₹${sp.amount.toLocaleString('en-IN')} taxable · ${sp.commissionPct || 0}% comm</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="split-staff">₹${sp.commissionAmount.toLocaleString('en-IN')}</div>
+            <div class="split-amount">commission</div>
+          </div>
+        </div>
+      `).join('');
+  } else if (panel) {
+    panel.style.display = 'none';
+  }
+}
+
+/* ─── staff dashboard: today's appointments strip ─── */
+function renderStaffApptStrip() {
+  const host = document.getElementById('staff-appt-strip-host');
+  if (!host) return;
+  const today = todayISO();
+  const upcoming = (state.appointments || [])
+    .filter(a => a.date === today && a.status !== 'cancelled' && a.status !== 'completed')
+    .sort((a, b) => String(a.startTime).localeCompare(String(b.startTime)))
+    .slice(0, 4);
+  if (!upcoming.length) {
+    host.innerHTML = `
+      <div class="staff-appt-strip">
+        <div class="strip-head">
+          <div class="strip-title">Today's Appointments</div>
+          <button class="strip-link" onclick="showScreen('appointments')">View calendar →</button>
+        </div>
+        <div class="muted-text" style="font-size:13px;padding:6px 0;">No bookings yet for today. Tap “Appointments &amp; Calendar” below to add one.</div>
+      </div>
+    `;
+    return;
+  }
+  const nowMins = (new Date()).getHours() * 60 + (new Date()).getMinutes();
+  host.innerHTML = `
+    <div class="staff-appt-strip">
+      <div class="strip-head">
+        <div class="strip-title">Today's Appointments (${upcoming.length})</div>
+        <button class="strip-link" onclick="showScreen('appointments')">View calendar →</button>
+      </div>
+      ${upcoming.map(a => {
+        const start = _hhmmToMins(a.startTime);
+        const isSoon = start != null && (start - nowMins) >= 0 && (start - nowMins) <= 30;
+        const svcs = (a.services || []).map(s => s.name).join(' · ');
+        return `
+          <div class="next-appt">
+            <div class="next-appt-time">${esc(_fmtTime12(a.startTime))}</div>
+            <div class="next-appt-meta">
+              <div class="next-appt-name">${esc(a.customerName || 'Walk-in')} · ${esc(a.customerPhone || '')}</div>
+              <div class="next-appt-svc">${esc(svcs || 'No services')}</div>
+            </div>
+            ${isSoon ? '<div class="next-appt-soon">Soon</div>' : ''}
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+/* ─── appointments screen ─── */
+function setApptDate(d) {
+  state.apptDate = d || todayISO();
+  renderAppointmentsScreen();
+}
+function shiftApptDate(deltaDays) {
+  const d = new Date(state.apptDate || todayISO());
+  d.setDate(d.getDate() + deltaDays);
+  state.apptDate = d.toISOString().slice(0, 10);
+  renderAppointmentsScreen();
+}
+
+function renderAppointmentsScreen() {
+  const dateInput = document.getElementById('appt-date-input');
+  if (!dateInput) return;
+  if (dateInput.value !== state.apptDate) dateInput.value = state.apptDate;
+  const cfg = _apptCfg();
+  const dayAppts = (state.appointments || [])
+    .filter(a => a.date === state.apptDate)
+    .sort((a, b) => String(a.startTime).localeCompare(String(b.startTime)));
+
+  // Summary chips
+  const active = dayAppts.filter(a => a.status !== 'cancelled');
+  const roomedCount = active.filter(a => (a.services || []).some(s => serviceNeedsRoom(s.name))).length;
+  const roomLoad = cfg.massageRooms > 0 ? Math.min(100, Math.round(roomedCount / cfg.massageRooms * 100)) : 0;
+  const summary = document.getElementById('appt-summary');
+  if (summary) {
+    summary.innerHTML =
+      `<span class="appt-chip"><strong>${active.length}</strong> bookings</span>` +
+      `<span class="appt-chip"><strong>${roomedCount}</strong> room-services</span>` +
+      `<span class="appt-chip ${roomLoad >= 90 ? 'full' : (roomLoad >= 60 ? 'busy' : 'free')}">Rooms used: <strong>${roomLoad}%</strong></span>` +
+      `<span class="appt-chip">${esc(cfg.massageRooms)} room${cfg.massageRooms === 1 ? '' : 's'} · ${esc(cfg.bufferMinutes)} min gap</span>`;
+  }
+
+  // List
+  const host = document.getElementById('appt-list-host');
+  if (!host) return;
+  if (!dayAppts.length) {
+    host.innerHTML = `
+      <div class="appt-section-title">Bookings</div>
+      <div style="padding:10px 18px 80px;">
+        <div class="appt-empty">No appointments for this day yet.<br><span style="font-size:11px;">Tap <b>+ Book</b> above to add one.</span></div>
+      </div>
+    `;
+    return;
+  }
+  const rows = dayAppts.map(renderAppointmentCard).join('');
+  host.innerHTML = `
+    <div class="appt-section-title">Bookings (${dayAppts.length})</div>
+    <div class="appt-list">${rows}</div>
+  `;
+}
+
+function renderAppointmentCard(a) {
+  const status = a.status || 'booked';
+  const svcs = (a.services || []).map(s => {
+    const isRoom = serviceNeedsRoom(s.name);
+    const tail = s.staffName ? ` · ${esc(s.staffName)}` : '';
+    return `<div>${esc(s.name)}${isRoom ? ' <span class="room-mark">Room</span>' : ''}${tail}</div>`;
+  }).join('');
+  const staffSet = Array.from(new Set((a.services || []).map(s => s.staffName).filter(Boolean)));
+  const tags = staffSet.map(n => `<span class="appt-staff-tag">${esc(n)}</span>`).join('');
+  const phone = (a.customerPhone || '').replace(/\D/g, '');
+  const waBtn = phone.length === 10
+    ? `<button onclick="sendApptWhatsApp('${a.id}')">WhatsApp</button>`
+    : '';
+  let actions = '';
+  if (status === 'booked') {
+    actions = `
+      ${waBtn}
+      <button onclick="openApptBooking('${a.id}')">Edit</button>
+      <button class="success" onclick="checkoutAppointment('${a.id}')">Check Out / Bill</button>
+      <button class="danger" onclick="markAppointmentNoShow('${a.id}')">No-show</button>
+    `;
+  } else if (status === 'inprogress') {
+    actions = `
+      <button class="success" onclick="checkoutAppointment('${a.id}')">Check Out / Bill</button>
+      <button onclick="openApptBooking('${a.id}')">Edit</button>
+    `;
+  } else if (status === 'completed') {
+    actions = a.linkedTransactionId
+      ? `<button>Bill #${esc(String(a.linkedTransactionId).slice(-6).toUpperCase())}</button>`
+      : '';
+  } else if (status === 'cancelled' || status === 'noshow') {
+    actions = `<button onclick="reopenAppointment('${a.id}')">Reopen</button>`;
+  }
+  return `
+    <div class="appt-card status-${esc(status)}">
+      <div class="appt-time">
+        <div class="appt-time-start">${esc(_fmtTime12(a.startTime))}</div>
+        <div class="appt-time-end">to ${esc(_fmtTime12(a.endTime))}</div>
+      </div>
+      <div class="appt-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div class="appt-name">${esc(a.customerName || 'Walk-in')}</div>
+          <span class="appt-status-pill ${status}">${status}</span>
+        </div>
+        ${a.customerPhone ? `<div class="appt-phone">+91 ${esc(a.customerPhone)}</div>` : ''}
+        <div class="appt-svcs">${svcs}</div>
+        ${tags ? `<div class="appt-staff-tags">${tags}</div>` : ''}
+        ${a.notes ? `<div class="appt-phone" style="margin-top:6px;font-style:italic;">“${esc(a.notes)}”</div>` : ''}
+        <div class="appt-actions">${actions}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ─── booking modal ─── */
+function openApptBooking(editId) {
+  state.apptDraft = {
+    services: [],   // [{name, category, mins, price, staffName}]
+    startTime: '',
+  };
+  state.apptEditingId = editId || null;
+  const titleEl = document.getElementById('appt-modal-title');
+  const delBtn = document.getElementById('appt-delete-btn');
+  if (editId) {
+    const a = (state.appointments || []).find(x => x.id === editId);
+    if (!a) { toast('Appointment not found'); return; }
+    document.getElementById('appt-phone').value = a.customerPhone || '';
+    document.getElementById('appt-name').value = a.customerName || '';
+    document.getElementById('appt-mod-date').value = a.date || state.apptDate;
+    document.getElementById('appt-notes').value = a.notes || '';
+    state.apptDraft.services = JSON.parse(JSON.stringify(a.services || []));
+    state.apptDraft.startTime = a.startTime || '';
+    if (titleEl) titleEl.textContent = 'Edit Appointment';
+    if (delBtn) delBtn.style.display = '';
+  } else {
+    document.getElementById('appt-phone').value = '';
+    document.getElementById('appt-name').value = '';
+    document.getElementById('appt-mod-date').value = state.apptDate || todayISO();
+    document.getElementById('appt-notes').value = '';
+    document.getElementById('appt-phone-hint').textContent = "Returning customer? Name will auto-fill.";
+    if (titleEl) titleEl.textContent = 'Book Appointment';
+    if (delBtn) delBtn.style.display = 'none';
+  }
+  document.getElementById('appt-svc-search').value = '';
+  renderApptSvcPicker('');
+  renderApptSelectedSvcs();
+  renderApptSlotGrid();
+  // Re-render slots whenever date changes
+  const dInput = document.getElementById('appt-mod-date');
+  dInput.onchange = () => { renderApptSlotGrid(); };
+  openModal('modal-appointment');
+}
+
+let _apptPhoneTimer = null;
+function onApptPhoneInput(value) {
+  const digits = String(value || '').replace(/\D/g, '');
+  const hint = document.getElementById('appt-phone-hint');
+  if (digits.length < 5) { if (hint) hint.textContent = "Returning customer? Name will auto-fill."; return; }
+  const id = digits.slice(-5);
+  if (hint) hint.textContent = 'Looking up #' + id + '…';
+  clearTimeout(_apptPhoneTimer);
+  _apptPhoneTimer = setTimeout(async () => {
+    const c = await lookupCustomer(id);
+    if (!hint) return;
+    if (c) {
+      hint.textContent = '👋 Returning customer · ' + (c.name || 'guest') + ' · ' + (c.visits || 1) + ' visit(s)';
+      const nameEl = document.getElementById('appt-name');
+      if (nameEl && !nameEl.value && c.name) nameEl.value = c.name;
+    } else {
+      hint.textContent = 'New customer · ID #' + id;
+    }
+  }, 350);
+}
+
+/* Service picker — flat list of all services with search */
+function renderApptSvcPicker(query) {
+  const host = document.getElementById('appt-svc-picker');
+  if (!host) return;
+  const q = String(query || '').toLowerCase().trim();
+  const all = [];
+  Object.entries(config.services || {}).forEach(([cat, list]) => {
+    (list || []).forEach(s => all.push({ name: s.name, category: cat, price: s.price }));
+  });
+  const filtered = q ? all.filter(s => s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q)) : all;
+  const limited = filtered.slice(0, 60);
+  host.innerHTML = limited.map(s => {
+    const meta = getServiceMeta(s.name, s.category);
+    const room = serviceNeedsRoom(s.name) ? ' · 🛏 Room' : '';
+    const checked = (state.apptDraft.services || []).some(x => x.name === s.name) ? 'checked' : '';
+    return `
+      <label class="appt-svc-row">
+        <input type="checkbox" ${checked} onchange="toggleApptSvc('${escAttr(s.name)}','${escAttr(s.category)}',${s.price},this.checked)">
+        <div class="svc-meta">
+          <div class="svc-name">${esc(s.name)}</div>
+          <div class="svc-sub">${esc(s.category)} · ${meta.mins || '?'} min · ₹${(s.price || 0).toLocaleString('en-IN')}${room}</div>
+        </div>
+      </label>
+    `;
+  }).join('') || '<div class="muted-text" style="padding:10px;font-size:12px;">No matches.</div>';
+}
+
+function toggleApptSvc(name, category, price, checked) {
+  state.apptDraft.services = state.apptDraft.services || [];
+  if (checked) {
+    if (state.apptDraft.services.some(s => s.name === name)) return;
+    const meta = getServiceMeta(name, category);
+    state.apptDraft.services.push({
+      name, category, price: parseFloat(price) || 0,
+      mins: meta.mins || 30, staffName: '',
+    });
+  } else {
+    state.apptDraft.services = state.apptDraft.services.filter(s => s.name !== name);
+  }
+  renderApptSelectedSvcs();
+  renderApptSlotGrid();
+}
+
+function renderApptSelectedSvcs() {
+  const host = document.getElementById('appt-selected-svcs');
+  if (!host) return;
+  const svcs = state.apptDraft.services || [];
+  const totalMins = svcs.reduce((s, x) => s + (x.mins || 0), 0);
+  const dur = document.getElementById('appt-duration-hint');
+  if (dur) dur.textContent = `Total duration: ${fmtDur(totalMins) || '0 min'} · ${svcs.length} service${svcs.length === 1 ? '' : 's'}`;
+  if (!svcs.length) { host.innerHTML = ''; return; }
+  const staffNames = (config.staff || []).map(s => (s.name || '').trim()).filter(Boolean);
+  host.innerHTML = svcs.map((s, i) => {
+    const opts = staffNames.map(n =>
+      `<option value="${escAttr(n)}"${n === s.staffName ? ' selected' : ''}>${esc(n)}</option>`
+    ).join('');
+    const room = serviceNeedsRoom(s.name) ? '🛏 Room' : '✂️ Chair';
+    return `
+      <div class="appt-selected-svc">
+        <div class="row1">
+          <div class="svc-title">${esc(s.name)}</div>
+          <div class="svc-mins">${s.mins} min · ${room}</div>
+          <button class="remove-x" onclick="removeApptSvc(${i})" aria-label="Remove">×</button>
+        </div>
+        <select onchange="setApptSvcStaff(${i}, this.value)">
+          <option value="">— assign staff (optional) —</option>${opts}
+        </select>
+      </div>
+    `;
+  }).join('');
+}
+
+function removeApptSvc(idx) {
+  state.apptDraft.services.splice(idx, 1);
+  renderApptSelectedSvcs();
+  renderApptSvcPicker(document.getElementById('appt-svc-search').value || '');
+  renderApptSlotGrid();
+}
+
+function setApptSvcStaff(idx, name) {
+  if (state.apptDraft.services[idx]) state.apptDraft.services[idx].staffName = name;
+}
+
+/* Slot availability — generate slot starts and check conflicts */
+function renderApptSlotGrid() {
+  const host = document.getElementById('appt-slot-grid');
+  const hint = document.getElementById('appt-slot-hint');
+  if (!host) return;
+  const svcs = state.apptDraft.services || [];
+  if (!svcs.length) {
+    host.innerHTML = '';
+    if (hint) hint.textContent = 'Pick services first to see available start times.';
+    return;
+  }
+  const cfg = _apptCfg();
+  const date = document.getElementById('appt-mod-date').value || state.apptDate;
+  const totalMins = svcs.reduce((s, x) => s + (x.mins || 0), 0);
+  const open = _hhmmToMins(cfg.openingTime) || 600;   // 10:00 default
+  const close = _hhmmToMins(cfg.closingTime) || 1260; // 21:00 default
+  const slot = parseInt(cfg.slotMinutes, 10) || 15;
+  const buffer = parseInt(cfg.bufferMinutes, 10) || 10;
+  const today = todayISO();
+  const nowMins = (new Date()).getHours() * 60 + (new Date()).getMinutes();
+  const editingId = state.apptEditingId;
+
+  // Existing bookings for the day (excluding cancelled/the one being edited)
+  const dayAppts = (state.appointments || [])
+    .filter(a => a.date === date && a.status !== 'cancelled' && a.status !== 'noshow' && a.id !== editingId);
+
+  const cells = [];
+  for (let t = open; t + totalMins <= close; t += slot) {
+    const startStr = _minsToHHMM(t);
+    const endMins = t + totalMins;
+    const isPast = (date === today) && (t < nowMins);
+    const conflict = isPast ? null : checkSlotConflict({
+      startMins: t, endMins, services: svcs, dayAppts, buffer,
+      maxRooms: parseInt(cfg.massageRooms, 10) || 1,
+      maxChairs: parseInt(cfg.chairCapacity, 10) || 4,
+    });
+    let cls = 'slot-cell';
+    let title = startStr + ' → ' + _minsToHHMM(endMins);
+    if (isPast) cls += ' past';
+    else if (conflict && conflict.blocking) { cls += ' unavailable'; title += ' · ' + conflict.reason; }
+    else if (conflict && conflict.partial) { cls += ' partial'; title += ' · ' + conflict.reason; }
+    if (state.apptDraft.startTime === startStr) cls += ' selected';
+    cells.push(
+      `<div class="${cls}" title="${escAttr(title)}" onclick="${(isPast || (conflict && conflict.blocking)) ? '' : `pickApptSlot('${startStr}')`}">${esc(_fmtTime12(startStr))}</div>`
+    );
+  }
+  host.innerHTML = cells.join('');
+  if (hint) {
+    const free = host.querySelectorAll('.slot-cell:not(.unavailable):not(.past)').length;
+    hint.textContent = `${free} open slot${free === 1 ? '' : 's'} for a ${fmtDur(totalMins)} session · ${cfg.massageRooms} room${cfg.massageRooms === 1 ? '' : 's'} cap`;
+  }
+}
+
+function pickApptSlot(startStr) {
+  state.apptDraft.startTime = startStr;
+  renderApptSlotGrid();
+}
+
+/**
+ * For a candidate booking [startMins, endMins) consisting of `services`,
+ * check whether placing it into `dayAppts` would exceed room or chair caps,
+ * honoring `buffer` minutes around each existing booking on the same resource.
+ * Returns { blocking, partial, reason } or null.
+ */
+function checkSlotConflict({ startMins, endMins, services, dayAppts, buffer, maxRooms, maxChairs }) {
+  const candNeedsRoom = (services || []).some(s => serviceNeedsRoom(s.name));
+  // Walk through every minute the candidate occupies; the moment any minute
+  // would exceed capacity we return blocking.
+  let maxRoomOverlap = 0;
+  let maxChairOverlap = 0;
+  // Build interval list with buffer around each existing.
+  const intervals = (dayAppts || []).map(a => {
+    const sa = _hhmmToMins(a.startTime);
+    const ea = _hhmmToMins(a.endTime);
+    if (sa == null || ea == null) return null;
+    return {
+      startBuffered: sa - buffer,
+      endBuffered: ea + buffer,
+      needsRoom: (a.services || []).some(s => serviceNeedsRoom(s.name)),
+    };
+  }).filter(Boolean);
+  // Sample at every 5 minutes for speed (room caps are coarse).
+  for (let t = startMins; t < endMins; t += 5) {
+    let rooms = candNeedsRoom ? 1 : 0;
+    let chairs = candNeedsRoom ? 0 : 1;
+    intervals.forEach(iv => {
+      if (t >= iv.startBuffered && t < iv.endBuffered) {
+        if (iv.needsRoom) rooms++; else chairs++;
+      }
+    });
+    if (rooms > maxRoomOverlap) maxRoomOverlap = rooms;
+    if (chairs > maxChairOverlap) maxChairOverlap = chairs;
+  }
+  const roomBlock = candNeedsRoom && maxRoomOverlap > maxRooms;
+  const chairBlock = !candNeedsRoom && maxChairOverlap > maxChairs;
+  if (roomBlock) return { blocking: true, reason: `Rooms full (${maxRoomOverlap}/${maxRooms})` };
+  if (chairBlock) return { blocking: true, reason: `Chairs full (${maxChairOverlap}/${maxChairs})` };
+  // Partial: at peak we'd be using >=80% of cap
+  if (candNeedsRoom && maxRoomOverlap >= maxRooms) return { partial: true, reason: `Last room (${maxRoomOverlap}/${maxRooms})` };
+  if (!candNeedsRoom && maxChairOverlap >= maxChairs) return { partial: true, reason: `Last chair (${maxChairOverlap}/${maxChairs})` };
+  return null;
+}
+
+/* ─── save / delete / status changes ─── */
+async function saveAppointment() {
+  const phone = String(document.getElementById('appt-phone').value || '').replace(/\D/g, '');
+  const name = String(document.getElementById('appt-name').value || '').trim();
+  const date = document.getElementById('appt-mod-date').value || state.apptDate;
+  const notes = String(document.getElementById('appt-notes').value || '').trim();
+  const svcs = state.apptDraft.services || [];
+  const start = state.apptDraft.startTime || '';
+  if (phone && phone.length !== 10) { toast('Enter a valid 10-digit phone (or leave blank)'); return; }
+  if (!svcs.length) { toast('Pick at least one service'); return; }
+  if (!start) { toast('Pick a start time slot'); return; }
+  const totalMins = svcs.reduce((s, x) => s + (x.mins || 0), 0);
+  const endMins = _hhmmToMins(start) + totalMins;
+  const cfg = _apptCfg();
+  const editingId = state.apptEditingId;
+
+  // Final conflict check at save time (defence against stale UI state)
+  const dayAppts = (state.appointments || [])
+    .filter(a => a.date === date && a.status !== 'cancelled' && a.status !== 'noshow' && a.id !== editingId);
+  const conflict = checkSlotConflict({
+    startMins: _hhmmToMins(start), endMins, services: svcs, dayAppts,
+    buffer: parseInt(cfg.bufferMinutes, 10) || 10,
+    maxRooms: parseInt(cfg.massageRooms, 10) || 1,
+    maxChairs: parseInt(cfg.chairCapacity, 10) || 4,
+  });
+  if (conflict && conflict.blocking) {
+    toast('Slot blocked: ' + conflict.reason);
+    return;
+  }
+
+  const customerId = phone.length >= 5 ? phone.slice(-5) : '';
+  const payload = {
+    date, startTime: start, endTime: _minsToHHMM(endMins),
+    durationMins: totalMins,
+    customerName: name, customerPhone: phone, customerId,
+    services: svcs,
+    staffNames: Array.from(new Set(svcs.map(s => s.staffName).filter(Boolean))),
+    notes,
+    status: 'booked',
+    reminderSent: false,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (editingId) {
+    try {
+      await db.collection(COL.APPOINTMENTS).doc(editingId).set(payload, { merge: true });
+      logAudit('appt.update', COL.APPOINTMENTS + '/' + editingId, { date, start, services: svcs.length });
+      toast('Appointment updated');
+    } catch (e) {
+      console.error('appt update failed', e);
+      toast('Save failed — try again');
+      return;
+    }
+  } else {
+    const newId = await fbAppendDoc(COL.APPOINTMENTS, payload);
+    if (!newId) { toast('Save failed — check connection'); return; }
+    logAudit('appt.create', COL.APPOINTMENTS + '/' + newId, { date, start, services: svcs.length });
+    toast('Appointment booked ✓');
+  }
+  closeModal('modal-appointment');
+  state.apptEditingId = null;
+  state.apptDraft = null;
+  state.apptDate = date;
+  renderAppointmentsScreen();
+}
+
+async function deleteAppointment() {
+  const id = state.apptEditingId;
+  if (!id) return;
+  if (!confirm('Cancel this appointment?')) return;
+  try {
+    await db.collection(COL.APPOINTMENTS).doc(id).set({
+      status: 'cancelled', updatedAt: new Date().toISOString(),
+    }, { merge: true });
+    logAudit('appt.cancel', COL.APPOINTMENTS + '/' + id);
+    toast('Appointment cancelled');
+    closeModal('modal-appointment');
+    state.apptEditingId = null;
+    renderAppointmentsScreen();
+  } catch (e) { console.error(e); toast('Cancel failed'); }
+}
+
+async function markAppointmentNoShow(id) {
+  if (!confirm('Mark this appointment as a no-show?')) return;
+  try {
+    await db.collection(COL.APPOINTMENTS).doc(id).set({
+      status: 'noshow', updatedAt: new Date().toISOString(),
+    }, { merge: true });
+    logAudit('appt.noshow', COL.APPOINTMENTS + '/' + id);
+    renderAppointmentsScreen();
+  } catch (e) { console.error(e); }
+}
+
+async function reopenAppointment(id) {
+  try {
+    await db.collection(COL.APPOINTMENTS).doc(id).set({
+      status: 'booked', updatedAt: new Date().toISOString(),
+    }, { merge: true });
+    renderAppointmentsScreen();
+  } catch (e) { console.error(e); }
+}
+
+/* ─── checkout flow: appointment → cart → billing ─── */
+function checkoutAppointment(id) {
+  const a = (state.appointments || []).find(x => x.id === id);
+  if (!a) { toast('Appointment not found'); return; }
+  if (state.cart && state.cart.length) {
+    if (!confirm('Replace the current cart with this appointment?')) return;
+  }
+  state.cart = (a.services || []).map(s => ({
+    id: uid(), name: s.name, price: parseFloat(s.price) || 0, qty: 1,
+    staffName: s.staffName || '',
+  }));
+  state.discount = null;
+  state.apptCheckoutId = a.id;
+  // Pre-fill receipt fields so when the user lands on the receipt screen
+  // the customer details are already there.
+  setTimeout(() => {
+    const ph = document.getElementById('customer-phone'); if (ph) ph.value = a.customerPhone || '';
+    const nm = document.getElementById('customer-name');  if (nm) nm.value = a.customerName || '';
+  }, 0);
+  // Mark in-progress (best-effort).
+  if (a.status === 'booked' && db) {
+    db.collection(COL.APPOINTMENTS).doc(a.id).set({
+      status: 'inprogress', updatedAt: new Date().toISOString(),
+    }, { merge: true }).catch(() => {});
+  }
+  toast('Cart loaded from appointment');
+  showScreen('cart');
+}
+
+async function completeAppointmentAfterCheckout(apptId, transactionId, total) {
+  if (!apptId || !db) return;
+  try {
+    await db.collection(COL.APPOINTMENTS).doc(apptId).set({
+      status: 'completed',
+      linkedTransactionId: transactionId || '',
+      billedTotal: total || 0,
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+    logAudit('appt.checkout', COL.APPOINTMENTS + '/' + apptId, { transactionId, total });
+  } catch (e) { console.warn('appt completion failed:', e); }
+}
+
+/* ─── reminders (browser notifications + WhatsApp link) ─── */
+function checkAppointmentReminders() {
+  const cfg = _apptCfg();
+  const lead = parseInt(cfg.reminderLeadMinutes, 10) || 15;
+  const today = todayISO();
+  const nowMins = (new Date()).getHours() * 60 + (new Date()).getMinutes();
+  (state.appointments || []).forEach(a => {
+    if (a.date !== today) return;
+    if (a.status !== 'booked' && a.status !== 'inprogress') return;
+    const start = _hhmmToMins(a.startTime);
+    if (start == null) return;
+    const minutesAway = start - nowMins;
+    if (minutesAway < 0 || minutesAway > lead) return;
+    if (state.apptRemindedIds[a.id]) return;
+    state.apptRemindedIds[a.id] = true;
+    // In-app toast
+    toast(`⏰ ${a.customerName || 'Walk-in'} — ${_fmtTime12(a.startTime)} (in ${minutesAway} min)`);
+    // Browser notification (best-effort, requires permission)
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try {
+        new Notification('Appointment in ' + minutesAway + ' min', {
+          body: (a.customerName || 'Walk-in') + ' · ' + _fmtTime12(a.startTime) + ' · ' +
+                (a.services || []).map(s => s.name).join(', '),
+          icon: '/manifest.json',
+          tag: 'appt-' + a.id,
+        });
+      } catch (_) {}
+    }
+  });
+}
+
+function sendApptWhatsApp(id) {
+  const a = (state.appointments || []).find(x => x.id === id);
+  if (!a) return;
+  const phone = (a.customerPhone || '').replace(/\D/g, '');
+  if (phone.length !== 10) { toast('Customer phone is missing'); return; }
+  const lines = [
+    `Hi ${a.customerName || 'there'} 👋`,
+    `Reminder: your appointment at *${config.shopName || 'our salon'}*`,
+    `📅 ${a.date} at ${_fmtTime12(a.startTime)} (${a.durationMins || ''} min)`,
+    'Services: ' + (a.services || []).map(s => s.name).join(', '),
+    a.notes ? 'Note: ' + a.notes : '',
+    '',
+    'See you soon! Reply here to reschedule.',
+  ].filter(Boolean).join('\n');
+  window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(lines)}`, '_blank');
+  // Mark reminder sent so we don't auto-fire it again locally.
+  state.apptRemindedIds[id] = true;
+  if (db) {
+    db.collection(COL.APPOINTMENTS).doc(id).set({ reminderSent: true }, { merge: true }).catch(() => {});
+  }
+}
+
+// Ask for browser notification permission once (best-effort, non-blocking).
+function requestNotificationPermissionOnce() {
+  if (typeof Notification === 'undefined') return;
+  if (Notification.permission === 'default') {
+    try { Notification.requestPermission(); } catch (_) {}
+  }
+}
+// Poll once every minute to fire reminders even when no Firestore event lands.
+setInterval(() => {
+  if (!currentUser || !currentUser.role) return;
+  checkAppointmentReminders();
+  // Also keep the live Today's strip fresh for time-based "Soon" badges.
+  if (state.screen === 'staff') renderStaffApptStrip();
+}, 60 * 1000);
+
 // ── START ──
 init();
+requestNotificationPermissionOnce();
 </script>
 </body>
 </html>
