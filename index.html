@@ -363,6 +363,72 @@ input,select,textarea{font-family:inherit;font-size:inherit;color:inherit;}
 .staff-hero-title{font-family:var(--serif);font-size:25px;line-height:1.12;font-weight:500;letter-spacing:-.01em;text-shadow:0 2px 10px rgba(0,0,0,.4);}
 .staff-hero-sub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:10px;opacity:.88;font-weight:600;}
 
+/* ─── STAFF DASHBOARD V2 — flowing layout (hero → floating CTA → bare sections) ─── */
+.staff-hero-v2{position:relative;height:300px;overflow:hidden;background-color:#1f1611;isolation:isolate;}
+.staff-hero-v2-img{position:absolute;inset:0;background-image:url('https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=1280');background-size:cover;background-position:center;background-repeat:no-repeat;transform:scale(1.04);}
+.staff-hero-v2-img::after{content:'';position:absolute;inset:0;background:linear-gradient(165deg,rgba(20,14,10,.58) 0%,rgba(20,14,10,.22) 45%,rgba(20,14,10,.55) 100%);}
+/* Long fade so hero MELTS into the page background instead of a hard cut */
+.staff-hero-v2-fade{position:absolute;left:0;right:0;bottom:0;height:160px;background:linear-gradient(180deg,rgba(248,245,240,0) 0%,rgba(248,245,240,.55) 55%,var(--bg) 100%);pointer-events:none;z-index:1;}
+.staff-hero-v2-content{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:0 24px 96px;color:#FFF;}
+.staff-hero-v2-tag{font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--champagne-soft);font-weight:700;margin-bottom:10px;}
+.staff-hero-v2-title{font-family:var(--serif);font-size:30px;line-height:1.1;font-weight:500;letter-spacing:-.015em;text-shadow:0 2px 14px rgba(0,0,0,.45);max-width:340px;}
+.staff-hero-v2-title em{font-style:italic;color:var(--champagne-soft);font-weight:400;display:block;margin-top:2px;}
+.staff-hero-v2-date{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;margin-top:14px;opacity:.86;font-weight:600;display:flex;align-items:center;gap:10px;}
+.staff-hero-v2-date::before{content:'';display:inline-block;width:24px;height:1px;background:var(--champagne-soft);opacity:.7;}
+
+/* Wrap that floats up over the hero so primary action overlaps it */
+.staff-flow-wrap{position:relative;z-index:3;margin-top:-72px;padding:0 18px 28px;display:flex;flex-direction:column;gap:24px;}
+
+/* The hero primary CTA — large card with icon, title, sub, arrow */
+.staff-primary-action{display:flex;align-items:center;gap:16px;width:100%;padding:18px 18px;border-radius:18px;background:linear-gradient(135deg,#1A1A1A 0%,#2d2620 100%);color:#FFF;border:1px solid rgba(255,255,255,.06);box-shadow:0 18px 40px -12px rgba(26,26,26,.48),0 4px 12px rgba(26,26,26,.18);text-align:left;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;}
+.staff-primary-action:active{transform:translateY(1px);box-shadow:0 12px 28px -10px rgba(26,26,26,.42);}
+.staff-primary-action .spa-leading{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--champagne) 0%,#9c7a4f 100%);display:flex;align-items:center;justify-content:center;color:#FFF;font-size:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 2px 8px rgba(184,149,106,.32);}
+.staff-primary-action .spa-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+.staff-primary-action .spa-title{font-size:15px;font-weight:600;letter-spacing:.01em;}
+.staff-primary-action .spa-sub{font-size:11.5px;font-weight:400;color:var(--champagne-soft);letter-spacing:.04em;opacity:.92;}
+.staff-primary-action .spa-arrow{flex-shrink:0;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:var(--champagne-soft);font-size:16px;transition:transform .18s ease,background .18s ease;}
+.staff-primary-action:hover .spa-arrow{transform:translateX(2px);background:rgba(255,255,255,.14);}
+
+/* Quick chip row — soft pills */
+.staff-quick-row{display:flex;gap:10px;}
+.staff-chip{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line-soft);color:var(--ink);font-size:12.5px;font-weight:600;letter-spacing:.02em;cursor:pointer;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;box-shadow:0 1px 2px rgba(26,26,26,.04);}
+.staff-chip:hover{border-color:var(--champagne);box-shadow:0 4px 12px rgba(184,149,106,.14);}
+.staff-chip:active{transform:translateY(1px);}
+.staff-chip .chip-ico{font-size:16px;line-height:1;}
+.staff-chip .chip-text{letter-spacing:.04em;}
+
+/* Bare section header — no card chrome, just typography */
+.flow-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;padding:0 4px;}
+.flow-section-eyebrow{font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--champagne);font-weight:700;}
+.flow-section-title{font-family:var(--serif);font-size:22px;color:var(--ink);font-weight:500;letter-spacing:-.01em;flex:1;}
+.flow-section-link{font-size:12px;font-weight:600;color:var(--terracotta);background:none;border:none;cursor:pointer;letter-spacing:.02em;padding:4px 0;}
+.flow-section-link:hover{text-decoration:underline;text-underline-offset:3px;}
+
+/* Appointment row — inline, with a soft champagne accent on the time pill */
+.flow-appt-row{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;cursor:pointer;transition:background .15s ease;background:transparent;}
+.flow-appt-row + .flow-appt-row{border-top:1px solid var(--line-soft);}
+.flow-appt-row:hover{background:var(--surface-2);}
+.flow-appt-row:focus-visible{outline:2px solid var(--champagne);outline-offset:2px;}
+.flow-appt-time{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:58px;padding:8px 6px;border-radius:10px;background:linear-gradient(135deg,rgba(184,149,106,.12) 0%,rgba(184,149,106,.04) 100%);border:1px solid rgba(184,149,106,.22);}
+.flow-appt-time .ft-h{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);line-height:1;}
+.flow-appt-time .ft-m{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--champagne);margin-top:3px;font-weight:700;}
+.flow-appt-meta{flex:1;min-width:0;}
+.flow-appt-name{font-size:14px;font-weight:600;color:var(--ink);letter-spacing:-.005em;}
+.flow-appt-svc{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.flow-appt-tag{flex-shrink:0;font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;border-radius:20px;background:rgba(166,85,85,.10);color:var(--terracotta);border:1px solid rgba(166,85,85,.18);}
+.flow-empty{padding:18px 4px;color:var(--muted);font-size:13px;line-height:1.55;}
+
+@media (max-width:380px){
+  .staff-hero-v2{height:270px;}
+  .staff-hero-v2-content{padding:0 20px 90px;}
+  .staff-hero-v2-title{font-size:26px;}
+  .staff-flow-wrap{padding:0 14px 24px;gap:22px;}
+  .staff-primary-action{padding:16px;}
+  .staff-primary-action .spa-leading{width:42px;height:42px;font-size:18px;}
+  .staff-primary-action .spa-title{font-size:14px;}
+  .flow-section-title{font-size:20px;}
+}
+
 /* BILLING HERO STRIP */
 .billing-hero{position:sticky;top:73px;z-index:7;height:126px;overflow:hidden;background-color:#1a1a1a;background-image:linear-gradient(155deg,rgba(17,17,17,.55) 0%,rgba(45,32,24,.28) 100%),url('https://images.pexels.com/photos/2076930/pexels-photo-2076930.jpeg?auto=compress&cs=tinysrgb&w=1280');background-size:cover;background-position:center;background-repeat:no-repeat;}
 
@@ -636,9 +702,20 @@ input,select,textarea{font-family:inherit;font-size:inherit;color:inherit;}
 .payment-amount-label{color:var(--muted);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:500;}
 .payment-amount{font-family:var(--serif);font-size:48px;color:var(--ink);margin-top:8px;font-weight:500;letter-spacing:-.02em;line-height:1;}
 .payment-amount .curr{color:var(--champagne);font-size:32px;font-weight:400;margin-right:2px;}
-.pay-method-row{display:flex;gap:8px;max-width:360px;margin:18px auto 8px;}
-.pay-method-btn{flex:1;padding:11px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--ink);}
+.pay-method-row{display:flex;gap:8px;max-width:420px;margin:18px auto 8px;flex-wrap:wrap;}
+.pay-method-btn{flex:1 1 70px;padding:11px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--ink);}
 .pay-method-btn.active{background:var(--ink);border-color:var(--ink);color:#FFF;}
+
+.split-card{margin:20px auto 16px;background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius-lg);padding:18px 18px 14px;max-width:360px;text-align:left;}
+.split-title{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:center;margin-bottom:12px;}
+.split-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.split-row label{flex:0 0 50px;font-size:12px;font-weight:600;color:var(--ink);letter-spacing:.08em;}
+.split-input{flex:1;display:flex;align-items:center;gap:6px;background:#FFF;border:1px solid var(--line);border-radius:8px;padding:8px 12px;}
+.split-input span{color:var(--champagne);font-weight:500;}
+.split-input input{flex:1;border:none;outline:none;font-size:15px;font-weight:500;color:var(--ink);background:transparent;width:100%;}
+.split-summary{margin-top:8px;text-align:center;font-size:12px;color:var(--muted);font-weight:500;}
+.split-summary.is-ok{color:#3a7a3a;}
+.split-summary.is-bad{color:var(--danger);}
 .payment-note{font-size:12px;color:var(--muted);line-height:1.55;max-width:320px;margin:0 auto;}
 .qr-card{margin:28px auto 20px;background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius-lg);padding:20px;max-width:300px;}
 .qr-card img{width:100%;height:auto;border-radius:8px;display:block;}
@@ -665,6 +742,20 @@ select.input{appearance:none;-webkit-appearance:none;background-image:url("data:
 .confirm-mark svg{width:36px;height:36px;stroke:#FFF;stroke-width:2;fill:none;}
 .confirm-title{font-family:var(--serif);font-size:32px;margin-bottom:14px;font-weight:500;letter-spacing:-.01em;}
 .confirm-subtitle{color:var(--muted);max-width:300px;line-height:1.65;margin-bottom:40px;font-size:13.5px;}
+
+.confirm-wa-panel{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;padding:16px 18px;max-width:340px;margin:0 0 28px;box-shadow:var(--shadow-card);}
+.confirm-wa-status{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px;}
+.confirm-wa-status.is-warn{color:#a06000;}
+.confirm-wa-actions{display:flex;flex-direction:column;gap:8px;}
+.confirm-wa-actions .btn{width:100%;}
+.confirm-wa-hint{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5;}
+
+.checkout-choice{margin-top:8px;display:flex;flex-direction:column;gap:10px;}
+.checkout-choice-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:center;margin-bottom:2px;}
+.checkout-btn{width:100%;flex-direction:column;align-items:stretch;justify-content:center;padding:14px 16px;line-height:1.3;text-align:center;gap:3px;display:flex;}
+.checkout-btn .checkout-btn-title{font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:none;}
+.checkout-btn .checkout-btn-sub{font-size:11px;font-weight:400;opacity:.85;letter-spacing:.02em;text-transform:none;}
+.checkout-help{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.5;margin-top:4px;}
 
 /* MODALS */
 .modal-backdrop{position:fixed;inset:0;background:rgba(15,12,10,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center;z-index:100;}
@@ -1481,35 +1572,52 @@ img, video, canvas, svg{max-width:100%;height:auto;}
     <div style="width:44px"></div>
   </div>
 
-  <!-- Hero banner with salon imagery -->
-  <div class="staff-hero">
-    <div class="staff-hero-overlay"></div>
-    <div class="staff-hero-content">
-      <div class="staff-hero-tag">Premium Salon &amp; Spa</div>
-      <div class="staff-hero-title">Welcome,<br>let's begin a beautiful day</div>
-      <div class="staff-hero-sub" id="staff-hero-date"></div>
+  <!-- Hero — full-bleed, feathered fade so it melts into the page -->
+  <div class="staff-hero-v2">
+    <div class="staff-hero-v2-img"></div>
+    <div class="staff-hero-v2-content">
+      <div class="staff-hero-v2-tag">Premium Salon &amp; Spa</div>
+      <div class="staff-hero-v2-title">Welcome,<em>let's begin a beautiful day</em></div>
+      <div class="staff-hero-v2-date" id="staff-hero-date"></div>
     </div>
+    <div class="staff-hero-v2-fade"></div>
   </div>
 
-  <div class="staff-section">
-    <!-- New bill button -->
-    <button class="new-bill-cta" onclick="showScreen('home')">
-      ✦ New Customer Bill
+  <!-- Flow content rises up over the hero so the primary action overlaps -->
+  <div class="staff-flow-wrap">
+    <button class="staff-primary-action" onclick="showScreen('home')">
+      <span class="spa-leading">✦</span>
+      <span class="spa-body">
+        <span class="spa-title">New Customer Bill</span>
+        <span class="spa-sub">Start a fresh checkout</span>
+      </span>
+      <span class="spa-arrow">→</span>
     </button>
-  </div>
 
-  <div class="staff-section" style="padding-top:0;">
+    <div class="staff-quick-row">
+      <button class="staff-chip" onclick="showScreen('appointments')">
+        <span class="chip-ico">📅</span><span class="chip-text">Calendar</span>
+      </button>
+      <button class="staff-chip" onclick="document.getElementById('staff-att-anchor').scrollIntoView({behavior:'smooth',block:'start'})">
+        <span class="chip-ico">👥</span><span class="chip-text">Attendance</span>
+      </button>
+    </div>
+
+    <!-- Today's appointments — bare typography, no nested card -->
     <div id="staff-appt-strip-host"></div>
-    <button class="new-bill-cta" style="background:var(--surface);color:var(--ink);border:1px solid var(--ink);box-shadow:none;" onclick="showScreen('appointments')">
-      📅 Appointments &amp; Calendar
-    </button>
-  </div>
 
-  <div class="staff-section">
-    <div class="section-title">Today's Attendance</div>
-    <div id="att-summary-strip" class="att-summary"></div>
-    <div id="attendance-list">
-      <div class="muted-text center" style="padding:20px">No staff configured yet. Ask admin to add staff in Setup.</div>
+    <!-- Today's attendance — bare typography too -->
+    <div id="staff-att-anchor">
+      <div class="flow-section-head">
+        <div>
+          <div class="flow-section-eyebrow">Today</div>
+          <div class="flow-section-title">Attendance</div>
+        </div>
+      </div>
+      <div id="att-summary-strip" class="att-summary"></div>
+      <div id="attendance-list">
+        <div class="flow-empty">No staff configured yet. Ask admin to add staff in Setup.</div>
+      </div>
     </div>
   </div>
 </section>
@@ -1598,10 +1706,27 @@ img, video, canvas, svg{max-width:100%;height:auto;}
       <button class="pay-method-btn" id="pay-btn-upi" onclick="setPaymentMethod('UPI')">UPI</button>
       <button class="pay-method-btn" id="pay-btn-cash" onclick="setPaymentMethod('Cash')">Cash</button>
       <button class="pay-method-btn" id="pay-btn-card" onclick="setPaymentMethod('Card')">Card</button>
+      <button class="pay-method-btn" id="pay-btn-split" onclick="setPaymentMethod('Split')">Split</button>
     </div>
     <div class="qr-card">
       <div id="qr-holder"></div>
       <div class="upi-id" id="upi-id-holder"></div>
+    </div>
+    <div class="split-card" id="split-card" style="display:none">
+      <div class="split-title">Split Payment</div>
+      <div class="split-row">
+        <label>UPI</label>
+        <div class="split-input"><span>₹</span><input type="number" inputmode="decimal" min="0" step="1" id="split-amt-upi" oninput="onSplitAmountChange()" placeholder="0"></div>
+      </div>
+      <div class="split-row">
+        <label>Cash</label>
+        <div class="split-input"><span>₹</span><input type="number" inputmode="decimal" min="0" step="1" id="split-amt-cash" oninput="onSplitAmountChange()" placeholder="0"></div>
+      </div>
+      <div class="split-row">
+        <label>Card</label>
+        <div class="split-input"><span>₹</span><input type="number" inputmode="decimal" min="0" step="1" id="split-amt-card" oninput="onSplitAmountChange()" placeholder="0"></div>
+      </div>
+      <div class="split-summary" id="split-summary">Entered ₹0 of ₹0 · Remaining ₹0</div>
     </div>
     <p class="payment-note" id="payment-note">Ask the customer to scan using PhonePe, GPay, or any UPI app. Tap below once payment reflects.</p>
   </div>
@@ -1630,7 +1755,7 @@ img, video, canvas, svg{max-width:100%;height:auto;}
         <div style="font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--champagne);font-weight:500;">Bill Total</div>
         <div style="font-family:var(--serif);font-size:28px;margin-top:6px;font-weight:500;letter-spacing:-.01em;line-height:1;" id="receipt-total">₹0</div>
       </div>
-      <div style="font-size:9.5px;letter-spacing:.22em;text-align:right;color:var(--champagne);font-weight:500;">PAID<br>VIA UPI</div>
+      <div style="font-size:9.5px;letter-spacing:.22em;text-align:right;color:var(--champagne);font-weight:500;" id="receipt-paid-via">PAID<br>VIA UPI</div>
     </div>
 
     <label class="form-label">Served by (Staff) <span style="color:var(--danger);">*</span></label>
@@ -1654,12 +1779,18 @@ img, video, canvas, svg{max-width:100%;height:auto;}
     </div>
     <div class="hint">Saved with the customer ID for repeat-visit greeting.</div>
 
-    <button class="btn btn-rose" style="width:100%;margin-top:8px" onclick="sendWhatsAppReceipt()">
-      Open WhatsApp &amp; Send Receipt
-    </button>
-      <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="skipReceiptAndFinish()">
-      Skip Receipt &amp; Finish
-    </button>
+    <div class="checkout-choice">
+      <div class="checkout-choice-label">Choose how to complete this bill</div>
+      <button class="btn btn-primary checkout-btn" id="btn-checkout-no-wa" onclick="checkoutWithoutWhatsApp()">
+        <span class="checkout-btn-title">Complete Bill (No WhatsApp)</span>
+        <span class="checkout-btn-sub">Save the transaction now · phone optional</span>
+      </button>
+      <button class="btn btn-rose checkout-btn" id="btn-checkout-wa" onclick="checkoutWithWhatsApp()">
+        <span class="checkout-btn-title">Complete &amp; Send WhatsApp Receipt</span>
+        <span class="checkout-btn-sub">Saves the bill, then opens WhatsApp · phone required</span>
+      </button>
+      <div class="checkout-help">Either button saves the sale to the books. WhatsApp can also be re-sent from the next screen if it fails to open.</div>
+    </div>
   </div>
 </section>
 
@@ -1673,6 +1804,16 @@ img, video, canvas, svg{max-width:100%;height:auto;}
     </div>
     <div class="confirm-title">Transaction Saved ✓</div>
     <div class="confirm-subtitle" id="confirm-sub">Bill saved · Counter ready for next customer.</div>
+
+    <div class="confirm-wa-panel" id="confirm-wa-panel" style="display:none">
+      <div class="confirm-wa-status" id="confirm-wa-status">WhatsApp window did not open.</div>
+      <div class="confirm-wa-actions">
+        <button class="btn btn-rose" id="confirm-wa-resend" onclick="resendLastWhatsApp()">Open WhatsApp Now</button>
+        <a class="btn btn-secondary" id="confirm-wa-link" href="#" target="_blank" rel="noopener">Copy / Open Link</a>
+      </div>
+      <div class="confirm-wa-hint">Pop-ups may be blocked by the browser. Tap above to open the chat directly — the bill is already saved.</div>
+    </div>
+
     <button class="btn btn-primary" style="min-width:220px" onclick="resetAndGoHome()">New Customer</button>
   </div>
 </section>
@@ -3155,6 +3296,9 @@ let state = {
   todayStr: todayISO(),
   attendanceCache: {},  // staffName → checkInTime
   paymentMethod: 'UPI',
+  paymentSplit: { UPI: 0, Cash: 0, Card: 0 }, // amounts entered when paymentMethod === 'Split'
+  lastTxForReceipt: null, // last successfully-saved tx (for confirm-screen WhatsApp retry)
+  lastWhatsAppUrl: null,  // wa.me deep link for the last saved tx (or null)
   dashboardMonth: todayISO().slice(0, 7),
   dashboardStaff: 'all',
   txInFlight: false,    // guard against double-submit on receipt screen
@@ -3256,8 +3400,8 @@ async function runDayCloseAutoLockSweep() {
         const dayEx = (exps || []).filter(e => String(e.date) === ds);
         if (!dayTx.length && !dayEx.length) continue; // no activity → skip
         const cashSales = dayTx.reduce((s, t) => {
-          const m = normalizePaymentMethod(t.paymentMethod);
-          return s + (m === 'Cash' ? (parseFloat(t.total) || 0) : 0);
+          const bd = getTxPaymentBreakdown(t);
+          return s + bd.Cash;
         }, 0);
         const cashExp = dayEx.reduce((s, e) => {
           return s + (String(e.paymentMode || 'Cash') === 'Cash' ? (parseFloat(e.amount) || 0) : 0);
@@ -4001,6 +4145,13 @@ window.addEventListener('popstate', (ev) => {
 function renderReceipt() {
   const el = document.getElementById('receipt-total');
   if (el) el.textContent = '₹' + grandTotal().toLocaleString('en-IN');
+  // Reflect the method picked on the payment screen on the "PAID VIA" badge
+  // so staff don't see "VIA UPI" on a Cash/Card/Split bill.
+  const badge = document.getElementById('receipt-paid-via');
+  if (badge) {
+    const m = state.paymentMethod === 'Split' ? 'Split' : normalizePaymentMethod(state.paymentMethod);
+    badge.innerHTML = 'PAID<br>VIA ' + m.toUpperCase();
+  }
   // Build / update the multi-staff split panel under the staff dropdown.
   renderReceiptStaffPanel();
 }
@@ -6070,55 +6221,242 @@ function normalizePaymentMethod(v) {
   const m = String(v || '').trim().toUpperCase();
   if (m === 'CASH') return 'Cash';
   if (m === 'CARD') return 'Card';
+  if (m === 'SPLIT') return 'Split';
   return 'UPI';
 }
 
+/* Returns {UPI,Cash,Card} amounts for a saved transaction.
+   Honours paymentSplits when present (split bills); otherwise
+   attributes the full total to tx.paymentMethod. */
+function getTxPaymentBreakdown(tx) {
+  const out = { UPI: 0, Cash: 0, Card: 0 };
+  const splits = Array.isArray(tx && tx.paymentSplits) ? tx.paymentSplits : null;
+  if (splits && splits.length) {
+    splits.forEach(s => {
+      const m = normalizePaymentMethod(s && s.method);
+      const k = (m === 'Split') ? 'UPI' : m;
+      out[k] += parseFloat(s && s.amount) || 0;
+    });
+    return out;
+  }
+  const m = normalizePaymentMethod(tx && tx.paymentMethod);
+  const k = (m === 'Split') ? 'UPI' : m;
+  out[k] += parseFloat(tx && tx.total) || 0;
+  return out;
+}
+
+/* Human label for a tx's payment ("UPI" or "Split (UPI ₹600 + Cash ₹400)"). */
+function describeTxPayment(tx) {
+  const splits = Array.isArray(tx && tx.paymentSplits)
+    ? tx.paymentSplits.filter(s => parseFloat(s && s.amount) > 0)
+    : null;
+  if (splits && splits.length > 1) {
+    return 'Split (' + splits.map(s =>
+      `${normalizePaymentMethod(s.method)} ₹${(parseFloat(s.amount) || 0).toLocaleString('en-IN')}`
+    ).join(' + ') + ')';
+  }
+  if (splits && splits.length === 1) return normalizePaymentMethod(splits[0].method);
+  return normalizePaymentMethod(tx && tx.paymentMethod);
+}
+
 function setPaymentMethod(method) {
-  state.paymentMethod = normalizePaymentMethod(method);
+  const next = String(method || '').trim().toUpperCase() === 'SPLIT'
+    ? 'Split'
+    : normalizePaymentMethod(method);
+  state.paymentMethod = next;
+  if (next === 'Split') {
+    // Pre-fill UPI with the full bill so the user only needs to reduce it.
+    if (!state.paymentSplit || typeof state.paymentSplit !== 'object') {
+      state.paymentSplit = { UPI: 0, Cash: 0, Card: 0 };
+    }
+    const total = grandTotal();
+    const sum = (parseFloat(state.paymentSplit.UPI)||0)
+              + (parseFloat(state.paymentSplit.Cash)||0)
+              + (parseFloat(state.paymentSplit.Card)||0);
+    if (sum === 0) {
+      state.paymentSplit = { UPI: total, Cash: 0, Card: 0 };
+    }
+  }
   renderPaymentMethodUI();
 }
 
 function renderPaymentMethodUI() {
-  const method = normalizePaymentMethod(state.paymentMethod);
+  const method = state.paymentMethod === 'Split' ? 'Split' : normalizePaymentMethod(state.paymentMethod);
   state.paymentMethod = method;
   const byId = {
-    UPI:  document.getElementById('pay-btn-upi'),
-    Cash: document.getElementById('pay-btn-cash'),
-    Card: document.getElementById('pay-btn-card'),
+    UPI:   document.getElementById('pay-btn-upi'),
+    Cash:  document.getElementById('pay-btn-cash'),
+    Card:  document.getElementById('pay-btn-card'),
+    Split: document.getElementById('pay-btn-split'),
   };
   Object.entries(byId).forEach(([k, el]) => {
     if (el) el.classList.toggle('active', k === method);
   });
-  const qrCard = document.querySelector('#screen-payment .qr-card');
-  const note   = document.getElementById('payment-note');
-  if (qrCard) qrCard.style.display = (method === 'UPI') ? '' : 'none';
+  const qrCard    = document.querySelector('#screen-payment .qr-card');
+  const splitCard = document.getElementById('split-card');
+  const note      = document.getElementById('payment-note');
+  if (qrCard)    qrCard.style.display    = (method === 'UPI')   ? '' : 'none';
+  if (splitCard) splitCard.style.display = (method === 'Split') ? '' : 'none';
+  if (method === 'Split') {
+    const sp = state.paymentSplit || { UPI: 0, Cash: 0, Card: 0 };
+    const setVal = (id, v) => {
+      const el = document.getElementById(id);
+      if (el) el.value = v ? String(v) : '';
+    };
+    setVal('split-amt-upi',  sp.UPI);
+    setVal('split-amt-cash', sp.Cash);
+    setVal('split-amt-card', sp.Card);
+    refreshSplitSummary();
+  }
   if (note) {
     if (method === 'UPI') {
       note.textContent = 'Ask the customer to scan using PhonePe, GPay, or any UPI app. Tap below once payment reflects.';
     } else if (method === 'Cash') {
       note.textContent = 'Collect cash and verify amount before tapping Payment Received.';
-    } else {
+    } else if (method === 'Card') {
       note.textContent = 'Process card payment on POS machine and confirm approval before tapping Payment Received.';
+    } else {
+      note.textContent = 'Enter how much the customer paid by each mode. Total must match the bill amount.';
     }
   }
 }
 
+function onSplitAmountChange() {
+  const get = id => parseFloat((document.getElementById(id) || {}).value) || 0;
+  state.paymentSplit = {
+    UPI:  get('split-amt-upi'),
+    Cash: get('split-amt-cash'),
+    Card: get('split-amt-card'),
+  };
+  refreshSplitSummary();
+}
+
+function refreshSplitSummary() {
+  const total = grandTotal();
+  const sp = state.paymentSplit || { UPI: 0, Cash: 0, Card: 0 };
+  const entered = (parseFloat(sp.UPI)||0) + (parseFloat(sp.Cash)||0) + (parseFloat(sp.Card)||0);
+  const remaining = Math.round((total - entered) * 100) / 100;
+  const el = document.getElementById('split-summary');
+  if (!el) return;
+  el.textContent = `Entered ₹${entered.toLocaleString('en-IN')} of ₹${total.toLocaleString('en-IN')} · ${remaining === 0 ? 'Matches bill ✓' : (remaining > 0 ? 'Remaining ₹' + remaining.toLocaleString('en-IN') : 'Over by ₹' + Math.abs(remaining).toLocaleString('en-IN'))}`;
+  el.classList.toggle('is-ok',  remaining === 0 && entered > 0);
+  el.classList.toggle('is-bad', remaining !== 0);
+}
+
 /* ────────────────────────────────────────────────────
    RECEIPT + TRANSACTION LOG
+   ----------------------------------------------------
+   Two checkout paths (kept deliberately equal so staff
+   never feel WhatsApp is the only way out):
+
+     • checkoutWithoutWhatsApp() — phone optional, just saves
+     • checkoutWithWhatsApp()    — phone required, saves THEN
+                                   tries to open wa.me; if the
+                                   pop-up is blocked the confirm
+                                   screen exposes a retry button
+                                   so the bill is never lost and
+                                   the customer record is still
+                                   written.
+
+   Both paths funnel into finaliseTransaction() which is the
+   single source of truth for the DB write — WhatsApp is a
+   strictly post-write side-effect, so customers/sales totals
+   can never drift from each other.
 ──────────────────────────────────────────────────── */
-function sendWhatsAppReceipt() {
-  const phone = document.getElementById('customer-phone').value.trim();
-  if (phone && phone.length !== 10) { toast('Enter a valid 10-digit number'); return; }
-  finaliseTransaction(phone);
+function checkoutWithoutWhatsApp() {
+  const phoneRaw = (document.getElementById('customer-phone').value || '').trim();
+  // Phone is OPTIONAL on this path — but if entered, must be a valid 10-digit
+  // number so the customer record keys correctly.
+  if (phoneRaw && phoneRaw.length !== 10) {
+    toast('Phone must be 10 digits — clear it or fix it');
+    return;
+  }
+  finaliseTransaction(phoneRaw, { sendWhatsApp: false });
 }
 
-function skipReceiptAndFinish() {
-  const phone = document.getElementById('customer-phone').value.trim();
-  const validPhone = phone && phone.length === 10 ? phone : '';
-  finaliseTransaction(validPhone);
+function checkoutWithWhatsApp() {
+  const phoneRaw = (document.getElementById('customer-phone').value || '').trim();
+  if (!phoneRaw) {
+    toast('WhatsApp checkout needs a 10-digit number');
+    const el = document.getElementById('customer-phone');
+    if (el) { el.focus(); el.style.borderColor = 'var(--danger)'; setTimeout(() => { el.style.borderColor = ''; }, 1800); }
+    return;
+  }
+  if (phoneRaw.length !== 10) { toast('Enter a valid 10-digit number'); return; }
+  finaliseTransaction(phoneRaw, { sendWhatsApp: true });
 }
 
-async function finaliseTransaction(phone) {
+// Legacy wrappers — kept so any old onclick references continue to work.
+function sendWhatsAppReceipt() { checkoutWithWhatsApp(); }
+function skipReceiptAndFinish() { checkoutWithoutWhatsApp(); }
+
+/* Build the WhatsApp deep-link text + URL from a saved tx row.
+   Shared between the initial send and the confirm-screen retry. */
+function buildWhatsAppLinkForTx(txRow) {
+  const phone = String(txRow && txRow.customerPhone || '').replace(/\D/g, '');
+  if (phone.length !== 10) return null;
+  const sub = parseFloat(txRow.subtotal) || 0;
+  const disc = parseFloat(txRow.discount) || 0;
+  const gst = parseFloat(txRow.gst) || 0;
+  const total = parseFloat(txRow.total) || 0;
+  const items = Array.isArray(txRow.items) ? txRow.items : [];
+  const itemLines = items.length
+    ? items.map(i => `${i.name}${i.qty > 1 ? ' ×' + i.qty : ''} — ₹${((parseFloat(i.price)||0) * (parseFloat(i.qty)||0)).toLocaleString('en-IN')}`)
+    : [String(txRow.services || '')];
+  const lines = [
+    `*${config.shopName}*`,
+    config.location,
+    '─────────────────',
+    ...itemLines,
+    '─────────────────',
+    sub !== total ? `Subtotal: ₹${sub.toLocaleString('en-IN')}` : '',
+    disc ? `Discount: −₹${disc.toLocaleString('en-IN')}` : '',
+    gst ? `GST (${config.gstRate}%): ₹${gst.toLocaleString('en-IN')}` : '',
+    `*Total Paid: ₹${total.toLocaleString('en-IN')}*`,
+    '─────────────────',
+    config.receiptFooter,
+    `Date: ${txRow.date} | ${txRow.time || ''}`,
+  ].filter(Boolean).join('\n');
+  return `https://wa.me/91${phone}?text=${encodeURIComponent(lines)}`;
+}
+
+/* Try to open WhatsApp. Returns true if window.open returned a handle,
+   false if the browser blocked it (so the caller can show a retry UI). */
+function tryOpenWhatsApp(url) {
+  if (!url) return false;
+  let win = null;
+  try { win = window.open(url, '_blank'); } catch(_) { win = null; }
+  return !!win;
+}
+
+/* Confirm-screen retry: rebuilds the link from the last saved tx and tries
+   again. Because this runs from a direct user click it almost always
+   succeeds even if the original auto-open was popup-blocked. */
+function resendLastWhatsApp() {
+  const tx = state.lastTxForReceipt;
+  if (!tx) { toast('No saved bill to resend'); return; }
+  const url = buildWhatsAppLinkForTx(tx);
+  if (!url) { toast('No valid customer phone on this bill'); return; }
+  const ok = tryOpenWhatsApp(url);
+  const status = document.getElementById('confirm-wa-status');
+  if (ok) {
+    if (status) {
+      status.textContent = 'WhatsApp opened ✓ — verify the chat opened in the new tab.';
+      status.classList.remove('is-warn');
+    }
+    try { logAudit('tx.whatsapp.resend.opened', null, { phone: tx.customerPhone, total: tx.total }); } catch(_) {}
+  } else {
+    if (status) {
+      status.textContent = 'Pop-up still blocked. Use the link button below 👇';
+      status.classList.add('is-warn');
+    }
+    try { logAudit('tx.whatsapp.resend.blocked', null, { phone: tx.customerPhone, total: tx.total }); } catch(_) {}
+  }
+}
+
+async function finaliseTransaction(phone, options) {
+  options = options || {};
+  const sendWhatsApp = !!options.sendWhatsApp;
   // Guard against double-submit: if already finalising, ignore subsequent taps.
   if (state.txInFlight) return;
   // Always re-read the IST calendar date at the moment of save, never the
@@ -6171,6 +6509,34 @@ async function finaliseTransaction(phone) {
   const disc = discountAmount();
   const gst = config.gstRate ? Math.round((sub - disc) * config.gstRate / 100) : 0;
   const total = sub - disc + gst;
+
+  // SPLIT PAYMENT — validate sum of UPI+Cash+Card equals bill total before saving.
+  let paymentSplits = null;
+  let savedPaymentMethod = normalizePaymentMethod(state.paymentMethod);
+  if (state.paymentMethod === 'Split') {
+    const sp = state.paymentSplit || { UPI: 0, Cash: 0, Card: 0 };
+    const parts = [
+      { method: 'UPI',  amount: Math.round((parseFloat(sp.UPI)  || 0) * 100) / 100 },
+      { method: 'Cash', amount: Math.round((parseFloat(sp.Cash) || 0) * 100) / 100 },
+      { method: 'Card', amount: Math.round((parseFloat(sp.Card) || 0) * 100) / 100 },
+    ].filter(p => p.amount > 0);
+    const sum = parts.reduce((s, p) => s + p.amount, 0);
+    if (parts.length < 2) {
+      toast('Split needs at least two payment modes — or pick a single mode above.');
+      state.txInFlight = false;
+      buttons.forEach(b => b.disabled = false);
+      return;
+    }
+    if (Math.abs(sum - total) > 0.5) {
+      toast(`Split total ₹${sum.toLocaleString('en-IN')} doesn't match bill ₹${total.toLocaleString('en-IN')}.`);
+      state.txInFlight = false;
+      buttons.forEach(b => b.disabled = false);
+      return;
+    }
+    paymentSplits = parts;
+    savedPaymentMethod = 'Split';
+  }
+
   const now = new Date();
   const timeStr = nowTimeIST();
 
@@ -6200,7 +6566,8 @@ async function finaliseTransaction(phone) {
     discountLabel: state.discount ? (state.discount.label || '') : '',
     gst,
     total,
-    paymentMethod: normalizePaymentMethod(state.paymentMethod),
+    paymentMethod: savedPaymentMethod,
+    paymentSplits: paymentSplits,  // null for single-mode bills; array of {method,amount} for splits
     staffId:   staffRec ? (staffRec.id || '') : '',
     staffName: staffName,
     commissionPct,
@@ -6242,30 +6609,64 @@ async function finaliseTransaction(phone) {
     state.apptCheckoutId = null;
   }
 
-  // Send WhatsApp if phone provided
-  if (phone) {
-    const lines = [
-      `*${config.shopName}*`,
-      config.location,
-      '─────────────────',
-      ...state.cart.map(i => `${i.name}${i.qty > 1 ? ' ×' + i.qty : ''} — ₹${(i.price * i.qty).toLocaleString('en-IN')}`),
-      '─────────────────',
-      sub !== total ? `Subtotal: ₹${sub.toLocaleString('en-IN')}` : '',
-      disc ? `Discount: −₹${disc.toLocaleString('en-IN')}` : '',
-      gst ? `GST (${config.gstRate}%): ₹${gst.toLocaleString('en-IN')}` : '',
-      `*Total Paid: ₹${total.toLocaleString('en-IN')}*`,
-      '─────────────────',
-      config.receiptFooter,
-      `Date: ${state.todayStr} | ${timeStr}`,
-    ].filter(Boolean).join('\n');
-    const waUrl = `https://wa.me/91${phone}?text=${encodeURIComponent(lines)}`;
-    window.open(waUrl, '_blank');
+  // Send WhatsApp ONLY if the staff chose the WhatsApp checkout path.
+  // The bill is already persisted above — WhatsApp is purely cosmetic.
+  // We capture the saved row on `state.lastTxForReceipt` so the confirm
+  // screen can offer a one-tap retry if the pop-up was blocked.
+  const savedTx = Object.assign({ id: newId }, txRow);
+  state.lastTxForReceipt = savedTx;
+  let waPanelMode = 'hidden';   // hidden | sent | blocked | nophone
+  if (sendWhatsApp && phoneClean.length === 10) {
+    const waUrl = buildWhatsAppLinkForTx(savedTx);
+    const opened = tryOpenWhatsApp(waUrl);
+    waPanelMode = opened ? 'sent' : 'blocked';
+    state.lastWhatsAppUrl = waUrl;
+    try {
+      logAudit(opened ? 'tx.whatsapp.opened' : 'tx.whatsapp.blocked',
+        `${COL.TRANSACTIONS}/${newId}`,
+        { phone: phoneClean, total });
+    } catch(_) {}
+    if (!opened) toast('Pop-up blocked — use the WhatsApp button on next screen');
+  } else if (sendWhatsApp && phoneClean.length !== 10) {
+    waPanelMode = 'nophone';
+    state.lastWhatsAppUrl = null;
+  } else {
+    state.lastWhatsAppUrl = null;
+  }
+
+  // Configure the WhatsApp retry panel on the confirm screen.
+  const waPanel  = document.getElementById('confirm-wa-panel');
+  const waStatus = document.getElementById('confirm-wa-status');
+  const waLink   = document.getElementById('confirm-wa-link');
+  if (waPanel && waStatus) {
+    if (waPanelMode === 'hidden') {
+      waPanel.style.display = 'none';
+    } else {
+      waPanel.style.display = '';
+      waStatus.classList.toggle('is-warn', waPanelMode !== 'sent');
+      if (waPanelMode === 'sent') {
+        waStatus.textContent = `WhatsApp opened for +91 ${phoneClean} ✓ — verify message sent.`;
+      } else if (waPanelMode === 'blocked') {
+        waStatus.textContent = `Pop-up was blocked. Tap below to open WhatsApp for +91 ${phoneClean}.`;
+      } else {
+        waStatus.textContent = 'Bill saved, but no valid customer phone — receipt not sent.';
+      }
+      if (waLink) {
+        if (state.lastWhatsAppUrl) {
+          waLink.href = state.lastWhatsAppUrl;
+          waLink.style.display = '';
+        } else {
+          waLink.removeAttribute('href');
+          waLink.style.display = 'none';
+        }
+      }
+    }
   }
 
   // Show the saved doc id briefly so the staff can refer to it.
   const sub2 = document.getElementById('confirm-sub');
   if (sub2) {
-    sub2.textContent = `Bill ${newId.slice(-6).toUpperCase()} saved · ₹${total.toLocaleString('en-IN')} · ${txRow.paymentMethod} · Counter ready for next customer.`;
+    sub2.textContent = `Bill ${newId.slice(-6).toUpperCase()} saved · ₹${total.toLocaleString('en-IN')} · ${describeTxPayment(txRow)} · Counter ready for next customer.`;
   }
 
   // Clear in-flight guard & re-enable buttons (in case user comes back)
@@ -6279,11 +6680,19 @@ function resetAndGoHome() {
   state.cart = [];
   state.discount = null;
   state.paymentMethod = 'UPI';
+  state.paymentSplit = { UPI: 0, Cash: 0, Card: 0 };
   state.txInFlight = false;
   state.apptCheckoutId = null;
+  state.lastTxForReceipt = null;
+  state.lastWhatsAppUrl = null;
   const phEl = document.getElementById('customer-phone'); if (phEl) phEl.value = '';
   const nmEl = document.getElementById('customer-name');  if (nmEl) nmEl.value = '';
   const stEl = document.getElementById('receipt-staff');  if (stEl) stEl.value = '';
+  ['split-amt-upi','split-amt-cash','split-amt-card'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const waPanel = document.getElementById('confirm-wa-panel'); if (waPanel) waPanel.style.display = 'none';
   const hint = document.getElementById('phone-hint');
   if (hint) {
     hint.textContent = "Last 5 digits become the customer ID. We'll greet returning customers.";
@@ -6796,8 +7205,10 @@ async function renderAdminDashboard() {
   const uniqueCustomers = new Set(scopedTxs.filter(t => t.customerId).map(t => t.customerId)).size;
   const paymentMonth = { UPI: 0, Cash: 0, Card: 0 };
   scopedTxs.forEach(t => {
-    const m = normalizePaymentMethod(t.paymentMethod);
-    paymentMonth[m] += parseFloat(t.total) || 0;
+    const bd = getTxPaymentBreakdown(t);
+    paymentMonth.UPI  += bd.UPI;
+    paymentMonth.Cash += bd.Cash;
+    paymentMonth.Card += bd.Card;
   });
   const plPct = revenue > 0 ? Math.min(100, Math.round((revenue / (totalExpenses || 1)) * 100)) : 0;
   const isProfit = netPL >= 0;
@@ -6808,8 +7219,10 @@ async function renderAdminDashboard() {
   const todayCount   = todayTxs.length;
   const paymentToday = { UPI: 0, Cash: 0, Card: 0 };
   todayTxs.forEach(t => {
-    const method = normalizePaymentMethod(t.paymentMethod);
-    paymentToday[method] += parseFloat(t.total) || 0;
+    const bd = getTxPaymentBreakdown(t);
+    paymentToday.UPI  += bd.UPI;
+    paymentToday.Cash += bd.Cash;
+    paymentToday.Card += bd.Card;
   });
   // Count UNIQUE customers today (those who provided phone #)
   const todayCustomers = new Set(todayTxs.filter(t => t.customerId).map(t => t.customerId)).size;
@@ -7051,8 +7464,11 @@ async function loadSales() {
   let html = '';
   sorted.forEach(tx => {
     total += parseFloat(tx.total) || 0;
-    const pm = normalizePaymentMethod(tx.paymentMethod);
-    paymentSplit[pm] += parseFloat(tx.total) || 0;
+    const bd = getTxPaymentBreakdown(tx);
+    paymentSplit.UPI  += bd.UPI;
+    paymentSplit.Cash += bd.Cash;
+    paymentSplit.Card += bd.Card;
+    const pm = describeTxPayment(tx);
     const canEdit = hasRoleAdmin();
     html += `
       <div class="tx-row">
@@ -7181,7 +7597,7 @@ function shapeSalesRows(rows) {
     'Disc Label':String(r.discountLabel || ''),
     GST:         parseFloat(r.gst) || 0,
     Total:       parseFloat(r.total) || 0,
-    Payment:     normalizePaymentMethod(r.paymentMethod),
+    Payment:     describeTxPayment(r),
     Staff:       r.staffName || '',
     'Comm %':    parseFloat(r.commissionPct) || 0,
     'Comm ₹':    parseFloat(r.commissionAmount) || 0,
@@ -7197,8 +7613,10 @@ function exportSalesAs(ym, fmt) {
   const disc  = rows.reduce((s,r) => s + (parseFloat(r.discount)||0), 0);
   const comm  = rows.reduce((s,r) => s + (parseFloat(r.commissionAmount)||0), 0);
   const paymentSplit = rows.reduce((acc, r) => {
-    const m = normalizePaymentMethod(r.paymentMethod);
-    acc[m] += parseFloat(r.total) || 0;
+    const bd = getTxPaymentBreakdown(r);
+    acc.UPI  += bd.UPI;
+    acc.Cash += bd.Cash;
+    acc.Card += bd.Card;
     return acc;
   }, { UPI: 0, Cash: 0, Card: 0 });
   const summary = [
@@ -7669,8 +8087,10 @@ async function getMonthlyLifecycle(ym, monthExpenses) {
   } catch(e) {}
   const salesSplit = { UPI: 0, Cash: 0, Card: 0 };
   (txs || []).forEach(t => {
-    const m = normalizePaymentMethod(t.paymentMethod);
-    salesSplit[m] += parseFloat(t.total) || 0;
+    const bd = getTxPaymentBreakdown(t);
+    salesSplit.UPI  += bd.UPI;
+    salesSplit.Cash += bd.Cash;
+    salesSplit.Card += bd.Card;
   });
   const salesTotal = salesSplit.UPI + salesSplit.Cash + salesSplit.Card;
   const variableTotal = (monthExpenses || []).reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
@@ -7752,8 +8172,10 @@ async function refreshCODPanel() {
   const { txs, exps } = await getDailySalesAndExpense(dateStr);
   const salesSplit = { UPI: 0, Cash: 0, Card: 0 };
   txs.forEach(t => {
-    const m = normalizePaymentMethod(t.paymentMethod);
-    salesSplit[m] += parseFloat(t.total) || 0;
+    const bd = getTxPaymentBreakdown(t);
+    salesSplit.UPI  += bd.UPI;
+    salesSplit.Cash += bd.Cash;
+    salesSplit.Card += bd.Card;
   });
   let expenseTotal = 0;
   let cashExpenseTotal = 0;
@@ -10881,42 +11303,50 @@ function renderStaffApptStrip() {
     .filter(a => a.date === today && a.status !== 'cancelled' && a.status !== 'completed')
     .sort((a, b) => String(a.startTime).localeCompare(String(b.startTime)))
     .slice(0, 4);
-  if (!upcoming.length) {
-    host.innerHTML = `
-      <div class="staff-appt-strip">
-        <div class="strip-head">
-          <div class="strip-title">Today's Appointments</div>
-          <button class="strip-link" onclick="showScreen('appointments')">View calendar →</button>
-        </div>
-        <div class="muted-text" style="font-size:13px;padding:6px 0;">No bookings yet for today. Tap “Appointments &amp; Calendar” below to add one.</div>
+
+  const head = `
+    <div class="flow-section-head">
+      <div>
+        <div class="flow-section-eyebrow">Today</div>
+        <div class="flow-section-title">Appointments${upcoming.length ? ` <span style="color:var(--muted);font-weight:400;font-size:16px;">· ${upcoming.length}</span>` : ''}</div>
       </div>
-    `;
+      <button class="flow-section-link" onclick="showScreen('appointments')">View calendar →</button>
+    </div>`;
+
+  if (!upcoming.length) {
+    host.innerHTML = head + `
+      <div class="flow-empty">
+        No bookings yet for today.<br>
+        Tap <strong style="color:var(--ink);">Calendar</strong> above to add one.
+      </div>`;
     return;
   }
+
   const nowMins = (new Date()).getHours() * 60 + (new Date()).getMinutes();
-  host.innerHTML = `
-    <div class="staff-appt-strip">
-      <div class="strip-head">
-        <div class="strip-title">Today's Appointments (${upcoming.length})</div>
-        <button class="strip-link" onclick="showScreen('appointments')">View calendar →</button>
-      </div>
-      ${upcoming.map(a => {
-        const start = _hhmmToMins(a.startTime);
-        const isSoon = start != null && (start - nowMins) >= 0 && (start - nowMins) <= 30;
-        const svcs = (a.services || []).map(s => s.name).join(' · ');
-        return `
-          <div class="next-appt" role="button" tabindex="0" onclick="openApptBooking('${a.id}')" title="Open appointment">
-            <div class="next-appt-time">${esc(_fmtTime12(a.startTime))}</div>
-            <div class="next-appt-meta">
-              <div class="next-appt-name">${esc(a.customerName || 'Walk-in')} · ${esc(a.customerPhone || '')}</div>
-              <div class="next-appt-svc">${esc(svcs || 'No services')}</div>
-            </div>
-            ${isSoon ? '<div class="next-appt-soon">Soon</div>' : ''}
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
+  const rows = upcoming.map(a => {
+    const start = _hhmmToMins(a.startTime);
+    const isSoon = start != null && (start - nowMins) >= 0 && (start - nowMins) <= 30;
+    const svcs = (a.services || []).map(s => s.name).join(' · ');
+    // Split "10:30 am" into "10:30" + "am" for the two-line time pill.
+    const t12 = _fmtTime12(a.startTime) || '';
+    const m = t12.match(/^(\d{1,2}:\d{2})\s*(am|pm)$/i);
+    const ftH = m ? m[1] : t12;
+    const ftM = m ? m[2].toLowerCase() : '';
+    return `
+      <div class="flow-appt-row" role="button" tabindex="0" onclick="openApptBooking('${a.id}')" title="Open appointment">
+        <div class="flow-appt-time">
+          <div class="ft-h">${esc(ftH)}</div>
+          ${ftM ? `<div class="ft-m">${esc(ftM)}</div>` : ''}
+        </div>
+        <div class="flow-appt-meta">
+          <div class="flow-appt-name">${esc(a.customerName || 'Walk-in')}${a.customerPhone ? ` · ${esc(a.customerPhone)}` : ''}</div>
+          <div class="flow-appt-svc">${esc(svcs || 'No services')}</div>
+        </div>
+        ${isSoon ? '<div class="flow-appt-tag">Soon</div>' : ''}
+      </div>`;
+  }).join('');
+
+  host.innerHTML = head + rows;
 }
 
 /* ─── appointments screen ─── */
