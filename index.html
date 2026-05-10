@@ -1322,6 +1322,126 @@ img, video, canvas, svg{max-width:100%;height:auto;}
 .staff-appt-strip .next-appt-svc{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .staff-appt-strip .next-appt-soon{font-size:10px;font-weight:700;color:var(--danger);letter-spacing:.08em;text-transform:uppercase;}
 
+/* ─── APPOINTMENTS V2 — flow design ─── */
+.appt-v2-hero{position:relative;padding:18px 20px 22px;background:linear-gradient(180deg,var(--surface) 0%,var(--bg) 100%);border-bottom:1px solid var(--line-soft);}
+.appt-v2-datebar{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+.appt-v2-arrow{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s ease;flex-shrink:0;font-size:20px;line-height:1;box-shadow:0 1px 2px rgba(0,0,0,.03);}
+.appt-v2-arrow:hover{border-color:var(--champagne);color:var(--champagne);transform:scale(1.05);}
+.appt-v2-arrow:active{transform:scale(.95);}
+.appt-v2-datecore{flex:1;text-align:center;cursor:pointer;position:relative;}
+.appt-v2-datecore-eyebrow{font-size:11px;letter-spacing:.22em;color:var(--champagne);font-weight:600;text-transform:uppercase;margin-bottom:4px;}
+.appt-v2-datecore-main{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink);line-height:1.05;letter-spacing:-.01em;}
+.appt-v2-datecore-main em{font-style:italic;color:var(--champagne);font-weight:500;}
+.appt-v2-datecore-year{font-size:12px;color:var(--muted);margin-top:3px;letter-spacing:.04em;}
+.appt-v2-datecore-input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0;}
+.appt-v2-actionrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:18px;}
+.appt-v2-today-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted);font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+.appt-v2-today-pill:hover{border-color:var(--champagne);color:var(--champagne);}
+.appt-v2-today-pill.hidden{visibility:hidden;}
+.appt-v2-book{display:inline-flex;align-items:center;gap:8px;padding:11px 20px 11px 16px;border-radius:999px;background:linear-gradient(135deg,var(--ink) 0%,#2a2a2a 100%);color:#FFF;border:none;font-size:13px;font-weight:600;letter-spacing:.04em;cursor:pointer;box-shadow:0 8px 22px -8px rgba(0,0,0,.35),0 2px 4px rgba(0,0,0,.06);transition:all .2s;}
+.appt-v2-book:hover{transform:translateY(-1px);box-shadow:0 12px 28px -8px rgba(0,0,0,.45),0 3px 6px rgba(0,0,0,.08);}
+.appt-v2-book:active{transform:translateY(0);}
+.appt-v2-book .plus{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--champagne);color:#FFF;align-items:center;justify-content:center;font-size:16px;line-height:1;font-weight:300;}
+
+/* Stats line — bare typography */
+.appt-v2-stats{padding:14px 20px 6px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.5;}
+.appt-v2-stats strong{color:var(--ink);font-weight:600;}
+.appt-v2-stats .dot{width:3px;height:3px;border-radius:50%;background:var(--line);display:inline-block;}
+.appt-v2-stats .load-free{color:#0a7a4a;font-weight:600;}
+.appt-v2-stats .load-busy{color:#9a6500;font-weight:600;}
+.appt-v2-stats .load-full{color:var(--terracotta);font-weight:600;}
+
+/* List */
+.appt-v2-listhead{padding:18px 20px 10px;display:flex;align-items:baseline;justify-content:space-between;}
+.appt-v2-listhead-eyebrow{font-size:11px;letter-spacing:.22em;color:var(--champagne);font-weight:600;text-transform:uppercase;}
+.appt-v2-listhead-count{font-family:var(--serif);font-size:14px;color:var(--muted);font-style:italic;}
+.appt-v2-list{padding:0 14px 100px;display:flex;flex-direction:column;}
+.appt-v2-row{display:flex;gap:16px;align-items:flex-start;padding:18px 12px;border-top:1px solid var(--line-soft);position:relative;transition:background .18s;}
+.appt-v2-row:first-child{border-top:none;}
+.appt-v2-row:hover{background:var(--surface);}
+.appt-v2-row.is-cancelled{opacity:.55;}
+.appt-v2-row.is-cancelled .av2-name,
+.appt-v2-row.is-cancelled .av2-time-h{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(0,0,0,.3);}
+.appt-v2-row.is-completed{opacity:.7;}
+.appt-v2-row.is-inprogress{background:linear-gradient(90deg,rgba(184,149,106,.06) 0%,transparent 60%);}
+.appt-v2-row.is-inprogress::before{content:'';position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:2px;background:var(--champagne);}
+.appt-v2-time{flex-shrink:0;width:64px;text-align:center;padding-top:2px;}
+.av2-time-h{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);line-height:1;letter-spacing:-.01em;}
+.av2-time-m{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;}
+.av2-time-end{font-size:10.5px;color:var(--muted);margin-top:6px;font-style:italic;letter-spacing:.02em;}
+.appt-v2-body{flex:1;min-width:0;}
+.av2-status-eyebrow{font-size:9.5px;letter-spacing:.18em;font-weight:700;text-transform:uppercase;margin-bottom:5px;display:inline-block;}
+.av2-status-eyebrow.s-booked{color:var(--muted);}
+.av2-status-eyebrow.s-inprogress{color:var(--champagne);}
+.av2-status-eyebrow.s-completed{color:#475569;}
+.av2-status-eyebrow.s-cancelled{color:var(--terracotta);}
+.av2-status-eyebrow.s-noshow{color:#9A3412;}
+.av2-name{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);line-height:1.25;letter-spacing:-.01em;}
+.av2-phone{font-size:12px;color:var(--muted);margin-top:3px;letter-spacing:.02em;}
+.av2-svcs{font-size:13px;color:var(--ink);margin-top:8px;line-height:1.55;opacity:.85;}
+.av2-svcs .room-mark{display:inline-block;font-size:9.5px;background:transparent;color:var(--terracotta);padding:0 5px;border:1px solid var(--terracotta);border-radius:4px;margin-left:4px;letter-spacing:.08em;font-weight:700;text-transform:uppercase;vertical-align:middle;}
+.av2-svcs .svc-staff{color:var(--muted);font-style:italic;}
+.av2-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.av2-tag{font-size:10.5px;color:var(--muted);padding:3px 9px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line-soft);letter-spacing:.04em;}
+.av2-note{font-size:12px;color:var(--muted);margin-top:8px;font-style:italic;border-left:2px solid var(--line);padding-left:10px;line-height:1.5;}
+.av2-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;align-items:center;}
+.av2-action{font-size:12px;font-weight:600;color:var(--ink);background:none;border:none;padding:4px 0;cursor:pointer;letter-spacing:.02em;border-bottom:1px solid var(--line);transition:all .15s;font-family:inherit;}
+.av2-action:hover{border-bottom-color:var(--champagne);color:var(--champagne);}
+.av2-action.primary{color:#FFF;background:var(--ink);padding:8px 16px;border-radius:999px;border:none;}
+.av2-action.primary:hover{background:#000;color:#FFF;}
+.av2-action.danger{color:var(--terracotta);border-bottom-color:transparent;}
+.av2-action.danger:hover{border-bottom-color:var(--terracotta);}
+.av2-action.muted{color:var(--muted);border-bottom-color:transparent;font-weight:500;}
+.av2-bill-tag{font-size:11px;color:var(--muted);font-style:italic;letter-spacing:.04em;}
+.av2-bill-tag strong{color:var(--ink);font-style:normal;font-family:var(--serif);font-weight:600;letter-spacing:.02em;}
+
+/* Empty state */
+.appt-v2-empty{text-align:center;padding:60px 24px;color:var(--muted);}
+.appt-v2-empty-icon{font-family:var(--serif);font-size:48px;color:var(--champagne);font-style:italic;line-height:1;margin-bottom:12px;opacity:.7;}
+.appt-v2-empty-title{font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:600;margin-bottom:6px;}
+.appt-v2-empty-sub{font-size:13px;line-height:1.5;}
+.appt-v2-empty-cta{display:inline-block;margin-top:16px;font-size:12px;font-weight:600;color:var(--champagne);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-bottom:1px solid var(--champagne);padding-bottom:2px;}
+
+@media (max-width:380px){
+  .appt-v2-datecore-main{font-size:22px;}
+  .appt-v2-arrow{width:40px;height:40px;}
+  .appt-v2-row{padding:16px 8px;gap:12px;}
+  .appt-v2-time{width:56px;}
+  .av2-time-h{font-size:20px;}
+  .av2-name{font-size:16px;}
+}
+
+/* ─── Booking modal V2 ─── */
+.bm-eyebrow{font-size:10.5px;letter-spacing:.22em;color:var(--champagne);font-weight:700;text-transform:uppercase;margin-bottom:4px;}
+.bm-title-serif{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);letter-spacing:-.01em;line-height:1.15;margin-bottom:6px;}
+.bm-title-sub{font-size:12.5px;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+.bm-step{margin-bottom:20px;}
+.bm-step-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.bm-step-num{width:22px;height:22px;border-radius:50%;background:var(--surface-2);color:var(--champagne);font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;font-family:var(--serif);border:1px solid var(--line-soft);}
+.bm-step-label{font-size:11.5px;letter-spacing:.16em;color:var(--ink);font-weight:600;text-transform:uppercase;}
+.bm-step-hint{font-size:11.5px;color:var(--muted);margin-bottom:8px;line-height:1.45;}
+
+/* Slot grid V2 — grouped by period */
+.slot-period{margin-bottom:14px;}
+.slot-period:last-child{margin-bottom:0;}
+.slot-period-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:10.5px;letter-spacing:.18em;color:var(--muted);font-weight:600;text-transform:uppercase;}
+.slot-period-head::after{content:'';flex:1;height:1px;background:var(--line-soft);}
+.slot-grid-v2{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px;}
+.slot-cell-v2{padding:10px 4px;text-align:center;border-radius:10px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid var(--line-soft);background:var(--surface);color:var(--ink);transition:all .15s ease;font-family:inherit;}
+.slot-cell-v2:not(.unavailable):not(.past):hover{border-color:var(--champagne);background:var(--surface-2);}
+.slot-cell-v2.unavailable{background:transparent;color:#C1A4A4;border-color:transparent;cursor:not-allowed;text-decoration:line-through;text-decoration-thickness:1px;}
+.slot-cell-v2.partial{background:#FFFAF0;color:#92400E;border-color:#FCD9A6;}
+.slot-cell-v2.partial::after{content:'•';color:#92400E;display:block;font-size:8px;line-height:1;margin-top:2px;}
+.slot-cell-v2.selected{background:linear-gradient(135deg,var(--ink) 0%,#2a2a2a 100%);color:#FFF;border-color:var(--ink);transform:scale(1.04);box-shadow:0 6px 16px -6px rgba(0,0,0,.4);font-weight:600;}
+.slot-cell-v2.past{background:transparent;color:#C8C8C8;border-color:transparent;cursor:not-allowed;}
+.slot-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:11px;color:var(--muted);}
+.slot-legend .lg{display:inline-flex;align-items:center;gap:5px;}
+.slot-legend .sw{width:10px;height:10px;border-radius:3px;display:inline-block;border:1px solid var(--line-soft);}
+.slot-legend .sw.open{background:var(--surface);}
+.slot-legend .sw.partial{background:#FFFAF0;border-color:#FCD9A6;}
+.slot-legend .sw.taken{background:transparent;border-color:transparent;position:relative;}
+.slot-legend .sw.taken::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:#C1A4A4;}
+
 /* Booking modal helpers */
 .appt-svc-picker{max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:6px;}
 .appt-svc-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:13px;}
@@ -1829,13 +1949,29 @@ img, video, canvas, svg{max-width:100%;height:auto;}
     <div class="brand-tag">Appointments</div>
     <div style="width:44px"></div>
   </div>
-  <div class="appt-toolbar">
-    <button class="appt-nav-btn" onclick="shiftApptDate(-1)" aria-label="Previous day">‹</button>
-    <input type="date" id="appt-date-input" class="appt-date-input" onchange="setApptDate(this.value)">
-    <button class="appt-nav-btn" onclick="shiftApptDate(1)" aria-label="Next day">›</button>
-    <button class="appt-cta" onclick="openApptBooking()">+ Book</button>
+
+  <!-- Date hero -->
+  <div class="appt-v2-hero">
+    <div class="appt-v2-datebar">
+      <button class="appt-v2-arrow" onclick="shiftApptDate(-1)" aria-label="Previous day" title="Previous day">‹</button>
+      <div class="appt-v2-datecore" id="appt-v2-datecore" title="Tap to pick a date">
+        <div class="appt-v2-datecore-eyebrow" id="appt-v2-weekday">—</div>
+        <div class="appt-v2-datecore-main" id="appt-v2-datemain">—</div>
+        <div class="appt-v2-datecore-year" id="appt-v2-year"></div>
+        <input type="date" id="appt-date-input" class="appt-v2-datecore-input" onchange="setApptDate(this.value)" aria-label="Pick date">
+      </div>
+      <button class="appt-v2-arrow" onclick="shiftApptDate(1)" aria-label="Next day" title="Next day">›</button>
+    </div>
+    <div class="appt-v2-actionrow">
+      <button class="appt-v2-today-pill" id="appt-v2-today" onclick="setApptDate(todayISO())">Jump to Today</button>
+      <button class="appt-v2-book" onclick="openApptBooking()"><span class="plus">+</span> Book Appointment</button>
+    </div>
   </div>
-  <div class="appt-summary" id="appt-summary"></div>
+
+  <!-- Stats -->
+  <div class="appt-v2-stats" id="appt-summary"></div>
+
+  <!-- List -->
   <div id="appt-list-host"></div>
 </section>
 
@@ -2344,44 +2480,48 @@ img, video, canvas, svg{max-width:100%;height:auto;}
      MODAL: BOOK / EDIT APPOINTMENT
      ═══════════════════════════════════════════════════ -->
 <div class="modal-backdrop" id="modal-appointment">
-  <div class="modal" style="max-width:520px;">
+  <div class="modal" style="max-width:540px;">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="appt-modal-title">Book Appointment</div>
-    <div class="muted-text" style="font-size:12px;margin:-6px 0 12px;">Customer phone, services & time slot. Conflicts (room limits / overlapping) are blocked automatically.</div>
+    <div class="bm-eyebrow">Reservation</div>
+    <div class="bm-title-serif" id="appt-modal-title">Book an <em style="font-style:italic;color:var(--champagne);font-weight:500;">appointment</em></div>
+    <div class="bm-title-sub">Conflicts with existing bookings — overlapping rooms or staff — are detected automatically.</div>
 
-    <div class="modal-field">
-      <label class="modal-label">Customer Phone (10-digit) *</label>
-      <input type="tel" class="modal-input" id="appt-phone" maxlength="10" placeholder="e.g. 9876543210" inputmode="numeric" oninput="onApptPhoneInput(this.value)">
-      <div class="muted-text" style="font-size:11px;margin-top:4px;" id="appt-phone-hint">Returning customer? Name will auto-fill.</div>
+    <div class="bm-step">
+      <div class="bm-step-head"><span class="bm-step-num">1</span><span class="bm-step-label">Customer</span></div>
+      <div class="modal-field" style="margin-bottom:10px;">
+        <input type="tel" class="modal-input" id="appt-phone" maxlength="10" placeholder="Phone (10-digit)" inputmode="numeric" oninput="onApptPhoneInput(this.value)">
+        <div class="muted-text" style="font-size:11px;margin-top:4px;" id="appt-phone-hint">Returning customer? Name will auto-fill.</div>
+      </div>
+      <div class="modal-field" style="margin-bottom:0;">
+        <input type="text" class="modal-input" id="appt-name" placeholder="Customer name">
+      </div>
     </div>
 
-    <div class="modal-field">
-      <label class="modal-label">Customer Name</label>
-      <input type="text" class="modal-input" id="appt-name" placeholder="Walk-in name">
-    </div>
-
-    <div class="modal-field">
-      <label class="modal-label">Date *</label>
-      <input type="date" class="modal-input" id="appt-mod-date">
-    </div>
-
-    <div class="modal-field">
-      <label class="modal-label">Services *</label>
+    <div class="bm-step">
+      <div class="bm-step-head"><span class="bm-step-num">2</span><span class="bm-step-label">Services</span></div>
       <input type="text" class="appt-svc-search" id="appt-svc-search" placeholder="Search services to add…" oninput="renderApptSvcPicker(this.value)">
       <div class="appt-svc-picker" id="appt-svc-picker"></div>
       <div id="appt-selected-svcs" style="margin-top:8px;"></div>
       <div class="muted-text" style="font-size:11px;margin-top:6px;" id="appt-duration-hint">Total duration: 0 min</div>
     </div>
 
-    <div class="modal-field">
-      <label class="modal-label">Start Time *</label>
-      <div class="muted-text" style="font-size:11px;margin-bottom:6px;">Green = open, amber = partial (room near full), red = blocked. Past slots disabled for today.</div>
-      <div class="slot-grid" id="appt-slot-grid"></div>
-      <div class="muted-text" style="font-size:11px;margin-top:6px;" id="appt-slot-hint">Pick services first to see available start times.</div>
+    <div class="bm-step">
+      <div class="bm-step-head"><span class="bm-step-num">3</span><span class="bm-step-label">When</span></div>
+      <div class="modal-field" style="margin-bottom:14px;">
+        <input type="date" class="modal-input" id="appt-mod-date">
+      </div>
+      <div class="bm-step-hint">Past slots are dimmed for today. Strikethrough = already taken. Amber dot = room near capacity.</div>
+      <div id="appt-slot-grid"></div>
+      <div class="slot-legend">
+        <span class="lg"><span class="sw open"></span> Open</span>
+        <span class="lg"><span class="sw partial"></span> Filling up</span>
+        <span class="lg"><span class="sw taken"></span> Taken</span>
+      </div>
+      <div class="muted-text" style="font-size:11px;margin-top:8px;" id="appt-slot-hint">Pick services first to see available start times.</div>
     </div>
 
-    <div class="modal-field">
-      <label class="modal-label">Notes (optional)</label>
+    <div class="bm-step" style="margin-bottom:8px;">
+      <div class="bm-step-head"><span class="bm-step-num">4</span><span class="bm-step-label">Notes <span style="opacity:.6;font-weight:500;letter-spacing:.04em;text-transform:none;font-size:10.5px;margin-left:4px;">optional</span></span></div>
       <textarea class="modal-input" id="appt-notes" rows="2" placeholder="Allergies, preferences, special requests…"></textarea>
     </div>
 
@@ -11365,22 +11505,47 @@ function renderAppointmentsScreen() {
   const dateInput = document.getElementById('appt-date-input');
   if (!dateInput) return;
   if (dateInput.value !== state.apptDate) dateInput.value = state.apptDate;
+
+  // Hero date display — weekday eyebrow + serif date + year
+  const d = new Date(state.apptDate + 'T00:00:00');
+  const weekdayEl = document.getElementById('appt-v2-weekday');
+  const mainEl = document.getElementById('appt-v2-datemain');
+  const yearEl = document.getElementById('appt-v2-year');
+  const todayPill = document.getElementById('appt-v2-today');
+  if (weekdayEl && mainEl && yearEl) {
+    const weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const isToday = state.apptDate === todayISO();
+    weekdayEl.textContent = isToday ? 'Today · ' + weekdays[d.getDay()] : weekdays[d.getDay()];
+    mainEl.innerHTML = `${esc(months[d.getMonth()])} <em>${d.getDate()}</em>`;
+    yearEl.textContent = String(d.getFullYear());
+    if (todayPill) todayPill.classList.toggle('hidden', isToday);
+  }
+
   const cfg = _apptCfg();
   const dayAppts = (state.appointments || [])
     .filter(a => a.date === state.apptDate)
     .sort((a, b) => String(a.startTime).localeCompare(String(b.startTime)));
 
-  // Summary chips
+  // Stats — bare typography, no boxes
   const active = dayAppts.filter(a => a.status !== 'cancelled');
   const roomedCount = active.filter(a => (a.services || []).some(s => serviceNeedsRoom(s.name))).length;
   const roomLoad = cfg.massageRooms > 0 ? Math.min(100, Math.round(roomedCount / cfg.massageRooms * 100)) : 0;
+  const loadCls = roomLoad >= 90 ? 'load-full' : (roomLoad >= 60 ? 'load-busy' : 'load-free');
   const summary = document.getElementById('appt-summary');
   if (summary) {
-    summary.innerHTML =
-      `<span class="appt-chip"><strong>${active.length}</strong> bookings</span>` +
-      `<span class="appt-chip"><strong>${roomedCount}</strong> room-services</span>` +
-      `<span class="appt-chip ${roomLoad >= 90 ? 'full' : (roomLoad >= 60 ? 'busy' : 'free')}">Rooms used: <strong>${roomLoad}%</strong></span>` +
-      `<span class="appt-chip">${esc(cfg.massageRooms)} room${cfg.massageRooms === 1 ? '' : 's'} · ${esc(cfg.bufferMinutes)} min gap</span>`;
+    if (!active.length) {
+      summary.innerHTML = `<span style="font-style:italic;color:var(--muted);">A quiet day so far.</span>`;
+    } else {
+      summary.innerHTML =
+        `<strong>${active.length}</strong> booking${active.length === 1 ? '' : 's'}` +
+        `<span class="dot"></span>` +
+        `<strong>${roomedCount}</strong> in room${roomedCount === 1 ? '' : 's'}` +
+        `<span class="dot"></span>` +
+        `<span class="${loadCls}">${roomLoad}% capacity</span>` +
+        `<span class="dot"></span>` +
+        `<span style="opacity:.85;">${esc(cfg.massageRooms)} room${cfg.massageRooms === 1 ? '' : 's'} · ${esc(cfg.bufferMinutes)} min gap</span>`;
+    }
   }
 
   // List
@@ -11388,69 +11553,83 @@ function renderAppointmentsScreen() {
   if (!host) return;
   if (!dayAppts.length) {
     host.innerHTML = `
-      <div class="appt-section-title">Bookings</div>
-      <div style="padding:10px 18px 80px;">
-        <div class="appt-empty">No appointments for this day yet.<br><span style="font-size:11px;">Tap <b>+ Book</b> above to add one.</span></div>
+      <div class="appt-v2-empty">
+        <div class="appt-v2-empty-icon">∅</div>
+        <div class="appt-v2-empty-title">Nothing on the books</div>
+        <div class="appt-v2-empty-sub">No appointments for this day yet.</div>
+        <div class="appt-v2-empty-cta" onclick="openApptBooking()">Book the first one →</div>
       </div>
     `;
     return;
   }
   const rows = dayAppts.map(renderAppointmentCard).join('');
   host.innerHTML = `
-    <div class="appt-section-title">Bookings (${dayAppts.length})</div>
-    <div class="appt-list">${rows}</div>
+    <div class="appt-v2-listhead">
+      <div class="appt-v2-listhead-eyebrow">Bookings</div>
+      <div class="appt-v2-listhead-count">${dayAppts.length} on the day</div>
+    </div>
+    <div class="appt-v2-list">${rows}</div>
   `;
 }
 
 function renderAppointmentCard(a) {
   const status = a.status || 'booked';
+  const statusLabel = ({ booked:'Booked', inprogress:'In progress', completed:'Completed', cancelled:'Cancelled', noshow:'No-show' })[status] || status;
   const svcs = (a.services || []).map(s => {
     const isRoom = serviceNeedsRoom(s.name);
-    const tail = s.staffName ? ` · ${esc(s.staffName)}` : '';
+    const tail = s.staffName ? ` <span class="svc-staff">· ${esc(s.staffName)}</span>` : '';
     return `<div>${esc(s.name)}${isRoom ? ' <span class="room-mark">Room</span>' : ''}${tail}</div>`;
   }).join('');
   const staffSet = Array.from(new Set((a.services || []).map(s => s.staffName).filter(Boolean)));
-  const tags = staffSet.map(n => `<span class="appt-staff-tag">${esc(n)}</span>`).join('');
+  const tags = staffSet.map(n => `<span class="av2-tag">${esc(n)}</span>`).join('');
   const phone = (a.customerPhone || '').replace(/\D/g, '');
-  const waBtn = phone.length === 10
-    ? `<button onclick="sendApptWhatsApp('${a.id}')">WhatsApp</button>`
-    : '';
+
+  // Two-line time pill
+  const startT12 = _fmtTime12(a.startTime) || '';
+  const sm = startT12.match(/^(\d{1,2}:\d{2})\s*(am|pm)$/i);
+  const sH = sm ? sm[1] : startT12;
+  const sM = sm ? sm[2].toLowerCase() : '';
+
   let actions = '';
   if (status === 'booked') {
+    const waBtn = phone.length === 10 ? `<button class="av2-action" onclick="sendApptWhatsApp('${a.id}')">WhatsApp</button>` : '';
     actions = `
+      <button class="av2-action primary" onclick="checkoutAppointment('${a.id}')">Check out</button>
+      <button class="av2-action" onclick="openApptBooking('${a.id}')">Edit</button>
       ${waBtn}
-      <button onclick="openApptBooking('${a.id}')">Edit</button>
-      <button class="success" onclick="checkoutAppointment('${a.id}')">Check Out / Bill</button>
-      <button class="danger" onclick="markAppointmentNoShow('${a.id}')">No-show</button>
+      <button class="av2-action danger" onclick="markAppointmentNoShow('${a.id}')">No-show</button>
     `;
   } else if (status === 'inprogress') {
     actions = `
-      <button class="success" onclick="checkoutAppointment('${a.id}')">Check Out / Bill</button>
-      <button onclick="openApptBooking('${a.id}')">Edit</button>
+      <button class="av2-action primary" onclick="checkoutAppointment('${a.id}')">Check out</button>
+      <button class="av2-action" onclick="openApptBooking('${a.id}')">Edit</button>
     `;
   } else if (status === 'completed') {
     actions = a.linkedTransactionId
-      ? `<button>Bill #${esc(String(a.linkedTransactionId).slice(-6).toUpperCase())}</button>`
+      ? `<span class="av2-bill-tag">Billed as <strong>#${esc(String(a.linkedTransactionId).slice(-6).toUpperCase())}</strong></span>`
       : '';
   } else if (status === 'cancelled' || status === 'noshow') {
-    actions = `<button onclick="reopenAppointment('${a.id}')">Reopen</button>`;
+    actions = `<button class="av2-action muted" onclick="reopenAppointment('${a.id}')">Reopen</button>`;
   }
+
+  const isCancelledLike = (status === 'cancelled' || status === 'noshow');
+  const rowCls = `appt-v2-row is-${status}` + (isCancelledLike && status === 'cancelled' ? ' is-cancelled' : '') + (status === 'completed' ? ' is-completed' : '') + (status === 'inprogress' ? ' is-inprogress' : '');
+
   return `
-    <div class="appt-card status-${esc(status)}">
-      <div class="appt-time">
-        <div class="appt-time-start">${esc(_fmtTime12(a.startTime))}</div>
-        <div class="appt-time-end">to ${esc(_fmtTime12(a.endTime))}</div>
+    <div class="${rowCls}">
+      <div class="appt-v2-time">
+        <div class="av2-time-h">${esc(sH)}</div>
+        ${sM ? `<div class="av2-time-m">${esc(sM)}</div>` : ''}
+        <div class="av2-time-end">to ${esc(_fmtTime12(a.endTime))}</div>
       </div>
-      <div class="appt-body">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-          <div class="appt-name">${esc(a.customerName || 'Walk-in')}</div>
-          <span class="appt-status-pill ${status}">${status}</span>
-        </div>
-        ${a.customerPhone ? `<div class="appt-phone">+91 ${esc(a.customerPhone)}</div>` : ''}
-        <div class="appt-svcs">${svcs}</div>
-        ${tags ? `<div class="appt-staff-tags">${tags}</div>` : ''}
-        ${a.notes ? `<div class="appt-phone" style="margin-top:6px;font-style:italic;">“${esc(a.notes)}”</div>` : ''}
-        <div class="appt-actions">${actions}</div>
+      <div class="appt-v2-body">
+        <div class="av2-status-eyebrow s-${esc(status)}">${esc(statusLabel)}</div>
+        <div class="av2-name">${esc(a.customerName || 'Walk-in')}</div>
+        ${a.customerPhone ? `<div class="av2-phone">+91 ${esc(a.customerPhone)}</div>` : ''}
+        <div class="av2-svcs">${svcs}</div>
+        ${tags ? `<div class="av2-tags">${tags}</div>` : ''}
+        ${a.notes ? `<div class="av2-note">“${esc(a.notes)}”</div>` : ''}
+        ${actions ? `<div class="av2-actions">${actions}</div>` : ''}
       </div>
     </div>
   `;
@@ -11625,7 +11804,15 @@ function renderApptSlotGrid() {
   const dayAppts = (state.appointments || [])
     .filter(a => a.date === date && a.status !== 'cancelled' && a.status !== 'noshow' && a.id !== editingId);
 
-  const cells = [];
+  // Group slots into Morning / Afternoon / Evening for an itinerary feel.
+  const periods = [
+    { key: 'morning',   label: 'Morning',   from:   0, to: 12 * 60 },
+    { key: 'afternoon', label: 'Afternoon', from: 12 * 60, to: 17 * 60 },
+    { key: 'evening',   label: 'Evening',   from: 17 * 60, to: 24 * 60 },
+  ];
+  const buckets = { morning: [], afternoon: [], evening: [] };
+  let freeCount = 0;
+
   for (let t = open; t + totalMins <= close; t += slot) {
     const startStr = _minsToHHMM(t);
     const endMins = t + totalMins;
@@ -11635,20 +11822,31 @@ function renderApptSlotGrid() {
       maxRooms: parseInt(cfg.massageRooms, 10) || 1,
       maxChairs: parseInt(cfg.chairCapacity, 10) || 4,
     });
-    let cls = 'slot-cell';
+    let cls = 'slot-cell-v2';
     let title = startStr + ' → ' + _minsToHHMM(endMins);
-    if (isPast) cls += ' past';
-    else if (conflict && conflict.blocking) { cls += ' unavailable'; title += ' · ' + conflict.reason; }
+    let interactive = true;
+    if (isPast) { cls += ' past'; interactive = false; }
+    else if (conflict && conflict.blocking) { cls += ' unavailable'; title += ' · ' + conflict.reason; interactive = false; }
     else if (conflict && conflict.partial) { cls += ' partial'; title += ' · ' + conflict.reason; }
     if (state.apptDraft.startTime === startStr) cls += ' selected';
-    cells.push(
-      `<div class="${cls}" title="${escAttr(title)}" onclick="${(isPast || (conflict && conflict.blocking)) ? '' : `pickApptSlot('${startStr}')`}">${esc(_fmtTime12(startStr))}</div>`
-    );
+    if (interactive) freeCount++;
+    const cellHtml = `<div class="${cls}" title="${escAttr(title)}" onclick="${interactive ? `pickApptSlot('${startStr}')` : ''}">${esc(_fmtTime12(startStr))}</div>`;
+    const period = periods.find(p => t >= p.from && t < p.to) || periods[0];
+    buckets[period.key].push(cellHtml);
   }
-  host.innerHTML = cells.join('');
+
+  const sections = periods
+    .filter(p => buckets[p.key].length)
+    .map(p => `
+      <div class="slot-period">
+        <div class="slot-period-head">${esc(p.label)}</div>
+        <div class="slot-grid-v2">${buckets[p.key].join('')}</div>
+      </div>
+    `).join('');
+
+  host.innerHTML = sections || `<div class="muted-text" style="font-size:12px;padding:6px 0;">No slots fit a ${fmtDur(totalMins)} session in working hours.</div>`;
   if (hint) {
-    const free = host.querySelectorAll('.slot-cell:not(.unavailable):not(.past)').length;
-    hint.textContent = `${free} open slot${free === 1 ? '' : 's'} for a ${fmtDur(totalMins)} session · ${cfg.massageRooms} room${cfg.massageRooms === 1 ? '' : 's'} cap`;
+    hint.textContent = `${freeCount} open slot${freeCount === 1 ? '' : 's'} for a ${fmtDur(totalMins)} session · ${cfg.massageRooms} room${cfg.massageRooms === 1 ? '' : 's'} cap`;
   }
 }
 
