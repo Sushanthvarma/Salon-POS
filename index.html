@@ -2253,6 +2253,38 @@ img, video, canvas, svg{max-width:100%;height:auto;}
 </div>
 
 <!-- ═══════════════════════════════════════════════════
+     MODAL: EDIT TRANSACTION DATE / TIME (admin only)
+     ═══════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-edit-tx-datetime">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Edit Transaction Date &amp; Time</div>
+    <div class="muted-text" style="font-size:12px;margin-bottom:14px;line-height:1.5;">
+      Use this only to correct a wrong date/time on a previously saved bill. Requires admin PIN and a reason. Both the source day and the new day must be unlocked.
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Bill Reference</label>
+      <input type="text" class="modal-input" id="edit-tx-ref" readonly style="background:var(--surface-alt,#f6f1e9);color:var(--muted);">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="modal-field">
+        <label class="modal-label">New Date</label>
+        <input type="date" class="modal-input" id="edit-tx-date">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">New Time</label>
+        <input type="time" class="modal-input" id="edit-tx-time">
+      </div>
+    </div>
+    <div class="muted-text" id="edit-tx-current" style="font-size:12px;margin:-6px 0 14px;"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-tx-datetime')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmEditTransactionDateTime()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
      JAVASCRIPT
      ═══════════════════════════════════════════════════ -->
 <!-- Firebase SDK (compat v10) -->
@@ -7057,26 +7089,50 @@ async function loadSales() {
 // transaction (e.g. when it was filed against the wrong day due to a
 // device clock issue). Both the source date AND the new date must be
 // unlocked, and the change is gated by askHighRiskApproval (PIN + reason).
-async function editTransactionDateTime(txId, currentDate, currentTime) {
+function editTransactionDateTime(txId, currentDate, currentTime) {
   if (!hasRoleAdmin()) { toast('Only admin can edit transaction date/time'); return; }
   if (!txId) return;
-  const newDate = (prompt(`Edit transaction date (YYYY-MM-DD):\nCurrent: ${currentDate}`, currentDate) || '').trim();
-  if (!newDate) return;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) { toast('Date must be YYYY-MM-DD'); return; }
-  const newTimeRaw = (prompt(`Edit transaction time (e.g. 06:40 pm):\nCurrent: ${currentTime}`, currentTime || '') || '').trim();
-  if (!newTimeRaw) { toast('Time is required'); return; }
-  // Normalise time string (lowercase am/pm, ensure leading zero on hour).
-  const tm = newTimeRaw.toLowerCase().match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
-  if (!tm) { toast('Time must look like 06:40 pm'); return; }
-  let hh = parseInt(tm[1], 10);
-  const mm = String(parseInt(tm[2], 10)).padStart(2, '0');
-  let ampm = tm[3];
-  if (!ampm) ampm = hh >= 12 ? 'pm' : 'am';
-  if (ampm === 'pm' && hh < 12) hh += 0; // keep 12-hour as entered
-  const newTime = `${String(hh).padStart(2, '0')}:${mm} ${ampm}`;
-  if (isDayCloseLocked(currentDate)) { toast(`Source day ${currentDate} is locked. Unlock first.`); return; }
-  if (isDayCloseLocked(newDate)) { toast(`Target day ${newDate} is locked. Unlock first.`); return; }
-  const approval = askHighRiskApproval(`Edit tx ${txId.slice(-6).toUpperCase()} date/time → ${newDate} ${newTime}`);
+  // Convert "06:40 pm" → "18:40" for <input type="time">
+  const time24 = (() => {
+    const t = String(currentTime || '').trim().toLowerCase();
+    const m = t.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
+    if (!m) return '';
+    let h = parseInt(m[1], 10) || 0;
+    const mi = m[2];
+    if (m[3] === 'pm' && h < 12) h += 12;
+    if (m[3] === 'am' && h === 12) h = 0;
+    return `${String(h).padStart(2, '0')}:${mi}`;
+  })();
+  window.__editTxCtx = { id: txId, currentDate, currentTime: currentTime || '' };
+  const refEl = document.getElementById('edit-tx-ref');
+  if (refEl) refEl.value = `Bill ${String(txId).slice(-6).toUpperCase()}`;
+  const dEl = document.getElementById('edit-tx-date');
+  if (dEl) dEl.value = currentDate || todayISO();
+  const tEl = document.getElementById('edit-tx-time');
+  if (tEl) tEl.value = time24 || '';
+  const curEl = document.getElementById('edit-tx-current');
+  if (curEl) curEl.textContent = `Currently filed as: ${currentDate || '—'} ${currentTime || ''}`.trim();
+  openModal('modal-edit-tx-datetime');
+}
+
+async function confirmEditTransactionDateTime() {
+  if (!hasRoleAdmin()) { toast('Only admin can edit transaction date/time'); return; }
+  const ctx = window.__editTxCtx || {};
+  const txId = ctx.id;
+  if (!txId) { toast('No transaction selected'); return; }
+  const newDate = (document.getElementById('edit-tx-date') || {}).value || '';
+  const t24     = (document.getElementById('edit-tx-time') || {}).value || '';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) { toast('Pick a valid date'); return; }
+  if (!/^\d{2}:\d{2}$/.test(t24)) { toast('Pick a valid time'); return; }
+  // Convert "18:40" → "06:40 pm" for storage (matches existing tx.time format).
+  let [hh, mm] = t24.split(':').map(n => parseInt(n, 10));
+  const ampm = hh >= 12 ? 'pm' : 'am';
+  let h12 = hh % 12; if (h12 === 0) h12 = 12;
+  const newTime = `${String(h12).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${ampm}`;
+  if (isDayCloseLocked(ctx.currentDate)) { toast(`Source day ${ctx.currentDate} is locked. Unlock first.`); return; }
+  if (isDayCloseLocked(newDate))         { toast(`Target day ${newDate} is locked. Unlock first.`); return; }
+  closeModal('modal-edit-tx-datetime');
+  const approval = askHighRiskApproval(`Edit tx ${String(txId).slice(-6).toUpperCase()} → ${newDate} ${newTime}`);
   if (!approval) return;
   const ok = await fbUpdateDoc(COL.TRANSACTIONS, txId, {
     date: newDate,
@@ -7085,15 +7141,15 @@ async function editTransactionDateTime(txId, currentDate, currentTime) {
     dateEdited: true,
     dateEditedAtMs: Date.now(),
     dateEditedBy: currentUser ? currentUser.email : '',
-    dateEditPriorDate: currentDate,
-    dateEditPriorTime: currentTime || '',
+    dateEditPriorDate: ctx.currentDate || '',
+    dateEditPriorTime: ctx.currentTime || '',
     dateEditReason: approval.reason,
   });
   if (!ok) { toast('Could not update transaction'); return; }
   logAudit('tx.dateTime.edit', `${COL.TRANSACTIONS}/${txId}`, {
-    priorDate: currentDate, priorTime: currentTime, newDate, newTime, approval,
+    priorDate: ctx.currentDate, priorTime: ctx.currentTime, newDate, newTime, approval,
   });
-  toast('Transaction date/time updated');
+  toast('Transaction date & time updated ✓');
   loadSales();
 }
 
