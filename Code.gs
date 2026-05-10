@@ -28,6 +28,7 @@ const TABS = {
   EMI:           'EMI',
   ATTENDANCE:    'Attendance',
   FOOTFALL:      'Footfall',
+  APPOINTMENTS:  'Appointments',
 };
 
 const HEADERS = {
@@ -41,6 +42,7 @@ const HEADERS = {
   EMI:           ['id','name','totalAmount','monthlyEMI','startDate','monthsPaid'],
   Attendance:    ['id','date','staffName','checkIn'],
   Footfall:      ['date','count'],
+  Appointments:  ['id','date','startTime','endTime','durationMins','customerName','customerPhone','customerId','servicesText','staffNamesText','notes','status','linkedTransactionId','billedTotal','reminderSent','updatedAt'],
 };
 
 /* ========== ENTRY POINTS ========== */
@@ -58,6 +60,7 @@ function route_(e) {
     if (action === 'getTransactions')  return ok_({ transactions: getRowsForMonth_(TABS.TRANSACTIONS, p.month) });
     if (action === 'getExpenses')      return ok_({ expenses:     getRowsForMonth_(TABS.EXPENSES,     p.month) });
     if (action === 'getSalaries')      return ok_({ salaries:     readTab_(TABS.SALARIES) });
+    if (action === 'getAppointments')  return ok_({ appointments: getAppointmentsForRange_(p.from, p.to) });
 
     if (action === 'write') {
       const payloadRaw = p.payload || '';
@@ -97,6 +100,8 @@ function handleWrite_(payload, providedKey) {
   if (sub === 'saveStaff')          return replaceTab_(TABS.STAFF, payload.staff);
   if (sub === 'saveServices')       return replaceTab_(TABS.SERVICES, payload.services);
   if (sub === 'saveConfig')         return saveConfig_(payload.config);
+  if (sub === 'logAppointment')     return upsertAppointment_(payload.row);
+  if (sub === 'deleteAppointment')  return deleteAppointmentRow_(payload.id);
 
   throw new Error('Unknown write sub-action: ' + sub);
 }
@@ -303,6 +308,87 @@ function markEMIPaid_(emiId) {
     }
   }
   throw new Error('EMI not found: ' + emiId);
+}
+
+/* ========== APPOINTMENTS ========== */
+/**
+ * Upsert a single appointment row by id. Accepts the full appointment
+ * object as posted from the PWA. Arrays (services, staffNames) are
+ * flattened into readable text columns so the sheet stays human-friendly.
+ */
+function upsertAppointment_(row) {
+  if (!row || !row.id) throw new Error('Appointment row missing id');
+  const sh = ensureTab_(TABS.APPOINTMENTS, HEADERS.Appointments);
+  const headers = HEADERS.Appointments;
+  const flat = flattenAppointment_(row);
+  const data = sh.getDataRange().getValues();
+  const idIdx = headers.indexOf('id');
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idIdx]) === String(row.id)) {
+      const out = headers.map(h => flat[h] !== undefined ? flat[h] : data[i][headers.indexOf(h)] || '');
+      sh.getRange(i + 1, 1, 1, headers.length).setValues([out]);
+      return { updated: 1, id: row.id };
+    }
+  }
+  const out = headers.map(h => flat[h] !== undefined ? flat[h] : '');
+  sh.appendRow(out);
+  return { appended: 1, id: row.id };
+}
+
+function deleteAppointmentRow_(id) {
+  if (!id) throw new Error('Appointment id required');
+  const sh = ensureTab_(TABS.APPOINTMENTS, HEADERS.Appointments);
+  const data = sh.getDataRange().getValues();
+  const idIdx = HEADERS.Appointments.indexOf('id');
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idIdx]) === String(id)) {
+      sh.deleteRow(i + 1);
+      return { deleted: 1, id: id };
+    }
+  }
+  return { deleted: 0, id: id };
+}
+
+function flattenAppointment_(row) {
+  const services = Array.isArray(row.services) ? row.services : [];
+  const servicesText = services.map(s => {
+    const parts = [s.name];
+    if (s.staffName) parts.push('@' + s.staffName);
+    if (s.mins) parts.push('(' + s.mins + 'm)');
+    if (s.price != null) parts.push('₹' + s.price);
+    return parts.join(' ');
+  }).join(' | ');
+  const staffNames = Array.isArray(row.staffNames) ? row.staffNames
+                   : Array.from(new Set(services.map(s => s.staffName).filter(Boolean)));
+  return {
+    id:                  row.id || '',
+    date:                row.date || '',
+    startTime:           row.startTime || '',
+    endTime:             row.endTime || '',
+    durationMins:        row.durationMins || 0,
+    customerName:        row.customerName || '',
+    customerPhone:       row.customerPhone || '',
+    customerId:          row.customerId || '',
+    servicesText:        servicesText,
+    staffNamesText:      staffNames.join(', '),
+    notes:               row.notes || '',
+    status:              row.status || 'booked',
+    linkedTransactionId: row.linkedTransactionId || '',
+    billedTotal:         row.billedTotal || 0,
+    reminderSent:        !!row.reminderSent,
+    updatedAt:           row.updatedAt || new Date().toISOString(),
+  };
+}
+
+function getAppointmentsForRange_(from, to) {
+  const rows = readTab_(TABS.APPOINTMENTS);
+  if (!from && !to) return rows;
+  return rows.filter(r => {
+    const d = String(r.date || '');
+    if (from && d < from) return false;
+    if (to   && d > to)   return false;
+    return true;
+  });
 }
 
 /* ========== RESPONSE WRAPPERS ========== */
