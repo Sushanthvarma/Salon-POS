@@ -1186,8 +1186,10 @@ img, video, canvas, svg{max-width:100%;height:auto;}
 .staff-appt-strip .strip-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .staff-appt-strip .strip-title{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;}
 .staff-appt-strip .strip-link{font-size:12px;font-weight:600;color:var(--terracotta);background:none;border:none;cursor:pointer;letter-spacing:.02em;}
-.staff-appt-strip .next-appt{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line-soft);}
-.staff-appt-strip .next-appt:first-of-type{border-top:none;padding-top:0;}
+.staff-appt-strip .next-appt{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line-soft);cursor:pointer;border-radius:8px;transition:background .15s;margin:0 -8px;padding-left:8px;padding-right:8px;}
+.staff-appt-strip .next-appt:first-of-type{border-top:none;padding-top:2px;}
+.staff-appt-strip .next-appt:hover{background:var(--surface-2);}
+.staff-appt-strip .next-appt:focus-visible{outline:2px solid var(--terracotta);outline-offset:2px;}
 .staff-appt-strip .next-appt-time{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);width:56px;flex-shrink:0;}
 .staff-appt-strip .next-appt-meta{flex:1;min-width:0;}
 .staff-appt-strip .next-appt-name{font-weight:600;font-size:13px;color:var(--ink);}
@@ -10369,7 +10371,7 @@ function renderStaffApptStrip() {
         const isSoon = start != null && (start - nowMins) >= 0 && (start - nowMins) <= 30;
         const svcs = (a.services || []).map(s => s.name).join(' · ');
         return `
-          <div class="next-appt">
+          <div class="next-appt" role="button" tabindex="0" onclick="openApptBooking('${a.id}')" title="Open appointment">
             <div class="next-appt-time">${esc(_fmtTime12(a.startTime))}</div>
             <div class="next-appt-meta">
               <div class="next-appt-name">${esc(a.customerName || 'Walk-in')} · ${esc(a.customerPhone || '')}</div>
