@@ -3189,7 +3189,7 @@ async function runDayCloseAutoLockSweep() {
     const candidates = [];
     const baseMs = istDateTimeToMs(today, '00:00 am');
     for (let i = 1; i <= 14; i++) {
-      const d = new Date(baseMs - i * 24 * 60 * 60000 + IST_OFFSET_MIN * 60000);
+      const d = new Date(baseMs - i * 24 * 60 * 60000 + 330 * 60000);
       const y = d.getUTCFullYear();
       const m = String(d.getUTCMonth() + 1).padStart(2, '0');
       const dd = String(d.getUTCDate()).padStart(2, '0');
@@ -10406,10 +10406,12 @@ function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toS
 // (the salon's operating timezone). Using the device's local time or UTC
 // caused bills posted near midnight to be filed against the wrong calendar
 // day (e.g. a 12:10 AM IST bill landing on the previous date).
-const IST_OFFSET_MIN = 330; // UTC + 5:30
+// NOTE: these helpers are hoisted via `function` declarations and inline
+// the +330 minute offset so they are safe to call at top-level state init
+// (before any `const` further down in the file is initialised).
 function nowIST() {
   const d = new Date();
-  return new Date(d.getTime() + (d.getTimezoneOffset() + IST_OFFSET_MIN) * 60000);
+  return new Date(d.getTime() + (d.getTimezoneOffset() + 330) * 60000);
 }
 function todayISO() {
   const d = nowIST();
@@ -10441,7 +10443,7 @@ function istDateTimeToMs(dateStr, timeStr) {
     if (m[3] === 'am' && h === 12) h = 0;
   }
   // Treat h:mi as IST → convert back to UTC by subtracting 5:30
-  return Date.UTC(y, mo - 1, d, h, mi) - IST_OFFSET_MIN * 60000;
+  return Date.UTC(y, mo - 1, d, h, mi) - 330 * 60000;
 }
 function fmt(n) { return Math.round(n).toLocaleString('en-IN'); }
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
