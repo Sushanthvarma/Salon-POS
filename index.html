@@ -7027,8 +7027,12 @@ async function loadSales() {
           <span>${tx.staffName || ''}</span>
           <span>Pay: ${pm}</span>
           ${parseFloat(tx.discount) > 0 ? `<span>Disc: ₹${tx.discount}</span>` : ''}
-          ${canEdit ? `<button class="btn btn-secondary" style="flex:none;padding:4px 10px;font-size:10px;margin-left:auto;" onclick="editTransactionDateTime('${esc(tx.id)}','${tx.date}','${esc(tx.time||'')}')">Edit Date/Time</button>` : ''}
+          ${tx.dateEdited ? `<span style="color:#a06000">✎ Edited</span>` : ''}
         </div>
+        ${canEdit ? `
+        <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+          <button class="btn btn-secondary" style="flex:none;padding:8px 14px;font-size:11px;" onclick="editTransactionDateTime('${esc(tx.id)}','${tx.date}','${esc(tx.time||'')}')">✎ Edit Date / Time</button>
+        </div>` : ''}
       </div>
     `;
   });
@@ -7043,6 +7047,7 @@ async function loadSales() {
       <button class="btn btn-gold" onclick='exportSalesAs("${ym}","xlsx")'>📊 Excel</button>
       <button class="btn btn-secondary" onclick='exportSalesAs("${ym}","csv")'>📋 CSV</button>
     </div>
+    ${hasRoleAdmin() ? `<div class="muted-text" style="margin:6px 0 10px;font-size:12px;">Admin tip: tap <b>✎ Edit Date / Time</b> on any bill below to correct a wrong date (PIN + reason required).</div>` : ''}
     ${html}
   `;
   window.__lastSalesRows = sorted;
