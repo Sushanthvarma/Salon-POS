@@ -200,10 +200,18 @@ input,select,textarea{font-family:inherit;font-size:inherit;color:inherit;}
 #screen-auth .landing-btn-sub{margin-top:2px;font-size:12px;opacity:.68;}
 
 /* SYNC PILL */
-.sync-pill{position:fixed;top:12px;right:12px;background:var(--ink);color:#FFF;font-size:10.5px;padding:5px 11px;border-radius:20px;opacity:0;transition:opacity .3s;z-index:999;letter-spacing:.06em;font-weight:500;}
+.sync-pill{position:fixed;top:12px;right:12px;background:var(--ink);color:#FFF;font-size:10.5px;padding:5px 11px;border-radius:20px;opacity:0;transition:opacity .3s;z-index:999;letter-spacing:.06em;font-weight:500;cursor:pointer;}
 .sync-pill.show{opacity:1;}
 .sync-pill.syncing{background:var(--champagne);}
 .sync-pill.error{background:var(--terracotta);}
+.sync-pill.offline{background:#7a5a2e;}
+.sync-pill.pending{background:#9c6b1f;}
+/* Persistent offline banner shown when device is offline OR has queued writes */
+.offline-banner{position:fixed;left:0;right:0;top:0;z-index:1000;background:#7a5a2e;color:#FFF;font-size:12px;letter-spacing:.04em;padding:6px 14px;display:none;text-align:center;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.18);}
+.offline-banner.visible{display:block;}
+.offline-banner .ob-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ffd089;margin-right:7px;vertical-align:middle;animation:obpulse 1.4s infinite;}
+@keyframes obpulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+body.has-offline-banner .brand-strip,body.has-offline-banner .top-bar{top:28px;}
 
 /* GLOBAL BRAND STRIP */
 .brand-strip{display:none;align-items:center;gap:12px;padding:11px 16px 10px;background:rgba(248,245,240,.97);backdrop-filter:saturate(200%) blur(14px);-webkit-backdrop-filter:saturate(200%) blur(14px);border-bottom:1px solid var(--line-soft);position:sticky;top:0;z-index:50;}
@@ -1297,7 +1305,12 @@ img, video, canvas, svg{max-width:100%;height:auto;}
 /* Cart per-item staff selector */
 .cart-item-staff-row{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;}
 .cart-item-staff-row label{color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;flex-shrink:0;}
-.cart-item-staff-row select{flex:1;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:12.5px;font-family:inherit;color:var(--ink);min-width:0;}
+.cart-item-staff-row select{flex:1;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:12.5px;font-family:inherit;color:var(--ink);min-width:0;transition:border-color .18s,background .18s,box-shadow .18s;}
+.cart-item-staff-row.needs-staff label{color:#B91C1C;}
+.cart-item-staff-row.needs-staff select{border-color:#DC2626;background:#FEF2F2;color:#7F1D1D;box-shadow:0 0 0 3px rgba(220,38,38,.08);animation:cartStaffShake .35s ease-in-out;}
+.cart-item-staff-row .needs-staff-hint{display:none;font-size:10.5px;color:#B91C1C;font-weight:600;letter-spacing:.04em;margin-left:6px;flex-shrink:0;}
+.cart-item-staff-row.needs-staff .needs-staff-hint{display:inline;}
+@keyframes cartStaffShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-3px);}75%{transform:translateX(3px);}}
 
 /* Receipt staff splits panel */
 .staff-splits-panel{background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:12px 14px;margin:-14px 0 20px;}
@@ -1804,7 +1817,7 @@ img, video, canvas, svg{max-width:100%;height:auto;}
   <div class="totals" id="totals-block"></div>
   <div class="cta-footer">
     <button class="btn btn-secondary" onclick="showScreen('home')">Edit</button>
-    <button class="btn btn-primary" onclick="showScreen('payment')">Proceed to Payment</button>
+    <button class="btn btn-primary" onclick="goToPayment()">Proceed to Payment</button>
   </div>
 </section>
 
@@ -2443,7 +2456,10 @@ img, video, canvas, svg{max-width:100%;height:auto;}
 
 <!-- Toast & Sync Pill -->
 <div class="save-toast" id="save-toast"></div>
-<div class="sync-pill" id="sync-pill"></div>
+<div class="sync-pill" id="sync-pill" onclick="showOfflineDetails()"></div>
+<div class="offline-banner" id="offline-banner" onclick="showOfflineDetails()">
+  <span class="ob-dot"></span><span id="offline-banner-text">Offline — changes are saved on this device and will sync when internet returns.</span>
+</div>
 
 <!-- Edit Service Details (admin) -->
 <div class="modal-backdrop" id="modal-svc-detail">
@@ -3612,6 +3628,290 @@ let db    = null;
 let fbAuth = null;
 let currentUser = null;   // { email, name, photo, role: 'admin'|'supervisor'|'staff'|null }
 
+/* ────────────────────────────────────────────────────
+   OFFLINE-FIRST WRITE INFRASTRUCTURE
+   ─────────────────────────────────────────────────────
+   Strategy:
+   1. Firestore IndexedDB persistence is the primary local store. Writes are
+      saved to the local cache instantly and the SDK auto-syncs when online.
+   2. Every write also enqueues a JSON-serialisable record to localStorage
+      ("shadow queue") as a belt-and-braces backup. The shadow entry is
+      removed once Firestore confirms the server write. On startup / when
+      `online` fires we replay anything still in the shadow queue.
+   3. Writes return the new docId synchronously (without awaiting the network
+      ack) so the UI is never blocked by a flaky connection.
+──────────────────────────────────────────────────── */
+let __persistenceEnabled = false;
+let __pendingWrites      = 0;       // in-memory in-flight count
+const __SHADOW_KEY       = 'ozone_pending_ops_v1';
+let __shadowReplayInFlight = false;
+
+function _shadowRead() {
+  try { return JSON.parse(localStorage.getItem(__SHADOW_KEY) || '[]') || []; }
+  catch(e) { return []; }
+}
+function _shadowWrite(arr) {
+  try { localStorage.setItem(__SHADOW_KEY, JSON.stringify(arr || [])); }
+  catch(e) {
+    // QuotaExceededError — extremely rare (we store only small JSON ops),
+    // but if it ever happens we MUST tell the user so they don't think a
+    // bill was saved when it actually wasn't queued.
+    console.error('Shadow queue write failed (quota?):', e);
+    try {
+      if (typeof toast === 'function') toast('⚠️ Local storage full — connect to internet ASAP');
+    } catch (_) {}
+  }
+}
+function shadowPendingCount() { return _shadowRead().length; }
+
+// Strip Firestore sentinel values (serverTimestamp, FieldValue) — they aren't
+// JSON-serialisable. We keep `createdAtMs` (plain number) so ordering still works.
+function _sanitizeForShadow(data) {
+  if (data == null) return data;
+  const t = typeof data;
+  if (t !== 'object') return data;
+  // Date → ISO string so JSON.stringify round-trips correctly. (Without this
+  // a raw Date becomes "{}" because it has no enumerable own properties.)
+  if (data instanceof Date) return data.toISOString();
+  if (Array.isArray(data)) return data.map(_sanitizeForShadow);
+  // Firestore Timestamp objects expose toMillis(); preserve as a number so
+  // re-applying the field on replay is still ordering-correct.
+  if (typeof data.toMillis === 'function' && typeof data.toDate === 'function') {
+    try { return data.toMillis(); } catch (_) { return null; }
+  }
+  const out = {};
+  for (const k in data) {
+    if (!Object.prototype.hasOwnProperty.call(data, k)) continue;
+    const v = data[k];
+    // Skip Firestore FieldValue sentinels (serverTimestamp, increment, …).
+    if (v && typeof v === 'object' && (v._methodName || (v.constructor && v.constructor.name === 'FieldValue'))) {
+      continue;
+    }
+    out[k] = _sanitizeForShadow(v);
+  }
+  return out;
+}
+
+function shadowEnqueue(op) {
+  // op: { id (uniq), kind:'set'|'update'|'delete'|'increment', coll, docId, data?, field?, by?, merge? }
+  if (!op || !op.coll || !op.docId) return;
+  const arr = _shadowRead();
+  // De-dup by op.id when caller supplies one (prevents double-replay).
+  if (op.id && arr.some(e => e.id === op.id)) return;
+  arr.push(op);
+  _shadowWrite(arr);
+  updateOfflineUI();
+}
+
+function shadowAck(opId) {
+  if (!opId) return;
+  const arr = _shadowRead();
+  const next = arr.filter(e => e.id !== opId);
+  if (next.length !== arr.length) {
+    _shadowWrite(next);
+    updateOfflineUI();
+  }
+}
+
+// Race a promise against a timeout. Used by replayShadowQueue so a single
+// write that hangs (e.g. captive-portal connectivity that passes onLine=true
+// but never reaches the server) doesn't block every other queued op behind it.
+function _withTimeout(promise, ms, label) {
+  return new Promise((resolve, reject) => {
+    let done = false;
+    const t = setTimeout(() => {
+      if (done) return;
+      done = true;
+      const e = new Error('timeout: ' + (label || ''));
+      e.code = 'oz/timeout';
+      reject(e);
+    }, ms);
+    promise.then(
+      v => { if (done) return; done = true; clearTimeout(t); resolve(v); },
+      e => { if (done) return; done = true; clearTimeout(t); reject(e); }
+    );
+  });
+}
+
+async function replayShadowQueue() {
+  if (!db || __shadowReplayInFlight) return;
+  // Note: we deliberately do NOT bail when navigator.onLine === false. Many
+  // devices misreport connectivity (captive portals, VPNs, sleeping radios),
+  // and Firestore's own queue handles a real offline cleanly. We just attempt
+  // each op with a timeout so a dead socket doesn't block the loop.
+  const arr = _shadowRead();
+  if (!arr.length) return;
+  __shadowReplayInFlight = true;
+  // Track which op IDs we successfully synced or permanently dropped, plus
+  // those that failed transiently. We re-read the queue at the END and keep
+  // anything new that arrived during the loop — this prevents the classic
+  // read-modify-write race where a fresh enqueue gets clobbered.
+  const ackedIds   = new Set();
+  const droppedIds = new Set();
+  const failedIds  = new Set();
+  for (const op of arr) {
+    try {
+      const ref = db.collection(op.coll).doc(op.docId);
+      let p;
+      if (op.kind === 'delete') {
+        p = ref.delete();
+      } else if (op.kind === 'increment') {
+        p = ref.update({ [op.field]: firebase.firestore.FieldValue.increment(op.by || 1) });
+      } else {
+        // 'set' and 'update' are both replayed with merge:true. This is safe
+        // because docIds are deterministic and we never WANT replay to wipe a
+        // serverTimestamp the SDK already wrote (e.g. createdAt). The shadow
+        // queue is a backup for lost-cache scenarios — when it does fire, it
+        // should layer the field values on top, not overwrite siblings.
+        p = ref.set(op.data || {}, { merge: true });
+      }
+      // 12 s ceiling per op. Long enough for slow rural 2G uploads, short
+      // enough that a single dead op doesn't block the user for minutes.
+      await _withTimeout(p, 12000, op.coll + '/' + op.docId);
+      ackedIds.add(op.id);
+    } catch(e) {
+      const code = (e && e.code) || '';
+      // Permanent failures (permission-denied / not-found / invalid-argument)
+      // should NOT keep retrying forever — they would spam the queue.
+      if (/permission-denied|invalid-argument|not-found|unauthenticated/i.test(code)) {
+        console.warn('Dropping unsynced op (permanent failure):', op.coll, op.docId, code);
+        droppedIds.add(op.id);
+        continue;
+      }
+      // Timeout or transient — keep for the next retry pass.
+      failedIds.add(op.id);
+    }
+  }
+  // Re-read so any ops enqueued DURING the loop (or freshly acked by an
+  // unrelated _trackWrite resolving in the background) are preserved.
+  const current = _shadowRead();
+  const next = current.filter(e => !ackedIds.has(e.id) && !droppedIds.has(e.id));
+  _shadowWrite(next);
+  __shadowReplayInFlight = false;
+  updateOfflineUI();
+  // Schedule a follow-up pass for transient failures, but only when we
+  // actually still have something to retry — avoids hot-looping forever.
+  if (failedIds.size && next.length) {
+    setTimeout(replayShadowQueue, 8000);
+  }
+}
+
+function _newOpId() {
+  return 'op_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+// Wrap an async Firestore write so the UI never blocks on the network ack.
+// `localApply` is a function returning what should be returned synchronously
+// (e.g. the new docId). The actual server confirmation is tracked in the
+// background and removes the matching shadow-queue entry on success.
+function _trackWrite(promise, opId) {
+  __pendingWrites++;
+  updateOfflineUI();
+  promise
+    .then(() => {
+      __pendingWrites = Math.max(0, __pendingWrites - 1);
+      shadowAck(opId);
+      updateOfflineUI();
+    })
+    .catch(err => {
+      __pendingWrites = Math.max(0, __pendingWrites - 1);
+      const code = (err && err.code) || '';
+      // Permanent → drop from shadow queue too.
+      if (/permission-denied|invalid-argument|not-found|unauthenticated/i.test(code)) {
+        console.error('Permanent write failure:', code, err);
+        shadowAck(opId);
+      } else {
+        console.warn('Deferred write pending retry:', code || err);
+      }
+      updateOfflineUI();
+    });
+}
+
+function setupConnectivityWatch() {
+  if (window.__ozConnectivityWired) return;
+  window.__ozConnectivityWired = true;
+  // Both 'online' transitions AND visibility change (returning to tab on
+  // mobile) trigger a replay attempt. We do NOT trust navigator.onLine alone
+  // because captive portals / dozing radios often misreport.
+  window.addEventListener('online',  () => { updateOfflineUI(); replayShadowQueue(); });
+  window.addEventListener('offline', () => { updateOfflineUI(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      updateOfflineUI();
+      if (_shadowRead().length) replayShadowQueue();
+    }
+  });
+  // Periodic safety net — try draining the queue every 30 s regardless of
+  // navigator.onLine. replayShadowQueue() itself wraps each op in a 12 s
+  // timeout so a hung socket only costs one cycle, not the whole queue.
+  setInterval(() => {
+    if (_shadowRead().length) replayShadowQueue();
+  }, 30000);
+  updateOfflineUI();
+}
+
+function updateOfflineUI() {
+  const pill   = document.getElementById('sync-pill');
+  const banner = document.getElementById('offline-banner');
+  const btext  = document.getElementById('offline-banner-text');
+  const offline = (typeof navigator !== 'undefined' && navigator.onLine === false);
+  // Every in-flight write also has a shadow-queue entry, so the queue length
+  // is the canonical "pending" number — don't double-count with __pendingWrites.
+  const pending = shadowPendingCount();
+  if (banner && btext) {
+    if (offline) {
+      banner.classList.add('visible');
+      document.body.classList.add('has-offline-banner');
+      btext.textContent = pending
+        ? `Offline — ${pending} change${pending === 1 ? '' : 's'} saved on device, will sync when online.`
+        : 'Offline — changes are saved on this device and will sync when internet returns.';
+    } else if (pending > 0) {
+      banner.classList.add('visible');
+      document.body.classList.add('has-offline-banner');
+      btext.textContent = `Syncing ${pending} pending change${pending === 1 ? '' : 's'}…`;
+    } else {
+      banner.classList.remove('visible');
+      document.body.classList.remove('has-offline-banner');
+    }
+  }
+  if (pill) {
+    if (offline) {
+      pill.className = 'sync-pill show offline';
+      pill.textContent = pending ? `⚠ Offline · ${pending} pending` : '⚠ Offline';
+    } else if (pending > 0) {
+      pill.className = 'sync-pill show pending';
+      pill.textContent = `↑ Syncing ${pending}`;
+    }
+    // When fully synced & online, leave pill alone — showSync() handles the
+    // transient "✓ Synced" toast after each successful write.
+  }
+}
+
+function showOfflineDetails() {
+  const offline = (typeof navigator !== 'undefined' && navigator.onLine === false);
+  const pending = shadowPendingCount();
+  if (!offline && pending === 0) {
+    toast('All changes are synced ✓');
+    return;
+  }
+  const lines = [];
+  lines.push(offline ? '📴 Device is OFFLINE' : '📡 Device is ONLINE');
+  lines.push('');
+  if (pending > 0) {
+    lines.push(`${pending} change${pending === 1 ? '' : 's'} are saved on this device`);
+    lines.push('and will be uploaded automatically when internet is available.');
+  } else {
+    lines.push('No pending changes. Everything is saved on the server.');
+  }
+  lines.push('');
+  lines.push('Tip: keep this tab open until "Synced" appears.');
+  alert(lines.join('\n'));
+  // Always force a replay attempt, even if onLine reports false — the SDK
+  // and our 12 s timeout handle the truly-offline case gracefully.
+  replayShadowQueue();
+}
+
+function fbApp_NULL() {} // reserved
 // ⬇ Firebase config baked into the code — no setup wizard needed, works on every device.
 const EMBEDDED_FB_CONFIG = {
   apiKey:            'AIzaSyDoGba-TZvz9Jz6RybCAMkHecRj4Kttpec',
@@ -3638,7 +3938,18 @@ function initFirebase() {
     fbAuth = firebase.auth();
     // Enable offline persistence (IndexedDB cache + auto write queue)
     db.enablePersistence({ synchronizeTabs: true })
-      .catch(err => console.warn('Persistence not available:', err && err.code));
+      .then(() => {
+        __persistenceEnabled = true;
+        // Try to drain anything left from a previous session that might have
+        // been written before persistence was confirmed.
+        replayShadowQueue();
+      })
+      .catch(err => {
+        __persistenceEnabled = false;
+        console.warn('Persistence not available:', err && err.code);
+      });
+    // Wire up online/offline listeners + initial connectivity status.
+    setupConnectivityWatch();
     return true;
   } catch(e) {
     console.error('Firebase init failed:', e);
@@ -3794,15 +4105,14 @@ async function fbGetConfigDoc() {
 async function fbSetConfig(partial) {
   if (!db) return false;
   showSync('syncing');
-  try {
-    await db.collection(COL.CONFIG).doc('shop').set(partial, { merge: true });
-    showSync('ok');
-    return true;
-  } catch(e) {
-    console.error('setConfig failed:', e);
-    showSync('error');
-    return false;
-  }
+  const opId = _newOpId();
+  // Shadow-queue first so a tab close before ack still preserves the change.
+  shadowEnqueue({ id: opId, kind: 'update', coll: COL.CONFIG, docId: 'shop', data: _sanitizeForShadow(partial) });
+  const p = db.collection(COL.CONFIG).doc('shop').set(partial, { merge: true })
+              .then(() => { showSync('ok'); })
+              .catch(e => { showSync('error'); throw e; });
+  _trackWrite(p, opId);
+  return true; // optimistic — local cache is updated synchronously
 }
 
 // UPSERT: writes (or overwrites) a doc with a known/deterministic ID.
@@ -3811,16 +4121,15 @@ async function fbSetConfig(partial) {
 async function fbAddDoc(coll, data) {
   if (!db) return false;
   showSync('syncing');
-  try {
-    const docId = data.id || db.collection(coll).doc().id;
-    await db.collection(coll).doc(docId).set({ ...data, id: docId });
-    showSync('ok');
-    return docId;
-  } catch(e) {
-    console.error('addDoc failed:', coll, e);
-    showSync('error');
-    return false;
-  }
+  const docId   = data.id || db.collection(coll).doc().id;
+  const payload = { ...data, id: docId };
+  const opId    = _newOpId();
+  shadowEnqueue({ id: opId, kind: 'set', coll, docId, data: _sanitizeForShadow(payload) });
+  const p = db.collection(coll).doc(docId).set(payload)
+              .then(() => { showSync('ok'); })
+              .catch(e => { showSync('error'); throw e; });
+  _trackWrite(p, opId);
+  return docId;
 }
 
 // APPEND: always creates a NEW document with a Firestore auto-ID.
@@ -3840,27 +4149,23 @@ async function fbAppendDoc(coll, data) {
     createdAtMs: Date.now(),
     createdBy:   currentUser ? currentUser.email : null,
   };
-  try {
-    await ref.set(payload);
-    showSync('ok');
-    return docId;
-  } catch(e1) {
-    // One retry after a short backoff for transient errors.
-    if (isTransientFirestoreError(e1)) {
-      await sleep(800);
-      try {
-        await ref.set(payload);
-        showSync('ok');
-        return docId;
-      } catch(e2) {
-        console.error('appendDoc failed after retry:', coll, e2);
-      }
-    } else {
-      console.error('appendDoc failed:', coll, e1);
-    }
-    showSync('error');
-    return false;
-  }
+  const opId = _newOpId();
+  // Shadow queue uses sanitized payload (no serverTimestamp). createdAtMs is
+  // a real number so ordering still works after replay.
+  shadowEnqueue({ id: opId, kind: 'set', coll, docId, data: _sanitizeForShadow(payload) });
+  const p = ref.set(payload)
+               .then(() => { showSync('ok'); })
+               .catch(async (e1) => {
+                 if (isTransientFirestoreError(e1)) {
+                   await sleep(800);
+                   try { await ref.set(payload); showSync('ok'); return; }
+                   catch(e2) { showSync('error'); throw e2; }
+                 }
+                 showSync('error');
+                 throw e1;
+               });
+  _trackWrite(p, opId);
+  return docId;
 }
 
 function isTransientFirestoreError(e) {
@@ -3876,15 +4181,26 @@ function isTransientFirestoreError(e) {
 async function fbUpdateDoc(coll, docId, partial) {
   if (!db || !docId) return false;
   showSync('syncing');
-  try {
-    await db.collection(coll).doc(docId).set(partial, { merge: true });
-    showSync('ok');
-    return true;
-  } catch (e) {
-    console.error('updateDoc failed:', coll, docId, e);
-    showSync('error');
-    return false;
-  }
+  const opId = _newOpId();
+  shadowEnqueue({ id: opId, kind: 'update', coll, docId, data: _sanitizeForShadow(partial) });
+  const p = db.collection(coll).doc(docId).set(partial, { merge: true })
+              .then(() => { showSync('ok'); })
+              .catch(e => { showSync('error'); throw e; });
+  _trackWrite(p, opId);
+  return true;
+}
+
+// Delete a document by id, queued for offline replay.
+async function fbDeleteDoc(coll, docId) {
+  if (!db || !docId) return false;
+  showSync('syncing');
+  const opId = _newOpId();
+  shadowEnqueue({ id: opId, kind: 'delete', coll, docId });
+  const p = db.collection(coll).doc(docId).delete()
+              .then(() => { showSync('ok'); })
+              .catch(e => { showSync('error'); throw e; });
+  _trackWrite(p, opId);
+  return true;
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -3899,7 +4215,7 @@ async function logAudit(action, target, extra) {
   if (!db) return;
   try {
     const ref = db.collection(COL.AUDIT).doc();
-    await ref.set({
+    const payload = {
       id:          ref.id,
       action:      action,
       target:      target || null,
@@ -3909,7 +4225,10 @@ async function logAudit(action, target, extra) {
       actorRole:   currentUser ? currentUser.role  : null,
       createdAt:   firebase.firestore.FieldValue.serverTimestamp(),
       createdAtMs: Date.now(),
-    });
+    };
+    const opId = _newOpId();
+    shadowEnqueue({ id: opId, kind: 'set', coll: COL.AUDIT, docId: ref.id, data: _sanitizeForShadow(payload) });
+    _trackWrite(ref.set(payload), opId);
   } catch(e) {
     // Audit must never break the user flow.
     console.warn('audit write failed:', e && e.code);
@@ -3919,18 +4238,54 @@ async function logAudit(action, target, extra) {
 async function fbReplaceCollection(coll, rows) {
   // Wipe collection and rewrite. Used for config-style collections
   // (staff/services/fixedExpenses/emi) where the whole list is small.
+  // NOTE: this needs an existing-docs read to know what to delete, so it can
+  // only complete fully when online. We still queue per-row sets in the
+  // shadow queue so individual upserts replay after reconnect even if the
+  // batch.commit deferred-fails offline.
   if (!db) return false;
   showSync('syncing');
+  // Pre-queue every row as an idempotent set, so reconnect always restores
+  // the latest list even if the wipe-and-rewrite batch never reaches the
+  // server.
+  (rows || []).forEach(r => {
+    const id = r.id || db.collection(coll).doc().id;
+    r.id = id;
+    shadowEnqueue({ id: _newOpId(), kind: 'set', coll, docId: id, data: _sanitizeForShadow({ ...r, id }) });
+  });
   try {
-    const existing = await db.collection(coll).get();
+    // Read existing docs (cache-first, then server with a tight timeout) so
+    // we know what to delete. NEVER let this read block the caller for more
+    // than a few seconds — UI must stay responsive even on dead networks.
+    let existing = null;
+    try {
+      existing = await _withTimeout(
+        db.collection(coll).get({ source: 'cache' }),
+        2000,
+        'replaceCollection.cache:' + coll
+      );
+    } catch (_) { /* cache miss — fall back to server */ }
+    if (!existing && navigator.onLine) {
+      try {
+        existing = await _withTimeout(
+          db.collection(coll).get(),
+          5000,
+          'replaceCollection.server:' + coll
+        );
+      } catch (_) { /* network slow — proceed with no deletes */ }
+    }
     const batch = db.batch();
-    existing.docs.forEach(d => batch.delete(d.ref));
+    if (existing && existing.docs) existing.docs.forEach(d => batch.delete(d.ref));
     (rows || []).forEach(r => {
       const id = r.id || db.collection(coll).doc().id;
       batch.set(db.collection(coll).doc(id), { ...r, id });
     });
-    await batch.commit();
-    showSync('ok');
+    const opId = _newOpId();
+    _trackWrite(
+      batch.commit()
+           .then(() => { showSync('ok'); })
+           .catch(e => { showSync('error'); throw e; }),
+      opId
+    );
     return true;
   } catch(e) {
     console.error('replaceCollection failed:', coll, e);
@@ -3963,47 +4318,39 @@ async function fbUpsertAttendance(row) {
 
 async function fbUpsertStaffAttendance(staffName, attData) {
   // Save attendance as part of staff member's record (in STAFF collection).
-  // Retries transient failures with exponential backoff. Returns true on success.
+  // Uses the in-memory `config.staff` list (already kept in sync by the live
+  // listener) to find the doc id WITHOUT a network round-trip — so this works
+  // immediately even when offline. The actual write goes through fbUpdateDoc,
+  // which queues to the shadow store and replays on reconnect.
   if (!db) return false;
-  const MAX_ATTEMPTS = 3;
-  let lastErr = null;
-  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    try {
-      const staffDoc = await db.collection(COL.STAFF).where('name', '==', staffName).limit(1).get();
-      if (staffDoc.empty) return false;
-      const staffId = staffDoc.docs[0].id;
-      const staffData = staffDoc.docs[0].data();
-      if (!staffData.attendance) staffData.attendance = [];
-      const idx = staffData.attendance.findIndex(a => a.date === attData.date);
-      if (idx >= 0) staffData.attendance[idx] = attData;
-      else staffData.attendance.push(attData);
-      await db.collection(COL.STAFF).doc(staffId).update({ attendance: staffData.attendance });
-      return true;
-    } catch (e) {
-      lastErr = e;
-      const code = (e && (e.code || e.name)) || '';
-      // Don't retry on permission / not-found / invalid-argument errors.
-      if (/permission-denied|not-found|invalid-argument|unauthenticated/i.test(code)) break;
-      if (attempt < MAX_ATTEMPTS) {
-        const delay = 250 * Math.pow(2, attempt - 1); // 250ms, 500ms, 1000ms
-        await new Promise(r => setTimeout(r, delay));
-      }
-    }
+  const staffRec = (config.staff || []).find(s => String(s.name) === String(staffName));
+  if (!staffRec || !staffRec.id) {
+    console.warn('fbUpsertStaffAttendance: staff not found in local config:', staffName);
+    return false;
   }
-  console.error('fbUpsertStaffAttendance failed after retries:', lastErr);
-  return false;
+  // Mutate the local copy first so the next render reflects the change.
+  if (!Array.isArray(staffRec.attendance)) staffRec.attendance = [];
+  const idx = staffRec.attendance.findIndex(a => a.date === attData.date);
+  if (idx >= 0) staffRec.attendance[idx] = attData;
+  else staffRec.attendance.push(attData);
+  // Queue the write (returns synchronously / never blocks the UI).
+  return fbUpdateDoc(COL.STAFF, staffRec.id, { attendance: staffRec.attendance });
 }
 
 async function fbIncrementEMIPaid(emiId) {
   if (!db) return false;
   showSync('syncing');
-  try {
-    await db.collection(COL.EMI).doc(emiId).update({
-      monthsPaid: firebase.firestore.FieldValue.increment(1)
-    });
-    showSync('ok');
-    return true;
-  } catch(e) { showSync('error'); return false; }
+  // NOTE: increments are NOT mirrored to the localStorage shadow queue. They
+  // are non-idempotent (replay would double-count monthsPaid), so we trust
+  // Firestore's own IndexedDB persistence to retry them on reconnect.
+  const opId = _newOpId();
+  const p = db.collection(COL.EMI).doc(emiId).update({
+    monthsPaid: firebase.firestore.FieldValue.increment(1)
+  })
+  .then(() => { showSync('ok'); })
+  .catch(e => { showSync('error'); throw e; });
+  _trackWrite(p, opId);
+  return true;
 }
 
 /* ────────────────────────────────────────────────────
@@ -4168,6 +4515,13 @@ function rerenderActive() {
 ──────────────────────────────────────────────────── */
 let syncTimer;
 function showSync(status) {
+  // When offline OR there's a pending queue, the persistent offline indicator
+  // owns the pill — never let a transient "Syncing…" overwrite it.
+  const offline = (typeof navigator !== 'undefined' && navigator.onLine === false);
+  if (offline || (typeof shadowPendingCount === 'function' && shadowPendingCount() > 0)) {
+    if (typeof updateOfflineUI === 'function') updateOfflineUI();
+    return;
+  }
   const el = document.getElementById('sync-pill');
   el.className = 'sync-pill show ' + status;
   el.textContent = status === 'syncing' ? '↑ Syncing…' : status === 'ok' ? '✓ Synced' : '⚠ Offline';
@@ -6224,11 +6578,12 @@ function renderCart() {
           ${dur ? `<span class="cart-item-tag">⏱ ${dur} per session</span>` : ''}
           <span class="cart-item-tag muted">₹${item.price.toLocaleString('en-IN')} × ${item.qty}</span>
         </div>
-        <div class="cart-item-staff-row">
+        <div class="cart-item-staff-row" data-cart-item-id="${item.id}">
           <label>Staff</label>
           <select onchange="setCartItemStaff('${item.id}', this.value)">
             ${buildStaffOpts(item.staffName)}
           </select>
+          <span class="needs-staff-hint">Required</span>
         </div>
         <div class="cart-item-controls">
           <div class="qty-group">
@@ -6857,30 +7212,36 @@ function exitAdmin() { showScreen('landing'); }
 async function upsertCustomer({ id, phone, name, lastVisit, lastTotal, lastServices }) {
   if (!id || !db) return null;
   const ref = db.collection(COL.CUSTOMERS).doc(id);
+  let existing = null;
+  // Try cache first (instant), then server with a tight timeout. We never
+  // let this read block the bill flow for more than ~2 s.
   try {
-    const snap = await ref.get();
-    const existing = snap.exists ? snap.data() : null;
-    const visits = (existing && existing.visits ? existing.visits : 0) + 1;
-    const totalSpend = (parseFloat(existing && existing.totalSpend) || 0) + (parseFloat(lastTotal) || 0);
-    const data = {
-      id,
-      phone: phone || (existing && existing.phone) || '',
-      name: (name || (existing && existing.name) || '').trim(),
-      visits,
-      totalSpend,
-      firstVisit: (existing && existing.firstVisit) || lastVisit,
-      lastVisit,
-      lastTotal: parseFloat(lastTotal) || 0,
-      lastServices: lastServices || '',
-      updatedAt: new Date().toISOString(),
-    };
-    await ref.set(data, { merge: true });
-    logAudit('customer.upsert', COL.CUSTOMERS + '/' + id, { visits: data.visits, name: data.name });
-    return data;
-  } catch (e) {
-    console.warn('upsertCustomer failed:', e);
-    return null;
+    const cacheSnap = await _withTimeout(ref.get({ source: 'cache' }), 1500, 'cust.cache:' + id);
+    existing = cacheSnap && cacheSnap.exists ? cacheSnap.data() : null;
+  } catch (_) { /* not in cache */ }
+  if (!existing && navigator.onLine) {
+    try {
+      const srvSnap = await _withTimeout(ref.get(), 2500, 'cust.server:' + id);
+      existing = srvSnap && srvSnap.exists ? srvSnap.data() : null;
+    } catch (_) { /* slow / dead net — treat as new */ }
   }
+  const visits = (existing && existing.visits ? existing.visits : 0) + 1;
+  const totalSpend = (parseFloat(existing && existing.totalSpend) || 0) + (parseFloat(lastTotal) || 0);
+  const data = {
+    id,
+    phone: phone || (existing && existing.phone) || '',
+    name: (name || (existing && existing.name) || '').trim(),
+    visits,
+    totalSpend,
+    firstVisit: (existing && existing.firstVisit) || lastVisit,
+    lastVisit,
+    lastTotal: parseFloat(lastTotal) || 0,
+    lastServices: lastServices || '',
+    updatedAt: new Date().toISOString(),
+  };
+  await fbUpdateDoc(COL.CUSTOMERS, id, data);
+  logAudit('customer.upsert', COL.CUSTOMERS + '/' + id, { visits: data.visits, name: data.name });
+  return data;
 }
 
 async function lookupCustomer(id) {
@@ -9388,8 +9749,24 @@ async function deleteAdvance(id, staffName, amount) {
   if (!confirm(`Reverse ₹${fmt(amount)} advance for ${staffName}?`)) return;
   if (!db) return;
   try {
-    const originalDoc = await db.collection(COL.ADVANCES).doc(id).get();
-    if (!originalDoc.exists) {
+    // Read from cache first (instant); fall back to server with a tight
+    // timeout so a dead network can't freeze the reversal flow.
+    let originalDoc = null;
+    try {
+      originalDoc = await _withTimeout(
+        db.collection(COL.ADVANCES).doc(id).get({ source: 'cache' }),
+        1500, 'adv.cache:' + id
+      );
+    } catch (_) { /* not in cache */ }
+    if ((!originalDoc || !originalDoc.exists) && navigator.onLine) {
+      try {
+        originalDoc = await _withTimeout(
+          db.collection(COL.ADVANCES).doc(id).get(),
+          2500, 'adv.server:' + id
+        );
+      } catch (_) { /* slow / dead net */ }
+    }
+    if (!originalDoc || !originalDoc.exists) {
       toast('Original advance not found');
       return;
     }
@@ -11367,7 +11744,53 @@ function setCartItemStaff(itemId, staffName) {
   const i = (state.cart || []).find(x => x.id === itemId);
   if (!i) return;
   i.staffName = (staffName || '').trim();
+  // Clear the "needs-staff" red highlight as soon as a value is picked.
+  const row = document.querySelector(`.cart-item-staff-row[data-cart-item-id="${itemId}"]`);
+  if (row && i.staffName) row.classList.remove('needs-staff');
   // No re-render needed; preserve scroll position.
+}
+
+/**
+ * Validate every cart line has a staff assigned, then navigate to payment.
+ * Called from the "Proceed to Payment" button. Without this gate, a bill
+ * could be saved with empty `staffName`, breaking commission attribution
+ * and the per-staff revenue reports.
+ */
+function goToPayment() {
+  if (!state.cart || !state.cart.length) {
+    toast('Add at least one service first');
+    return;
+  }
+  // Make sure the shop has at least one staff configured — otherwise the
+  // dropdown will always be empty and the user is stuck. Fail fast with a
+  // useful message rather than blocking forever.
+  const staffNames = (config.staff || []).map(s => (s.name || '').trim()).filter(Boolean);
+  if (!staffNames.length) {
+    toast('No staff configured — add staff in Admin → Staff first');
+    return;
+  }
+  const missing = state.cart.filter(i => !(i.staffName || '').trim());
+  if (missing.length) {
+    // Highlight every offending row and scroll the first one into view.
+    const missingIds = new Set(missing.map(i => i.id));
+    document.querySelectorAll('.cart-item-staff-row').forEach(row => {
+      const id = row.getAttribute('data-cart-item-id');
+      if (id && missingIds.has(id)) row.classList.add('needs-staff');
+      else row.classList.remove('needs-staff');
+    });
+    const firstId = missing[0].id;
+    const firstRow = document.querySelector(`.cart-item-staff-row[data-cart-item-id="${firstId}"]`);
+    if (firstRow) {
+      firstRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const firstSel = firstRow.querySelector('select');
+      if (firstSel) setTimeout(() => firstSel.focus(), 250);
+    }
+    toast(missing.length === 1
+      ? 'Pick the staff who served this service'
+      : `Pick staff for ${missing.length} service${missing.length === 1 ? '' : 's'}`);
+    return;
+  }
+  showScreen('payment');
 }
 
 /**
@@ -11970,15 +12393,10 @@ async function saveAppointment() {
   };
 
   if (editingId) {
-    try {
-      await db.collection(COL.APPOINTMENTS).doc(editingId).set(payload, { merge: true });
-      logAudit('appt.update', COL.APPOINTMENTS + '/' + editingId, { date, start, services: svcs.length });
-      toast('Appointment updated');
-    } catch (e) {
-      console.error('appt update failed', e);
-      toast('Save failed — try again');
-      return;
-    }
+    const ok = await fbUpdateDoc(COL.APPOINTMENTS, editingId, payload);
+    if (!ok) { toast('Save failed — try again'); return; }
+    logAudit('appt.update', COL.APPOINTMENTS + '/' + editingId, { date, start, services: svcs.length });
+    toast('Appointment updated');
   } else {
     const newId = await fbAppendDoc(COL.APPOINTMENTS, payload);
     if (!newId) { toast('Save failed — check connection'); return; }
@@ -11996,36 +12414,30 @@ async function deleteAppointment() {
   const id = state.apptEditingId;
   if (!id) return;
   if (!confirm('Cancel this appointment?')) return;
-  try {
-    await db.collection(COL.APPOINTMENTS).doc(id).set({
-      status: 'cancelled', updatedAt: new Date().toISOString(),
-    }, { merge: true });
-    logAudit('appt.cancel', COL.APPOINTMENTS + '/' + id);
-    toast('Appointment cancelled');
-    closeModal('modal-appointment');
-    state.apptEditingId = null;
-    renderAppointmentsScreen();
-  } catch (e) { console.error(e); toast('Cancel failed'); }
+  await fbUpdateDoc(COL.APPOINTMENTS, id, {
+    status: 'cancelled', updatedAt: new Date().toISOString(),
+  });
+  logAudit('appt.cancel', COL.APPOINTMENTS + '/' + id);
+  toast('Appointment cancelled');
+  closeModal('modal-appointment');
+  state.apptEditingId = null;
+  renderAppointmentsScreen();
 }
 
 async function markAppointmentNoShow(id) {
   if (!confirm('Mark this appointment as a no-show?')) return;
-  try {
-    await db.collection(COL.APPOINTMENTS).doc(id).set({
-      status: 'noshow', updatedAt: new Date().toISOString(),
-    }, { merge: true });
-    logAudit('appt.noshow', COL.APPOINTMENTS + '/' + id);
-    renderAppointmentsScreen();
-  } catch (e) { console.error(e); }
+  await fbUpdateDoc(COL.APPOINTMENTS, id, {
+    status: 'noshow', updatedAt: new Date().toISOString(),
+  });
+  logAudit('appt.noshow', COL.APPOINTMENTS + '/' + id);
+  renderAppointmentsScreen();
 }
 
 async function reopenAppointment(id) {
-  try {
-    await db.collection(COL.APPOINTMENTS).doc(id).set({
-      status: 'booked', updatedAt: new Date().toISOString(),
-    }, { merge: true });
-    renderAppointmentsScreen();
-  } catch (e) { console.error(e); }
+  await fbUpdateDoc(COL.APPOINTMENTS, id, {
+    status: 'booked', updatedAt: new Date().toISOString(),
+  });
+  renderAppointmentsScreen();
 }
 
 /* ─── checkout flow: appointment → cart → billing ─── */
@@ -12047,11 +12459,11 @@ function checkoutAppointment(id) {
     const ph = document.getElementById('customer-phone'); if (ph) ph.value = a.customerPhone || '';
     const nm = document.getElementById('customer-name');  if (nm) nm.value = a.customerName || '';
   }, 0);
-  // Mark in-progress (best-effort).
+  // Mark in-progress (best-effort, queued offline).
   if (a.status === 'booked' && db) {
-    db.collection(COL.APPOINTMENTS).doc(a.id).set({
+    fbUpdateDoc(COL.APPOINTMENTS, a.id, {
       status: 'inprogress', updatedAt: new Date().toISOString(),
-    }, { merge: true }).catch(() => {});
+    });
   }
   toast('Cart loaded from appointment');
   showScreen('cart');
@@ -12059,15 +12471,13 @@ function checkoutAppointment(id) {
 
 async function completeAppointmentAfterCheckout(apptId, transactionId, total) {
   if (!apptId || !db) return;
-  try {
-    await db.collection(COL.APPOINTMENTS).doc(apptId).set({
-      status: 'completed',
-      linkedTransactionId: transactionId || '',
-      billedTotal: total || 0,
-      updatedAt: new Date().toISOString(),
-    }, { merge: true });
-    logAudit('appt.checkout', COL.APPOINTMENTS + '/' + apptId, { transactionId, total });
-  } catch (e) { console.warn('appt completion failed:', e); }
+  await fbUpdateDoc(COL.APPOINTMENTS, apptId, {
+    status: 'completed',
+    linkedTransactionId: transactionId || '',
+    billedTotal: total || 0,
+    updatedAt: new Date().toISOString(),
+  });
+  logAudit('appt.checkout', COL.APPOINTMENTS + '/' + apptId, { transactionId, total });
 }
 
 /* ─── reminders (browser notifications + WhatsApp link) ─── */
@@ -12119,7 +12529,7 @@ function sendApptWhatsApp(id) {
   // Mark reminder sent so we don't auto-fire it again locally.
   state.apptRemindedIds[id] = true;
   if (db) {
-    db.collection(COL.APPOINTMENTS).doc(id).set({ reminderSent: true }, { merge: true }).catch(() => {});
+    fbUpdateDoc(COL.APPOINTMENTS, id, { reminderSent: true });
   }
 }
 
@@ -12435,7 +12845,7 @@ async function saveCapex() {
   };
   try {
     if (state.capexEditingId) {
-      await db.collection(COL.CAPEX).doc(state.capexEditingId).set(payload, { merge: true });
+      await fbUpdateDoc(COL.CAPEX, state.capexEditingId, payload);
       logAudit('capex.update', COL.CAPEX + '/' + state.capexEditingId, { category, amount });
       toast('Capital expense updated');
     } else {
@@ -12459,7 +12869,9 @@ async function deleteCapex() {
   if (!id) return;
   if (!confirm('Delete this capital expense entry permanently?')) return;
   try {
-    await db.collection(COL.CAPEX).doc(id).delete();
+    const opId = _newOpId();
+    shadowEnqueue({ id: opId, kind: 'delete', coll: COL.CAPEX, docId: id });
+    _trackWrite(db.collection(COL.CAPEX).doc(id).delete(), opId);
     logAudit('capex.delete', COL.CAPEX + '/' + id);
     toast('Entry deleted');
     closeModal('modal-capex');
@@ -12493,12 +12905,11 @@ async function quickAddRecurring(name, amount) {
   if (exists) { toast('Already added'); return; }
   const id = uid();
   const row = { id, name, amount: parseFloat(amount) || 0, active: true };
-  try {
-    await db.collection(COL.FIXED).doc(id).set(row);
-    logAudit('fixed.create', COL.FIXED + '/' + id, { name });
-    toast('Added to monthly expenses ✓');
-    renderAdminCapex();
-  } catch (e) { console.error(e); toast('Add failed'); }
+  const ok = await fbAddDoc(COL.FIXED, row);
+  if (!ok) { toast('Add failed'); return; }
+  logAudit('fixed.create', COL.FIXED + '/' + id, { name });
+  toast('Added to monthly expenses ✓');
+  renderAdminCapex();
 }
 
 function exportCapexCSV() {
