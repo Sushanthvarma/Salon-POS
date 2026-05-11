@@ -4912,8 +4912,11 @@ function _attHHMMtoDisplay(hhmm) {
 }
 
 function _attNowHHMM() {
-  const d = new Date();
-  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  // IST 24-hour HH:MM. Using local getHours/getMinutes here would prefill
+  // the wrong time on devices in other timezones (and silently drift the
+  // attendance check-in away from salon wall-clock).
+  const d = nowIST();
+  return String(d.getUTCHours()).padStart(2,'0') + ':' + String(d.getUTCMinutes()).padStart(2,'0');
 }
 
 async function _attPersist(ctx, staffName) {
@@ -8054,7 +8057,13 @@ function normalizeImportDate(v) {
   const m = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
   if (m) return `${m[3]}-${m[2]}-${m[1]}`;
   const dt = new Date(raw);
-  if (!Number.isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+  if (!Number.isNaN(dt.getTime())) {
+    // Use UTC fields so a parsed local-midnight timestamp doesn't roll back a
+    // day on devices west of UTC (toISOString().slice(0,10) was the bug).
+    return dt.getUTCFullYear() + '-' +
+      String(dt.getUTCMonth() + 1).padStart(2, '0') + '-' +
+      String(dt.getUTCDate()).padStart(2, '0');
+  }
   return '';
 }
 
@@ -8782,9 +8791,14 @@ function getPayrollPeriodDays(year, month) {
 }
 
 function getDefaultPayrollYM() {
-  const d = new Date();
-  d.setMonth(d.getMonth() - 1);
-  return d.toISOString().slice(0, 7);
+  // Anchor to IST so payroll defaults don't flip to the wrong month for
+  // users on devices in other timezones (or near IST midnight).
+  const today = todayISO(); // YYYY-MM-DD in IST
+  const y = parseInt(today.slice(0, 4), 10);
+  const m = parseInt(today.slice(5, 7), 10);
+  const prevY = m === 1 ? y - 1 : y;
+  const prevM = m === 1 ? 12 : m - 1;
+  return prevY + '-' + String(prevM).padStart(2, '0');
 }
 
 function getStaffAttendanceMetrics(staffRec, ym, payrollDays) {
@@ -11044,8 +11058,13 @@ function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toS
 // the +330 minute offset so they are safe to call at top-level state init
 // (before any `const` further down in the file is initialised).
 function nowIST() {
+  // Return a Date whose UTC fields (getUTCHours, getUTCDate, ...) equal the
+  // current IST wall-clock. IST is UTC+5:30 → always add 330 minutes to the
+  // real UTC epoch ms. The device's own timezone is irrelevant; using
+  // getTimezoneOffset() here was the bug that made phones in IST log times
+  // 5h30m behind (e.g. 11:07 IST appearing as 05:37 am on bills).
   const d = new Date();
-  return new Date(d.getTime() + (d.getTimezoneOffset() + 330) * 60000);
+  return new Date(d.getTime() + 330 * 60000);
 }
 function todayISO() {
   const d = nowIST();
@@ -11495,9 +11514,16 @@ function setApptDate(d) {
   renderAppointmentsScreen();
 }
 function shiftApptDate(deltaDays) {
-  const d = new Date(state.apptDate || todayISO());
-  d.setDate(d.getDate() + deltaDays);
-  state.apptDate = d.toISOString().slice(0, 10);
+  // Operate on UTC fields so the YYYY-MM-DD string shifts by exactly
+  // `deltaDays` regardless of the device timezone (the previous version
+  // used local getDate/setDate which silently no-ops in negative-UTC zones).
+  const base = state.apptDate || todayISO();
+  const [y, mo, dd] = base.split('-').map(n => parseInt(n, 10));
+  const ms = Date.UTC(y, (mo || 1) - 1, dd || 1) + deltaDays * 86400000;
+  const d = new Date(ms);
+  state.apptDate = d.getUTCFullYear() + '-' +
+    String(d.getUTCMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getUTCDate()).padStart(2, '0');
   renderAppointmentsScreen();
 }
 
