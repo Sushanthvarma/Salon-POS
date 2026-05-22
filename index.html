@@ -7341,6 +7341,38 @@ async function lookupCustomer(id) {
 }
 
 let _phoneLookupTimer = null;
+
+// Search every place we might have stashed a customer for ANY record whose
+// stored phone-digits end with the digits the user has typed so far. This
+// rescues partial entries (e.g. user typed 9 digits but customer is saved
+// under the full 10-digit number).
+function _findCustomerByPhoneSuffix(digits) {
+  if (!digits || digits.length < 5) return null;
+  const needle = digits;
+  // 1. In-memory customer directory
+  const dir = Array.isArray(state._customers) ? state._customers : [];
+  for (const c of dir) {
+    const p = String(c && c.phone || '').replace(/\D/g, '');
+    if (p && (p.endsWith(needle) || needle.endsWith(p))) return c;
+  }
+  // 2. Past transactions (covers customers not yet synced to the directory)
+  const txs = (state.transactions || []).concat(state.transactionsAllMonths || []);
+  for (let i = txs.length - 1; i >= 0; i--) {
+    const t = txs[i];
+    const p = String(t && t.customerPhone || '').replace(/\D/g, '');
+    if (p && (p.endsWith(needle) || needle.endsWith(p)) && (t.customerName || t.customerId)) {
+      return {
+        id: t.customerId || p.slice(-5),
+        name: t.customerName || '',
+        phone: t.customerPhone || p,
+        visits: 0,
+        _recoveredFromTx: true
+      };
+    }
+  }
+  return null;
+}
+
 function onPhoneInput(value) {
   const digits = String(value || '').replace(/\D/g, '');
   const hint = document.getElementById('phone-hint');
@@ -7353,30 +7385,40 @@ function onPhoneInput(value) {
     return;
   }
   const id = digits.slice(-5);
+  const isFullMobile = digits.length >= 10;
   if (hint) {
-    hint.textContent = 'Customer ID: #' + id + ' \u00b7 looking up\u2026';
+    hint.textContent = isFullMobile
+      ? 'Customer ID: #' + id + ' \u00b7 looking up\u2026'
+      : 'Keep typing\u2026 (' + digits.length + '/10 digits) \u00b7 checking saved customers';
     hint.style.color = 'var(--muted)';
   }
   clearTimeout(_phoneLookupTimer);
   _phoneLookupTimer = setTimeout(async () => {
-    const c = await lookupCustomer(id);
     if (!hint) return;
+    // Always try a suffix match first so partial typing still surfaces a hit
+    let c = _findCustomerByPhoneSuffix(digits);
+    // If full mobile entered and no suffix hit yet, do the canonical lookup
+    if (!c && isFullMobile) {
+      c = await lookupCustomer(id);
+    }
     if (c) {
       const nm = (c.name || '').trim();
       const v  = parseInt(c.visits, 10) || 0;
       const visitsTxt = v ? (v + ' previous visit' + (v === 1 ? '' : 's')) : 'previously billed';
+      const shownId = c.id || id;
       if (nm) {
-        hint.textContent = '\ud83d\udc4b Welcome back, ' + nm + '! ' + visitsTxt + ' \u00b7 ID #' + id;
+        hint.textContent = '\ud83d\udc4b Welcome back, ' + nm + '! ' + visitsTxt + ' \u00b7 ID #' + shownId;
         if (nameEl && !nameEl.value) nameEl.value = nm;
       } else {
-        // Recognised customer but we never captured a name. Prompt the user
-        // to add one so the next visit auto-fills properly.
-        hint.textContent = '\u2705 Returning customer \u00b7 ' + visitsTxt + ' \u00b7 ID #' + id + ' \u2014 add name to greet them next time';
+        hint.textContent = '\u2705 Returning customer \u00b7 ' + visitsTxt + ' \u00b7 ID #' + shownId + ' \u2014 add name to greet them next time';
       }
       hint.style.color = 'var(--sage)';
-    } else {
+    } else if (isFullMobile) {
       hint.textContent = 'New customer \u00b7 ID #' + id + ' will be saved with the bill.';
       hint.style.color = 'var(--champagne-deep)';
+    } else {
+      hint.textContent = 'Keep typing\u2026 (' + digits.length + '/10 digits) \u00b7 no match yet';
+      hint.style.color = 'var(--muted)';
     }
   }, 350);
 }
