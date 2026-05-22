@@ -3749,7 +3749,12 @@ async function replayShadowQueue() {
   const ackedIds   = new Set();
   const droppedIds = new Set();
   const failedIds  = new Set();
-  for (const op of arr) {
+
+  // Run ops in PARALLEL with a small concurrency cap. The old serial loop
+  // could take 12 s × N on a slow link, so a 150-item queue effectively
+  // never drained — the user would see "Syncing 150 pending" forever.
+  const CONCURRENCY = 8;
+  const runOne = async (op) => {
     try {
       const ref = db.collection(op.coll).doc(op.docId);
       let p;
@@ -3776,11 +3781,17 @@ async function replayShadowQueue() {
       if (/permission-denied|invalid-argument|not-found|unauthenticated/i.test(code)) {
         console.warn('Dropping unsynced op (permanent failure):', op.coll, op.docId, code);
         droppedIds.add(op.id);
-        continue;
+      } else {
+        // Timeout or transient — keep for the next retry pass.
+        failedIds.add(op.id);
       }
-      // Timeout or transient — keep for the next retry pass.
-      failedIds.add(op.id);
     }
+  };
+  for (let i = 0; i < arr.length; i += CONCURRENCY) {
+    const slice = arr.slice(i, i + CONCURRENCY);
+    await Promise.all(slice.map(runOne));
+    // Surface progress to the pill mid-flight so the user sees movement.
+    try { updateOfflineUI(); } catch (_) {}
   }
   // Re-read so any ops enqueued DURING the loop (or freshly acked by an
   // unrelated _trackWrite resolving in the background) are preserved.
@@ -3905,6 +3916,26 @@ function showOfflineDetails() {
   }
   lines.push('');
   lines.push('Tip: keep this tab open until "Synced" appears.');
+  // If the queue is large AND we're online, offer a one-tap recovery: clear
+  // the backup queue. This is safe because the live Firestore writes
+  // (batch.commit in fbReplaceCollection / direct set in fbSetConfig) have
+  // already gone through — the shadow queue is only a "belt-and-braces"
+  // backup. Stuck queues from the pre-fix bug can be cleared here.
+  if (!offline && pending >= 10) {
+    lines.push('');
+    lines.push(`Press OK to FORCE-CLEAR the ${pending} backup entries (your data on the server is unaffected).`);
+    lines.push('Press Cancel to keep retrying.');
+    if (confirm(lines.join('\n'))) {
+      _shadowWrite([]);
+      __pendingWrites = 0;
+      updateOfflineUI();
+      toast('Pending queue cleared ✓');
+      return;
+    }
+    // Even on Cancel, kick a replay so progress resumes.
+    replayShadowQueue();
+    return;
+  }
   alert(lines.join('\n'));
   // Always force a replay attempt, even if onLine reports false — the SDK
   // and our 12 s timeout handle the truly-offline case gracefully.
@@ -4235,6 +4266,32 @@ async function logAudit(action, target, extra) {
   }
 }
 
+// Slug a string into a safe, deterministic Firestore docId. We use this for
+// config-style collections (staff/services/fixedExpenses/emi) so that
+// re-saving the SAME list does not mint brand-new docIds for every row —
+// otherwise every Save click would inflate the shadow queue without bound.
+function _slugId(s) {
+  return String(s || '')
+    .toLowerCase()
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 80) || 'row';
+}
+
+// Build a stable docId for a row in a config-style collection. Prefers an
+// explicit r.id; otherwise derives one from (category + name) so re-saves of
+// the same list overwrite the same docs instead of creating duplicates.
+function _stableRowId(coll, r, fallbackIdx) {
+  if (r && r.id) return r.id;
+  const parts = [];
+  if (r && r.category) parts.push(_slugId(r.category));
+  if (r && r.name)     parts.push(_slugId(r.name));
+  if (!parts.length && r && r.label) parts.push(_slugId(r.label));
+  if (!parts.length) parts.push('row_' + fallbackIdx);
+  return parts.join('__');
+}
+
 async function fbReplaceCollection(coll, rows) {
   // Wipe collection and rewrite. Used for config-style collections
   // (staff/services/fixedExpenses/emi) where the whole list is small.
@@ -4244,13 +4301,22 @@ async function fbReplaceCollection(coll, rows) {
   // batch.commit deferred-fails offline.
   if (!db) return false;
   showSync('syncing');
+  // Assign DETERMINISTIC ids first so re-saves overwrite the same docs and
+  // don't pile up new ones in the shadow queue.
+  const rowList = rows || [];
+  rowList.forEach((r, i) => {
+    if (!r.id) r.id = _stableRowId(coll, r, i);
+  });
   // Pre-queue every row as an idempotent set, so reconnect always restores
   // the latest list even if the wipe-and-rewrite batch never reaches the
-  // server.
-  (rows || []).forEach(r => {
-    const id = r.id || db.collection(coll).doc().id;
-    r.id = id;
-    shadowEnqueue({ id: _newOpId(), kind: 'set', coll, docId: id, data: _sanitizeForShadow({ ...r, id }) });
+  // server. Capture each opId so we can ack them all at once when the
+  // batch.commit succeeds — without this the per-row ops linger forever in
+  // the shadow queue and the "Syncing N pending" pill never clears.
+  const rowOpIds = [];
+  rowList.forEach(r => {
+    const opId = _newOpId();
+    rowOpIds.push(opId);
+    shadowEnqueue({ id: opId, kind: 'set', coll, docId: r.id, data: _sanitizeForShadow({ ...r }) });
   });
   try {
     // Read existing docs (cache-first, then server with a tight timeout) so
@@ -4274,17 +4340,27 @@ async function fbReplaceCollection(coll, rows) {
       } catch (_) { /* network slow — proceed with no deletes */ }
     }
     const batch = db.batch();
-    if (existing && existing.docs) existing.docs.forEach(d => batch.delete(d.ref));
-    (rows || []).forEach(r => {
-      const id = r.id || db.collection(coll).doc().id;
-      batch.set(db.collection(coll).doc(id), { ...r, id });
+    const keepIds = new Set(rowList.map(r => r.id));
+    if (existing && existing.docs) {
+      // Only delete docs that are NOT being re-written. Deterministic ids
+      // mean most rows reuse their existing docId, so the batch becomes a
+      // pure overwrite + a few targeted deletes — much smaller, much faster.
+      existing.docs.forEach(d => { if (!keepIds.has(d.id)) batch.delete(d.ref); });
+    }
+    rowList.forEach(r => {
+      batch.set(db.collection(coll).doc(r.id), { ...r });
     });
-    const opId = _newOpId();
+    const batchOpId = _newOpId();
     _trackWrite(
       batch.commit()
-           .then(() => { showSync('ok'); })
+           .then(() => {
+             // The batch covered every per-row set, so ack them all now —
+             // don't wait for replayShadowQueue to redo work that's done.
+             rowOpIds.forEach(shadowAck);
+             showSync('ok');
+           })
            .catch(e => { showSync('error'); throw e; }),
-      opId
+      batchOpId
     );
     return true;
   } catch(e) {
