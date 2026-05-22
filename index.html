@@ -7299,10 +7299,45 @@ async function upsertCustomer({ id, phone, name, lastVisit, lastTotal, lastServi
 
 async function lookupCustomer(id) {
   if (!id || !db) return null;
+  const ref = db.collection(COL.CUSTOMERS).doc(id);
+  // 1) IndexedDB cache (instant, works offline). This is what fixes the
+  //    "shows New customer even though they were billed yesterday" bug —
+  //    the previous code only tried server-preferred .get() and silently
+  //    returned null on any timeout / transient error.
   try {
-    const snap = await db.collection(COL.CUSTOMERS).doc(id).get();
-    return snap.exists ? snap.data() : null;
-  } catch (e) { return null; }
+    const cacheSnap = await _withTimeout(ref.get({ source: 'cache' }), 1200, 'lookupCust.cache:' + id);
+    if (cacheSnap && cacheSnap.exists) return cacheSnap.data();
+  } catch (_) { /* not cached */ }
+  // 2) In-memory directory (populated when admin opens Customers tab).
+  const fromState = (state._customers || []).find(c => c && c.id === id);
+  if (fromState) return fromState;
+  // 3) Server with a tight timeout — don't block the bill flow on a dead net.
+  if (navigator.onLine) {
+    try {
+      const srvSnap = await _withTimeout(ref.get(), 2500, 'lookupCust.server:' + id);
+      if (srvSnap && srvSnap.exists) return srvSnap.data();
+    } catch (_) { /* slow / offline */ }
+  }
+  // 4) Last resort: recover name + phone from any cached transaction that
+  //    used this customerId. Handles the legitimate case where a customer
+  //    was billed before but the `customers/<id>` doc never made it to the
+  //    server (or has an empty name field).
+  try {
+    const txs = (state.transactions || []).concat(state.transactionsAllMonths || []);
+    const hit = txs
+      .filter(t => t && t.customerId === id && (t.customerName || t.customerPhone))
+      .sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0))[0];
+    if (hit) {
+      return {
+        id,
+        name: hit.customerName || '',
+        phone: hit.customerPhone || '',
+        visits: txs.filter(t => t && t.customerId === id).length,
+        _recoveredFromTx: true,
+      };
+    }
+  } catch (_) {}
+  return null;
 }
 
 let _phoneLookupTimer = null;
@@ -7327,9 +7362,18 @@ function onPhoneInput(value) {
     const c = await lookupCustomer(id);
     if (!hint) return;
     if (c) {
-      hint.textContent = '\ud83d\udc4b Welcome back, ' + (c.name || 'guest') + '! ' + c.visits + ' previous visit' + (c.visits === 1 ? '' : 's') + ' \u00b7 ID #' + id;
+      const nm = (c.name || '').trim();
+      const v  = parseInt(c.visits, 10) || 0;
+      const visitsTxt = v ? (v + ' previous visit' + (v === 1 ? '' : 's')) : 'previously billed';
+      if (nm) {
+        hint.textContent = '\ud83d\udc4b Welcome back, ' + nm + '! ' + visitsTxt + ' \u00b7 ID #' + id;
+        if (nameEl && !nameEl.value) nameEl.value = nm;
+      } else {
+        // Recognised customer but we never captured a name. Prompt the user
+        // to add one so the next visit auto-fills properly.
+        hint.textContent = '\u2705 Returning customer \u00b7 ' + visitsTxt + ' \u00b7 ID #' + id + ' \u2014 add name to greet them next time';
+      }
       hint.style.color = 'var(--sage)';
-      if (nameEl && !nameEl.value && c.name) nameEl.value = c.name;
     } else {
       hint.textContent = 'New customer \u00b7 ID #' + id + ' will be saved with the bill.';
       hint.style.color = 'var(--champagne-deep)';
