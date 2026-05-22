@@ -1891,13 +1891,9 @@ img, video, canvas, svg{max-width:100%;height:auto;}
       <div style="font-size:9.5px;letter-spacing:.22em;text-align:right;color:var(--champagne);font-weight:500;" id="receipt-paid-via">PAID<br>VIA UPI</div>
     </div>
 
-    <label class="form-label">Served by (Staff) <span style="color:var(--danger);">*</span></label>
-    <div class="input-group">
-      <select class="input" id="receipt-staff" style="padding-left:16px;" required>
-        <option value="">— Select staff member —</option>
-      </select>
-    </div>
-    <div style="font-size:12px;color:var(--muted);margin-top:-14px;margin-bottom:20px;padding-left:4px;">Required · used for commission &amp; payroll.</div>
+    <!-- Staff is assigned per-service on the Review Bill screen and
+         enforced by goToPayment() — no need to ask again here. -->
+    <div id="staff-splits-host"></div>
 
     <label class="form-label">Customer WhatsApp Number</label>
     <div class="input-group">
@@ -5127,14 +5123,8 @@ function renderStaffDashboard() {
   host.innerHTML = cards.join('');
   _attBindHold();
 
-  // Staff receipt dropdown
-  const sel = document.getElementById('receipt-staff');
-  sel.innerHTML = '<option value="">— Select staff member —</option>';
-  (config.staff || []).forEach(s => {
-    const o = document.createElement('option');
-    o.value = s.name; o.textContent = s.name;
-    sel.appendChild(o);
-  });
+  // (Receipt-screen staff dropdown was removed — staff is now picked
+  // per-service on the Review Bill screen.)
 
   // Today's appointments strip
   renderStaffApptStrip();
@@ -7043,32 +7033,19 @@ async function finaliseTransaction(phone, options) {
   }
   if (!state.cart.length) { toast('Cart is empty'); return; }
 
-  // MANDATORY: which staff served this customer (for commission/payroll).
-  // Multi-staff bills (different stylists per service) carry a per-item
-  // staffName on each cart entry. The receipt-staff <select> acts as a
-  // FALLBACK / single-staff override — used to fill any items without a
-  // per-item assignment, and as the legacy `staffName` for top-line reports.
-  const fallbackStaff = (document.getElementById('receipt-staff').value || '').trim();
+  // Staff is mandatory per cart item and is enforced on the Review Bill
+  // screen by goToPayment(); by the time we get here every entry already
+  // carries a staffName. Belt-and-braces guard for safety only.
   const itemsMissingStaff = (state.cart || []).filter(i => !(i.staffName || '').trim());
-  if (itemsMissingStaff.length && !fallbackStaff) {
-    toast('Pick a staff for every service (or use the dropdown for one staff)');
-    const sel = document.getElementById('receipt-staff');
-    if (sel) {
-      sel.style.borderColor = 'var(--danger)';
-      sel.focus();
-      setTimeout(() => { sel.style.borderColor = ''; }, 2000);
-    }
+  if (itemsMissingStaff.length) {
+    toast('Go back to Review Bill and pick staff for every service');
     return;
   }
-  // Normalise per-item staff: fall back to the dropdown for any unassigned item.
-  state.cart.forEach(i => {
-    if (!(i.staffName || '').trim()) i.staffName = fallbackStaff;
-  });
   // Compute per-staff splits (amount = pre-GST taxable share, commission per their %).
   const staffSplits = computeStaffSplits(state.cart, subtotal(), discountAmount());
   // Primary staff = top contributor (largest amount). Used for legacy `staffName`.
   const primary = staffSplits.slice().sort((a, b) => b.amount - a.amount)[0] || null;
-  const staffName = primary ? primary.staffName : fallbackStaff;
+  const staffName = primary ? primary.staffName : '';
   if (!staffName) {
     toast('Please select the staff who served this customer');
     return;
@@ -11907,19 +11884,10 @@ function computeStaffSplits(cart, sub, disc) {
   return Object.values(byStaff);
 }
 
-/* ─── receipt: staff splits panel + auto-fill from cart ─── */
+/* ─── receipt: staff splits panel (read-only, auto-built from cart) ─── */
 function renderReceiptStaffPanel() {
-  const sel = document.getElementById('receipt-staff');
-  if (!sel) return;
-  // Auto-pick the most-common staff in the cart as the dropdown default
-  // (acts as fallback for any items without a per-item assignment).
-  const cartStaff = (state.cart || []).map(i => (i.staffName || '').trim()).filter(Boolean);
-  if (cartStaff.length && !sel.value) {
-    const counts = {};
-    cartStaff.forEach(n => { counts[n] = (counts[n] || 0) + 1; });
-    const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
-    if (top) sel.value = top[0];
-  }
+  const host = document.getElementById('staff-splits-host');
+  if (!host) return;
   // Build / replace splits panel
   let panel = document.getElementById('staff-splits-panel');
   const splits = computeStaffSplits(state.cart || [], subtotal(), discountAmount());
@@ -11930,7 +11898,7 @@ function renderReceiptStaffPanel() {
       panel = document.createElement('div');
       panel.id = 'staff-splits-panel';
       panel.className = 'staff-splits-panel';
-      sel.closest('.input-group').insertAdjacentElement('afterend', panel);
+      host.appendChild(panel);
     }
     panel.style.display = '';
     panel.innerHTML =
