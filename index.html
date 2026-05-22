@@ -468,6 +468,41 @@ body.has-offline-banner .brand-strip,body.has-offline-banner .top-bar{top:28px;}
 .customer-last{margin-left:auto;}
 .customer-last-svc{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4;font-style:italic;border-top:1px dashed var(--line-soft);padding-top:6px;}
 
+/* RECEIPT / SEND-RECEIPT — CUSTOMER HERO CARD
+   The customer is the star of this screen. Avatar + greeting line update
+   live as the cashier types the phone number. Three visual states are
+   driven via the [data-state] attribute on .cust-hero:
+     empty     → nothing typed yet (neutral grey)
+     known     → matched a saved customer (sage / brand accent)
+     newcust   → 10 digits typed, no match (champagne accent) */
+.cust-hero{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:18px 18px 20px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:border-color .25s ease, background .25s ease;}
+.cust-hero[data-state="known"]{border-color:var(--sage);background:linear-gradient(180deg, rgba(143,177,131,.06) 0%, var(--surface) 50%);}
+.cust-hero[data-state="newcust"]{border-color:var(--champagne);background:linear-gradient(180deg, rgba(184,148,106,.05) 0%, var(--surface) 50%);}
+.cust-hero-head{display:flex;align-items:flex-start;gap:14px;}
+.cust-hero-avatar{width:56px;height:56px;border-radius:50%;background:var(--surface-2);color:var(--muted);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:24px;font-weight:600;flex-shrink:0;border:1.5px solid var(--line);transition:all .25s ease;}
+.cust-hero[data-state="known"] .cust-hero-avatar{background:linear-gradient(135deg, var(--sage) 0%, #6f9665 100%);color:#FFF;border-color:#6f9665;box-shadow:0 3px 10px rgba(143,177,131,.35);}
+.cust-hero[data-state="newcust"] .cust-hero-avatar{background:linear-gradient(135deg,var(--champagne) 0%,var(--champagne-deep) 100%);color:#FFF;border-color:var(--champagne-deep);}
+.cust-hero-body{flex:1;min-width:0;}
+.cust-hero-eyebrow{font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:4px;}
+.cust-hero[data-state="known"] .cust-hero-eyebrow{color:var(--sage);}
+.cust-hero[data-state="newcust"] .cust-hero-eyebrow{color:var(--champagne-deep);}
+.cust-hero-name{font-family:var(--serif);font-size:21px;font-weight:500;color:var(--ink);letter-spacing:-.005em;line-height:1.15;word-break:break-word;}
+.cust-hero-sub{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45;}
+.cust-hero-badge{align-self:flex-start;font-size:9.5px;letter-spacing:.18em;font-weight:700;padding:5px 9px;border-radius:6px;background:var(--champagne-bg);color:var(--champagne-deep);border:1px solid var(--champagne);flex-shrink:0;}
+.cust-hero[data-state="known"] .cust-hero-badge{background:rgba(143,177,131,.15);color:#5d7e54;border-color:var(--sage);}
+.cust-hero-stats{display:flex;gap:6px;margin-top:14px;padding:12px;background:var(--surface-2);border-radius:12px;border:1px solid var(--line-soft);}
+.cust-hero-stat{flex:1;text-align:center;min-width:0;}
+.cust-hero-stat-v{display:block;font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);letter-spacing:-.005em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cust-hero-stat-l{display:block;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:4px;}
+.cust-hero-form{margin-top:16px;padding-top:16px;border-top:1px solid var(--line-soft);}
+.cust-hero-form .form-label:first-child{margin-top:0;}
+
+/* Slim total band — bill is still visible but secondary to the customer. */
+.receipt-total-band{background:var(--ink);color:#FFF;border-radius:12px;padding:13px 18px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
+.receipt-total-band-eyebrow{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--champagne);font-weight:500;}
+.receipt-total-band-amt{font-family:var(--serif);font-size:22px;margin-top:3px;font-weight:500;letter-spacing:-.01em;line-height:1;}
+.receipt-total-band-r{font-size:9px;letter-spacing:.22em;text-align:right;color:var(--champagne);font-weight:500;}
+
 /* Image-decorated section banners inside admin tabs */
 .admin-section-banner{position:relative;height:90px;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:18px;background:#241a13;background-size:cover;background-position:center;box-shadow:var(--shadow-card);}
 .admin-section-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,12,10,.7) 0%,rgba(15,12,10,.25) 60%,rgba(0,0,0,0) 100%);}
@@ -1883,40 +1918,62 @@ img, video, canvas, svg{max-width:100%;height:auto;}
     <div style="width:44px"></div>
   </div>
   <div class="form-wrap">
-    <div style="background:var(--ink);color:#FFF;border-radius:14px;padding:18px 22px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;position:relative;">
-      <div>
-        <div style="font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--champagne);font-weight:500;">Bill Total</div>
-        <div style="font-family:var(--serif);font-size:28px;margin-top:6px;font-weight:500;letter-spacing:-.01em;line-height:1;" id="receipt-total">₹0</div>
+    <!-- ── CUSTOMER HERO ── The customer is the hero of this screen. ──
+         Avatar + greeting line update live as the phone is typed. ──── -->
+    <div class="cust-hero" id="cust-hero" data-state="empty">
+      <div class="cust-hero-head">
+        <div class="cust-hero-avatar" id="cust-hero-avatar">?</div>
+        <div class="cust-hero-body">
+          <div class="cust-hero-eyebrow" id="cust-hero-eyebrow">Customer</div>
+          <div class="cust-hero-name" id="cust-hero-name">Enter phone to recognise</div>
+          <div class="cust-hero-sub" id="cust-hero-sub">We'll greet returning guests automatically.</div>
+        </div>
+        <div class="cust-hero-badge" id="cust-hero-badge" style="display:none">NEW</div>
       </div>
-      <div style="font-size:9.5px;letter-spacing:.22em;text-align:right;color:var(--champagne);font-weight:500;" id="receipt-paid-via">PAID<br>VIA UPI</div>
+      <div class="cust-hero-stats" id="cust-hero-stats" style="display:none">
+        <div class="cust-hero-stat"><span class="cust-hero-stat-v" id="cust-hero-visits">0</span><span class="cust-hero-stat-l">visits</span></div>
+        <div class="cust-hero-stat"><span class="cust-hero-stat-v" id="cust-hero-spend">\u20b90</span><span class="cust-hero-stat-l">lifetime</span></div>
+        <div class="cust-hero-stat"><span class="cust-hero-stat-v" id="cust-hero-last">\u2014</span><span class="cust-hero-stat-l">last visit</span></div>
+      </div>
+      <div class="cust-hero-form">
+        <label class="form-label">WhatsApp Number</label>
+        <div class="input-group">
+          <span class="input-prefix">+91</span>
+          <input type="tel" class="input with-prefix" id="customer-phone" maxlength="10" placeholder="10-digit mobile" inputmode="numeric" oninput="onPhoneInput(this.value)">
+        </div>
+        <div class="hint" id="phone-hint">Last 5 digits become the customer ID.</div>
+
+        <label class="form-label" style="margin-top:14px">Customer Name <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+        <div class="input-group">
+          <input type="text" class="input" id="customer-name" placeholder="e.g. Aarav Sharma" maxlength="60" oninput="onCustomerNameInput(this.value)">
+        </div>
+        <div class="hint">Auto-capitalised. Saved for repeat-visit greeting.</div>
+      </div>
+    </div>
+
+    <!-- Bill total moves below the customer \u2014 still prominent but no longer
+         stealing focus from the person being billed. -->
+    <div class="receipt-total-band">
+      <div class="receipt-total-band-l">
+        <div class="receipt-total-band-eyebrow">Bill Total</div>
+        <div class="receipt-total-band-amt" id="receipt-total">\u20b90</div>
+      </div>
+      <div class="receipt-total-band-r" id="receipt-paid-via">PAID<br>VIA UPI</div>
     </div>
 
     <!-- Staff is assigned per-service on the Review Bill screen and
-         enforced by goToPayment() — no need to ask again here. -->
+         enforced by goToPayment() \u2014 no need to ask again here. -->
     <div id="staff-splits-host"></div>
-
-    <label class="form-label">Customer WhatsApp Number</label>
-    <div class="input-group">
-      <span class="input-prefix">+91</span>
-      <input type="tel" class="input with-prefix" id="customer-phone" maxlength="10" placeholder="10-digit mobile" inputmode="numeric" oninput="onPhoneInput(this.value)">
-    </div>
-    <div class="hint" id="phone-hint">Last 5 digits become the customer ID. We'll greet returning customers.</div>
-
-    <label class="form-label">Customer Name <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
-    <div class="input-group">
-      <input type="text" class="input" id="customer-name" placeholder="e.g. Aarav Sharma" maxlength="60">
-    </div>
-    <div class="hint">Saved with the customer ID for repeat-visit greeting.</div>
 
     <div class="checkout-choice">
       <div class="checkout-choice-label">Choose how to complete this bill</div>
       <button class="btn btn-primary checkout-btn" id="btn-checkout-no-wa" onclick="checkoutWithoutWhatsApp()">
         <span class="checkout-btn-title">Complete Bill (No WhatsApp)</span>
-        <span class="checkout-btn-sub">Save the transaction now · phone optional</span>
+        <span class="checkout-btn-sub">Save the transaction now \u00b7 phone optional</span>
       </button>
       <button class="btn btn-rose checkout-btn" id="btn-checkout-wa" onclick="checkoutWithWhatsApp()">
         <span class="checkout-btn-title">Complete &amp; Send WhatsApp Receipt</span>
-        <span class="checkout-btn-sub">Saves the bill, then opens WhatsApp · phone required</span>
+        <span class="checkout-btn-sub">Saves the bill, then opens WhatsApp \u00b7 phone required</span>
       </button>
       <div class="checkout-help">Either button saves the sale to the books. WhatsApp can also be re-sent from the next screen if it fails to open.</div>
     </div>
@@ -4273,6 +4330,22 @@ function _slugId(s) {
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '')
     .slice(0, 80) || 'row';
+}
+
+// Title-case a customer / person name. Collapses extra whitespace and
+// capitalises the first letter of every word, but leaves any embedded
+// uppercase runs (e.g. initials like "AB") intact so we don't mangle
+// what the cashier typed deliberately.
+function _titleCase(s) {
+  const str = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+  if (!str) return '';
+  return str.split(' ').map(w => {
+    if (!w) return w;
+    // If the word already has an internal capital (e.g. "McLeod", "AB")
+    // leave it as the user typed it — just guarantee the first char is upper.
+    if (/[A-Z]/.test(w.slice(1))) return w.charAt(0).toUpperCase() + w.slice(1);
+    return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+  }).join(' ');
 }
 
 // Build a stable docId for a row in a config-style collection. Prefers an
@@ -7101,7 +7174,7 @@ async function finaliseTransaction(phone, options) {
 
   // Customer info — name from form, ID = last 5 digits of phone (10-digit Indian #).
   const _custNameEl = document.getElementById('customer-name');
-  const customerName = _custNameEl ? _custNameEl.value.trim() : '';
+  const customerName = _custNameEl ? _titleCase(_custNameEl.value) : '';
   const phoneClean   = String(phone || '').replace(/\D/g, '');
   const customerId   = phoneClean.length >= 5 ? phoneClean.slice(-5) : '';
   const totalDurMins = state.cart.reduce((s, i) => s + ((getServiceMeta(i.name).mins || 0) * i.qty), 0);
@@ -7249,6 +7322,7 @@ function resetAndGoHome() {
     hint.textContent = "Last 5 digits become the customer ID. We'll greet returning customers.";
     hint.style.color = '';
   }
+  if (typeof _setCustHero === 'function') _setCustHero('empty');
   showScreen('staff');
 }
 
@@ -7283,7 +7357,7 @@ async function upsertCustomer({ id, phone, name, lastVisit, lastTotal, lastServi
   const data = {
     id,
     phone: phone || (existing && existing.phone) || '',
-    name: (name || (existing && existing.name) || '').trim(),
+    name: _titleCase(name || (existing && existing.name) || ''),
     visits,
     totalSpend,
     firstVisit: (existing && existing.firstVisit) || lastVisit,
@@ -7395,6 +7469,7 @@ function onPhoneInput(value) {
       hint.textContent = "Last 5 digits become the customer ID. We'll greet returning customers.";
       hint.style.color = '';
     }
+    _setCustHero('empty');
     return;
   }
   const id = digits.slice(-5);
@@ -7405,6 +7480,7 @@ function onPhoneInput(value) {
       : 'Keep typing\u2026 (' + digits.length + '/10 digits) \u00b7 checking saved customers';
     hint.style.color = 'var(--muted)';
   }
+  _setCustHero('looking', { id, digits: digits.length });
   clearTimeout(_phoneLookupTimer);
   _phoneLookupTimer = setTimeout(async () => {
     if (!hint) return;
@@ -7415,7 +7491,7 @@ function onPhoneInput(value) {
       c = await lookupCustomer(id);
     }
     if (c) {
-      const nm = (c.name || '').trim();
+      const nm = _titleCase(c.name || '');
       const v  = parseInt(c.visits, 10) || 0;
       const visitsTxt = v ? (v + ' previous visit' + (v === 1 ? '' : 's')) : 'previously billed';
       const shownId = c.id || id;
@@ -7426,14 +7502,97 @@ function onPhoneInput(value) {
         hint.textContent = '\u2705 Returning customer \u00b7 ' + visitsTxt + ' \u00b7 ID #' + shownId + ' \u2014 add name to greet them next time';
       }
       hint.style.color = 'var(--sage)';
+      _setCustHero('known', { customer: c, id: shownId });
     } else if (isFullMobile) {
       hint.textContent = 'New customer \u00b7 ID #' + id + ' will be saved with the bill.';
       hint.style.color = 'var(--champagne-deep)';
+      _setCustHero('newcust', { id });
     } else {
       hint.textContent = 'Keep typing\u2026 (' + digits.length + '/10 digits) \u00b7 no match yet';
       hint.style.color = 'var(--muted)';
+      _setCustHero('looking', { id, digits: digits.length });
     }
   }, 350);
+}
+
+// Live-updates the customer hero card as the user types name/phone.
+function onCustomerNameInput(value) {
+  const nm = _titleCase(value);
+  // Don't fight the cursor — only fix the display, not the input value
+  // (we'll normalise on save). Still, update the hero name preview.
+  const heroName = document.getElementById('cust-hero-name');
+  const hero = document.getElementById('cust-hero');
+  if (!hero || !heroName) return;
+  const state = hero.getAttribute('data-state');
+  if (state === 'newcust' || state === 'known') {
+    if (nm) heroName.textContent = nm;
+  }
+}
+
+// Drive the customer hero card. State: empty | looking | known | newcust
+function _setCustHero(stateName, ctx) {
+  const hero    = document.getElementById('cust-hero');
+  const avatar  = document.getElementById('cust-hero-avatar');
+  const eyebrow = document.getElementById('cust-hero-eyebrow');
+  const nameEl  = document.getElementById('cust-hero-name');
+  const subEl   = document.getElementById('cust-hero-sub');
+  const badge   = document.getElementById('cust-hero-badge');
+  const stats   = document.getElementById('cust-hero-stats');
+  if (!hero) return;
+  hero.setAttribute('data-state', stateName === 'looking' ? 'empty' : stateName);
+  ctx = ctx || {};
+  if (stateName === 'empty') {
+    avatar.textContent = '?';
+    eyebrow.textContent = 'Customer';
+    nameEl.textContent = 'Enter phone to recognise';
+    subEl.textContent = "We'll greet returning guests automatically.";
+    badge.style.display = 'none';
+    stats.style.display = 'none';
+    return;
+  }
+  if (stateName === 'looking') {
+    avatar.textContent = '\u2026';
+    eyebrow.textContent = 'Checking\u2026';
+    nameEl.textContent = ctx.digits >= 10 ? 'Looking up #' + ctx.id : 'Keep typing\u2026 ' + (ctx.digits || 0) + '/10';
+    subEl.textContent = 'Matching against saved customers.';
+    badge.style.display = 'none';
+    stats.style.display = 'none';
+    return;
+  }
+  if (stateName === 'newcust') {
+    const typedName = _titleCase((document.getElementById('customer-name') || {}).value || '');
+    avatar.textContent = typedName ? typedName.charAt(0).toUpperCase() : '+';
+    eyebrow.textContent = 'New Customer';
+    nameEl.textContent = typedName || 'First-time guest';
+    subEl.textContent = 'ID #' + ctx.id + ' will be created when the bill is saved.';
+    badge.textContent = 'NEW';
+    badge.style.display = '';
+    stats.style.display = 'none';
+    return;
+  }
+  if (stateName === 'known') {
+    const c = ctx.customer || {};
+    const nm = _titleCase(c.name || '');
+    const visits = parseInt(c.visits, 10) || 0;
+    const spend  = parseFloat(c.totalSpend) || 0;
+    avatar.textContent = (nm ? nm : '\u2605').charAt(0).toUpperCase();
+    eyebrow.textContent = 'Returning \u00b7 ID #' + (ctx.id || c.id || '');
+    nameEl.textContent = nm || 'Returning customer';
+    subEl.textContent = nm
+      ? 'Welcome back! Their details auto-filled below.'
+      : 'We recognise this phone \u2014 please add a name to greet them next time.';
+    badge.textContent = visits >= 5 ? 'VIP \u2605' : 'RETURNING';
+    badge.style.display = '';
+    // Stats panel
+    document.getElementById('cust-hero-visits').textContent = visits || '\u2014';
+    document.getElementById('cust-hero-spend').textContent  = spend ? '\u20b9' + spend.toLocaleString('en-IN') : '\u2014';
+    const lv = c.lastVisit;
+    document.getElementById('cust-hero-last').textContent = lv
+      ? new Date(lv + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+      : '\u2014';
+    stats.style.display = (visits || spend || lv) ? '' : 'none';
+    return;
+  }
 }
 
 async function renderAdminCustomers() {
@@ -7479,7 +7638,8 @@ function renderCustomerList(list) {
   host.innerHTML = list.map(c => {
     const phoneDisp = c.phone ? '+91 ' + c.phone.slice(0, 5) + ' ' + c.phone.slice(5) : '\u2014';
     const last = c.lastVisit ? new Date(c.lastVisit + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '\u2014';
-    const initial = (c.name || '?').charAt(0).toUpperCase();
+    const displayName = _titleCase(c.name || '');
+    const initial = (displayName || '?').charAt(0).toUpperCase();
     const visits = c.visits || 0;
     const isVip = visits >= 5;
     return (
@@ -7487,7 +7647,7 @@ function renderCustomerList(list) {
         '<div class="customer-avatar' + (isVip ? ' vip' : '') + '">' + esc(initial) + (isVip ? '<span class="vip-badge">\u2605</span>' : '') + '</div>' +
         '<div class="customer-meta">' +
           '<div class="customer-row-top">' +
-            '<div class="customer-name">' + esc(c.name || 'Unnamed') + '</div>' +
+            '<div class="customer-name">' + esc(displayName || 'Unnamed') + '</div>' +
             '<div class="customer-id">#' + esc(c.id) + '</div>' +
           '</div>' +
           '<div class="customer-phone">' + phoneDisp + '</div>' +
