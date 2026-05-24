@@ -1656,6 +1656,40 @@ img, video, canvas, svg{max-width:100%;height:auto;}
       </div>
     </button>
 
+    <!-- Divider -->
+    <div style="max-width:360px;margin:8px auto 12px;display:flex;align-items:center;gap:12px;color:rgba(255,255,255,.5);font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;">
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.18);"></div>
+      <span>or</span>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.18);"></div>
+    </div>
+
+    <!-- Email/password toggle button -->
+    <button class="landing-btn" onclick="toggleEmailAuthForm()" id="email-toggle-btn" style="max-width:360px;margin:0 auto 12px;background:rgba(255,255,255,.10);color:#FFF;border:1px solid rgba(255,255,255,.20);box-shadow:none;backdrop-filter:blur(8px);">
+      <div class="landing-btn-icon" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.20);">
+        <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#FFF;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 7h16v10H4z"/><path d="m4 7 8 6 8-6"/></svg>
+      </div>
+      <div class="landing-btn-text">
+        <div class="landing-btn-label" style="color:#FFF;">Try the Demo</div>
+        <div class="landing-btn-sub" style="color:rgba(255,255,255,.65);">Sign up / sign in with email</div>
+      </div>
+    </button>
+
+    <!-- Email/password form (hidden by default) -->
+    <div id="email-auth-form" style="display:none;max-width:360px;margin:8px auto 4px;padding:18px 18px 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:16px;backdrop-filter:blur(10px);">
+      <input id="email-input" type="email" autocomplete="email" placeholder="you@example.com" style="width:100%;padding:13px 14px;border-radius:11px;border:1px solid rgba(255,255,255,.20);background:rgba(255,255,255,.10);color:#FFF;font-size:14px;margin-bottom:10px;outline:none;" />
+      <input id="password-input" type="password" autocomplete="current-password" placeholder="Password (min 6 chars)" style="width:100%;padding:13px 14px;border-radius:11px;border:1px solid rgba(255,255,255,.20);background:rgba(255,255,255,.10);color:#FFF;font-size:14px;margin-bottom:12px;outline:none;" />
+      <div style="display:flex;gap:10px;">
+        <button id="email-signin-btn" onclick="signInWithEmail()" class="btn" style="flex:1;background:#FFF;color:#111;padding:13px;border-radius:11px;font-weight:700;letter-spacing:.04em;font-size:13px;">Sign In</button>
+        <button id="email-signup-btn" onclick="signUpWithEmail()" class="btn" style="flex:1;background:linear-gradient(135deg,var(--champagne) 0%,var(--champagne-deep) 100%);color:#FFF;padding:13px;border-radius:11px;font-weight:700;letter-spacing:.04em;font-size:13px;text-transform:uppercase;">Create&nbsp;Account</button>
+      </div>
+      <button onclick="resetDemoPassword()" style="margin-top:10px;width:100%;background:transparent;border:none;color:rgba(255,255,255,.65);font-size:12px;text-decoration:underline;cursor:pointer;">Forgot password?</button>
+      <div style="margin-top:10px;padding:10px 12px;background:rgba(184,149,106,.18);border:1px solid rgba(184,149,106,.30);border-radius:10px;color:rgba(255,255,255,.85);font-size:11.5px;line-height:1.45;text-align:center;">
+        <strong style="color:var(--champagne-soft);letter-spacing:.06em;">DEMO MODE</strong> &mdash; Every account gets full admin access to explore the ERP. Data is shared across all demo users.
+      </div>
+    </div>
+
+    <input type="text" autocomplete="username" style="display:none" />
+
     <div id="auth-error" style="display:none;margin-top:16px;padding:14px 16px;border-radius:12px;background:rgba(197,106,106,.12);color:var(--danger);font-size:13px;text-align:center;line-height:1.5;"></div>
 
     <div style="margin-top:auto;padding-top:40px;font-size:11px;color:rgba(255,255,255,.65);text-align:center;letter-spacing:.06em;">
@@ -1700,6 +1734,12 @@ img, video, canvas, svg{max-width:100%;height:auto;}
       <button class="user-chip-out" onclick="signOut()" title="Sign out">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       </button>
+    </div>
+
+    <!-- Demo mode banner (shown only when DEMO_MODE is on) -->
+    <div id="demo-banner" style="display:none;max-width:360px;margin:0 auto 18px;padding:12px 14px;background:linear-gradient(135deg,rgba(184,149,106,.22),rgba(184,149,106,.10));border:1px solid rgba(184,149,106,.40);border-radius:14px;color:#FFF;font-size:12px;line-height:1.5;text-align:center;backdrop-filter:blur(8px);">
+      <div style="font-weight:700;letter-spacing:.14em;color:var(--champagne-soft);font-size:10.5px;margin-bottom:4px;">DEMO MODE</div>
+      You have full admin access. Try Staff Counter to bill, or Admin ERP for dashboards &amp; setup. Data is shared with other demo users.
     </div>
 
     <button class="landing-btn landing-btn-staff" onclick="enterStaff()" id="btn-enter-staff">
@@ -4007,6 +4047,11 @@ const EMBEDDED_FB_CONFIG = {
   measurementId:     'G-V5K2PLLX7L'
 };
 
+// DEMO MODE — when true, anyone who signs in (Google OR email/password) is
+// auto-granted admin role so they can explore the full ERP. Flip to false for
+// production rollout to lock down access via the Team list again.
+const DEMO_MODE = true;
+
 function fbConfig() {
   // Always prefer the embedded config so a fresh device skips the wizard.
   return EMBEDDED_FB_CONFIG;
@@ -4049,6 +4094,8 @@ function normEmail(e) { return String(e || '').trim().toLowerCase(); }
 function resolveRole(email) {
   const e = normEmail(email);
   if (!e) return null;
+  // DEMO MODE: every signed-in user gets admin so they can explore freely.
+  if (DEMO_MODE) return 'admin';
   const admins      = (config.adminEmails      || []).map(normEmail);
   const supervisors = (config.supervisorEmails || []).map(normEmail);
   const staff       = (config.staffEmails      || []).map(normEmail);
@@ -4059,6 +4106,91 @@ function resolveRole(email) {
   if (supervisors.includes(e)) return 'supervisor';
   if (staff.includes(e))       return 'staff';
   return null;
+}
+
+/* ────────────────────────────────────────────────────
+   EMAIL / PASSWORD AUTH (Demo signup)
+──────────────────────────────────────────────────── */
+function _emailAuthBusy(busy) {
+  const btnSignin = document.getElementById('email-signin-btn');
+  const btnSignup = document.getElementById('email-signup-btn');
+  [btnSignin, btnSignup].forEach(b => {
+    if (!b) return;
+    b.style.opacity = busy ? '.6' : '';
+    b.style.pointerEvents = busy ? 'none' : '';
+  });
+}
+
+function _readEmailAuthForm() {
+  const email = (document.getElementById('email-input')||{}).value || '';
+  const pass  = (document.getElementById('password-input')||{}).value || '';
+  return { email: email.trim(), password: pass };
+}
+
+async function signUpWithEmail() {
+  clearAuthError();
+  const { email, password } = _readEmailAuthForm();
+  if (!email || !password) { showAuthError('Enter both email and password.'); return; }
+  if (password.length < 6)  { showAuthError('Password must be at least 6 characters.'); return; }
+  if (!fbAuth && !initFirebase()) { showAuthError('Firebase not configured.'); return; }
+  _emailAuthBusy(true);
+  try {
+    await fbAuth.createUserWithEmailAndPassword(email, password);
+    // onAuthStateChanged handles the rest
+  } catch (e) {
+    console.error('Email signup failed:', e);
+    let msg = e.message || e.code || 'Sign-up failed.';
+    if (e.code === 'auth/email-already-in-use') msg = 'That email is already registered — try Sign In instead.';
+    if (e.code === 'auth/invalid-email')        msg = 'Invalid email address.';
+    if (e.code === 'auth/weak-password')        msg = 'Password is too weak (min 6 chars).';
+    if (e.code === 'auth/operation-not-allowed')msg = 'Email/Password sign-in is disabled in Firebase. Enable it in Firebase Console → Authentication → Sign-in method.';
+    showAuthError(msg);
+    _emailAuthBusy(false);
+  }
+}
+
+async function signInWithEmail() {
+  clearAuthError();
+  const { email, password } = _readEmailAuthForm();
+  if (!email || !password) { showAuthError('Enter both email and password.'); return; }
+  if (!fbAuth && !initFirebase()) { showAuthError('Firebase not configured.'); return; }
+  _emailAuthBusy(true);
+  try {
+    await fbAuth.signInWithEmailAndPassword(email, password);
+  } catch (e) {
+    console.error('Email sign-in failed:', e);
+    let msg = e.message || e.code || 'Sign-in failed.';
+    if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') {
+      msg = 'Email or password incorrect. New here? Tap “Create demo account”.';
+    }
+    if (e.code === 'auth/too-many-requests') msg = 'Too many attempts. Wait a minute and try again.';
+    showAuthError(msg);
+    _emailAuthBusy(false);
+  }
+}
+
+async function resetDemoPassword() {
+  clearAuthError();
+  const { email } = _readEmailAuthForm();
+  if (!email) { showAuthError('Enter your email above first, then tap Forgot.'); return; }
+  if (!fbAuth && !initFirebase()) { showAuthError('Firebase not configured.'); return; }
+  try {
+    await fbAuth.sendPasswordResetEmail(email);
+    showAuthError('Password reset email sent to ' + email + '.');
+  } catch (e) {
+    showAuthError(e.message || 'Could not send reset email.');
+  }
+}
+
+function toggleEmailAuthForm() {
+  const form = document.getElementById('email-auth-form');
+  if (!form) return;
+  const showing = form.style.display !== 'none';
+  form.style.display = showing ? 'none' : 'block';
+  if (!showing) {
+    const inp = document.getElementById('email-input');
+    if (inp) setTimeout(() => inp.focus(), 50);
+  }
 }
 
 async function signInWithGoogle() {
@@ -4135,7 +4267,8 @@ async function handleAuthStateChange(user) {
   const role  = resolveRole(email);
 
   // Bootstrap owner: no admins configured yet → save this user as the first admin
-  if (role === 'admin' && (!config.adminEmails || !config.adminEmails.length)) {
+  // (Skipped in DEMO_MODE so demo users don't accumulate in the shared config.)
+  if (!DEMO_MODE && role === 'admin' && (!config.adminEmails || !config.adminEmails.length)) {
     config.adminEmails = [normEmail(email)];
     saveConfig();
     try { await fbSetConfig({ adminEmails: config.adminEmails }); } catch(e) {}
@@ -5096,6 +5229,10 @@ function renderLanding() {
   document.getElementById('landing-location').textContent = config.location;
   document.getElementById('landing-date').textContent =
     new Date().toLocaleDateString('en-IN', {weekday:'long',day:'numeric',month:'long'});
+
+  // Demo banner
+  const demoBanner = document.getElementById('demo-banner');
+  if (demoBanner) demoBanner.style.display = (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) ? '' : 'none';
 
   // User chip
   if (currentUser) {
