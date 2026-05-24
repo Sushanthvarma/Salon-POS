@@ -4365,6 +4365,49 @@ async function seedDemoDataIfNeeded() {
       attendance: [],
       ...s,
     }));
+    // Build 60 days of attendance per staff (mostly present, sprinkle leaves/half-days)
+    const attDays = 60;
+    staffRows.forEach((s, idx) => {
+      const arr = [];
+      for (let d = attDays - 1; d >= 0; d--) {
+        const dateStr = _seedDateStr(d);
+        const dow = new Date(dateStr + 'T00:00:00').getDay();
+        // Each staff has a fixed weekly off (rotated by index): Mon=1 for first, Tue=2 for second, etc.
+        const weeklyOff = (idx % 6) + 1; // 1..6
+        const isWeeklyOff = dow === weeklyOff;
+        // Random sick-leave (~3%)
+        const isSick = Math.random() < 0.03;
+        if (isWeeklyOff) {
+          arr.push({ date: dateStr, checkInTime: null, checkOutTime: null, isHalfDay: false, status: 'leave', leaveType: 'Weekly Off', markedBy: 'demo-seeder', markedAt: new Date(dateStr).toISOString() });
+          continue;
+        }
+        if (isSick) {
+          arr.push({ date: dateStr, checkInTime: null, checkOutTime: null, isHalfDay: false, status: 'leave', leaveType: 'Sick Leave', markedBy: 'demo-seeder', markedAt: new Date(dateStr).toISOString() });
+          continue;
+        }
+        // Half-day ~5%
+        const isHalf = Math.random() < 0.05;
+        const inH = _seedRand(9, 11);
+        const inM = _seedPick(['00','15','30','45']);
+        const outH = isHalf ? _seedRand(13, 14) : _seedRand(19, 21);
+        const outM = _seedPick(['00','15','30','45']);
+        const fmtT = (h, m) => {
+          const ampm = h >= 12 ? 'pm' : 'am';
+          const hh = h % 12 || 12;
+          return `${String(hh).padStart(2,'0')}:${m} ${ampm}`;
+        };
+        arr.push({
+          date: dateStr,
+          checkInTime:  fmtT(inH, inM),
+          checkOutTime: fmtT(outH, outM),
+          isHalfDay: isHalf,
+          status: 'present',
+          markedBy: 'demo-seeder',
+          markedAt: new Date(dateStr).toISOString(),
+        });
+      }
+      s.attendance = arr;
+    });
     {
       const b = db.batch();
       staffRows.forEach(s => b.set(db.collection(COL.STAFF).doc(s.id), s));
@@ -4563,6 +4606,203 @@ async function seedDemoDataIfNeeded() {
       }
       if (eCount > 0) await eb.commit();
     }
+
+    // ── SERVICES (push the default catalog so the Setup → Services tab shows entries) ──
+    try {
+      const svcRows = flattenServices(config.services || {});
+      if (svcRows && svcRows.length) {
+        for (let i = 0; i < svcRows.length; i += 400) {
+          const b = db.batch();
+          svcRows.slice(i, i + 400).forEach(r => {
+            const sid = r.id || db.collection(COL.SERVICES).doc().id;
+            b.set(db.collection(COL.SERVICES).doc(sid), { ...r, id: sid });
+          });
+          await b.commit();
+        }
+      }
+    } catch (e) { console.warn('Service seed skipped:', e); }
+
+    // ── ADVANCES (1-2 per staff per recent month) ──
+    {
+      const b = db.batch();
+      const months = ['2026-04', '2026-05'];
+      staffRows.forEach((s, idx) => {
+        months.forEach(ym => {
+          if (Math.random() < 0.55) {
+            const day = String(_seedRand(8, 22)).padStart(2, '0');
+            const date = ym + '-' + day;
+            const amount = _seedRand(2, 8) * 1000;
+            const id = db.collection(COL.ADVANCES).doc().id;
+            b.set(db.collection(COL.ADVANCES).doc(id), {
+              id, date, amount,
+              note: _seedPick(['Personal expense','Medical','Family emergency','Festival advance','Travel']),
+              immutable: true, type: 'advance',
+              staffId: s.id, staffName: s.name,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              createdAtMs: new Date(date).getTime(),
+              createdBy: 'demo-seeder',
+            });
+          }
+        });
+      });
+      await b.commit();
+    }
+
+    // ── SALARIES (paid payroll records for the last 2 closed months) ──
+    {
+      const b = db.batch();
+      const closed = [
+        { ym: '2026-03', year: 2026, month: 3 },
+        { ym: '2026-04', year: 2026, month: 4 },
+      ];
+      closed.forEach(({ ym, year, month }) => {
+        staffRows.forEach((s) => {
+          const base = s.salary;
+          const payrollDays = 30;
+          const leaveDays = _seedRand(2, 5);
+          const presentUnits = payrollDays - leaveDays;
+          const paidLeaves = s.paidLeaves || 2;
+          const excessLeaveDays = Math.max(0, leaveDays - paidLeaves);
+          const baseAfterLeave = Math.round(base * (payrollDays - excessLeaveDays) / payrollDays);
+          const revenueGenerated = _seedRand(60, 140) * 1000;
+          const commission = Math.round(revenueGenerated * s.commissionPct / 100);
+          const advance = Math.random() < 0.5 ? _seedRand(2, 6) * 1000 : 0;
+          const leaveDeduction = base - baseAfterLeave;
+          const netPayable = baseAfterLeave + commission - advance;
+          const id = db.collection(COL.SALARIES).doc().id;
+          b.set(db.collection(COL.SALARIES).doc(id), {
+            id, staffId: s.id, staffName: s.name,
+            month, year, type: 'payment', immutable: true,
+            amount: netPayable, base, baseAfterLeave, commission,
+            advance, leaveDeduction, leaveDays, paidLeaves,
+            excessLeaveDays, payrollDays, presentUnits, revenueGenerated,
+            paidDate: ym + '-05',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAtMs: new Date(ym + '-05').getTime(),
+            createdBy: 'demo-seeder',
+          });
+        });
+      });
+      await b.commit();
+    }
+
+    // ── APPOINTMENTS (8 upcoming + 6 past completed) ──
+    {
+      const b = db.batch();
+      const apptCustomers = _SEED_CUSTOMERS.slice(0, 14);
+      apptCustomers.forEach((cust, i) => {
+        const upcoming = i < 8;
+        const daysOffset = upcoming ? _seedRand(1, 14) : -_seedRand(2, 20);
+        const date = _seedDateStr(-daysOffset); // negative daysAgo = future
+        const startH = _seedRand(10, 18);
+        const startM = _seedPick([0, 15, 30, 45]);
+        const startMins = startH * 60 + startM;
+        const svc = _seedPick(_SEED_SERVICES);
+        const staff = _seedPick(staffRows);
+        const endMins = startMins + svc.mins;
+        const fmt = mins => `${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`;
+        const phone = cust[1];
+        const id = db.collection(COL.APPOINTMENTS).doc().id;
+        b.set(db.collection(COL.APPOINTMENTS).doc(id), {
+          id,
+          date, startTime: fmt(startMins), endTime: fmt(endMins),
+          durationMins: svc.mins,
+          customerName: cust[0], customerPhone: phone, customerId: phone.slice(-5),
+          services: [{ name: svc.name, price: svc.price, staffName: staff.name, mins: svc.mins }],
+          staffNames: [staff.name],
+          notes: upcoming ? _seedPick(['First-time visit','Regular client','Prefers female stylist','','Allergic to ammonia','Bridal trial']) : '',
+          status: upcoming ? 'booked' : 'completed',
+          reminderSent: !upcoming,
+          updatedAt: new Date().toISOString(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAtMs: Date.now() - i * 60000,
+          createdBy: 'demo-seeder',
+        });
+      });
+      await b.commit();
+    }
+
+    // ── CAPEX (one-time setup investments) ──
+    {
+      const b = db.batch();
+      const capexItems = [
+        { category: 'Furniture & Fixtures', item: 'Reception desk + mirrors', amount: 85000,  vendor: 'Krishna Interiors',     payment: 'Bank Transfer', depreciationMonths: 60, kind: 'asset',  date: '2025-04-12' },
+        { category: 'Furniture & Fixtures', item: 'Customer waiting sofas',  amount: 42000,  vendor: 'Urban Living',           payment: 'UPI',           depreciationMonths: 60, kind: 'asset',  date: '2025-04-15' },
+        { category: 'Equipment',            item: 'Hair washing chairs (3)', amount: 95000,  vendor: 'Salon Pro Supplies',     payment: 'EMI',           depreciationMonths: 36, kind: 'asset',  date: '2025-05-02' },
+        { category: 'Equipment',            item: 'Premium hair dryers (6)', amount: 36000,  vendor: 'Salon Pro Supplies',     payment: 'Card',          depreciationMonths: 24, kind: 'asset',  date: '2025-05-20' },
+        { category: 'Renovation',           item: 'Interior renovation',      amount: 180000, vendor: 'Tellapur Constructions', payment: 'Bank Transfer', depreciationMonths: 60, kind: 'expense',date: '2025-03-25' },
+        { category: 'Branding',             item: 'Signage + logo + print',   amount: 22000,  vendor: 'Plate Pixel',            payment: 'UPI',           depreciationMonths: 0,  kind: 'expense',date: '2025-04-08' },
+        { category: 'Equipment',            item: 'Billing tablet + printer', amount: 28000,  vendor: 'Reliance Digital',       payment: 'Card',          depreciationMonths: 36, kind: 'asset',  date: '2025-04-18' },
+      ];
+      capexItems.forEach((it, i) => {
+        const id = db.collection(COL.CAPEX).doc().id;
+        b.set(db.collection(COL.CAPEX).doc(id), {
+          id, ...it,
+          invoiceNo: 'INV-' + (1000 + i),
+          linkedEmiId: '',
+          quantity: 1, notes: '',
+          updatedAt: new Date().toISOString(),
+          createdAt: new Date(it.date).toISOString(),
+          createdAtMs: new Date(it.date).getTime(),
+          createdBy: 'demo-seeder',
+        });
+      });
+      await b.commit();
+    }
+
+    // ── AUDIT (representative admin actions) ──
+    {
+      const b = db.batch();
+      const auditLogs = [
+        { action: 'config.update',   target: 'config/shop',            meta: { field: 'shopName', value: 'Ozone Salon & Spa' }, daysAgo: 70 },
+        { action: 'staff.create',    target: 'staff/priya_sharma',     meta: { name: 'Priya Sharma' },                            daysAgo: 65 },
+        { action: 'staff.create',    target: 'staff/anjali_reddy',     meta: { name: 'Anjali Reddy' },                            daysAgo: 65 },
+        { action: 'services.update', target: 'services',               meta: { servicesVersion: 'v1' },                           daysAgo: 60 },
+        { action: 'salary.paid',     target: 'salaries/xxx',           meta: { staffName: 'Rohit Verma', month: 3, amount: 31200 }, daysAgo: 50 },
+        { action: 'expense.create',  target: 'expenses/yyy',           meta: { amount: 65000, category: 'Rent & Facility' },      daysAgo: 22 },
+        { action: 'capex.create',    target: 'capex/zzz',              meta: { category: 'Equipment', amount: 95000 },            daysAgo: 18 },
+        { action: 'advance.create',  target: 'advances/aaa',           meta: { staffName: 'Karthik Naik', amount: 5000 },         daysAgo: 12 },
+      ];
+      auditLogs.forEach(log => {
+        const id = db.collection(COL.AUDIT).doc().id;
+        const when = new Date();
+        when.setDate(when.getDate() - log.daysAgo);
+        b.set(db.collection(COL.AUDIT).doc(id), {
+          id,
+          action: log.action,
+          target: log.target,
+          meta: log.meta,
+          actor: 'demo-seeder',
+          actorEmail: 'admin@demo.platepixel',
+          at: when.toISOString(),
+          atMs: when.getTime(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAtMs: when.getTime(),
+        });
+      });
+      await b.commit();
+    }
+
+    // ── CONFIG (shop branding + business settings) ──
+    try {
+      await db.collection(COL.CONFIG).doc('shop').set({
+        shopName: 'Ozone Salon & Spa',
+        location: 'Ozone Heights Clubhouse, Tellapur, Hyderabad',
+        upiId: 'ozonesalon@upi',
+        adminWhatsappNumber: '919876500000',
+        gstRate: 0,
+        receiptFooter: 'Thank you for visiting Ozone Salon & Spa! Follow us @ozone.salon · Book again: 9876500000',
+        servicesVersion: (DEFAULTS && DEFAULTS.servicesVersion) || 'v1',
+        codOpeningBalances: { [_seedDateStr(0)]: 2500 },
+        appointmentConfig: {
+          bufferMinutes: 10,
+          chairCapacity: 4,
+          massageRooms: 2,
+          openTime: '10:00',
+          closeTime: '21:00',
+        },
+      }, { merge: true });
+    } catch (e) { console.warn('Config seed partial:', e); }
 
     console.log('✅ Demo seed complete.');
     toast('Demo data loaded — explore the dashboard ✓');
