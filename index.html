@@ -4238,6 +4238,346 @@ function toggleEmailAuthForm() {
   }
 }
 
+/* ────────────────────────────────────────────────────
+   DEMO DATA SEEDER — runs ONCE per Firebase project.
+   Populates ~75 days of realistic salon activity so
+   first-time visitors see a fully-populated ERP.
+──────────────────────────────────────────────────── */
+const _SEED_STAFF = [
+  { name: 'Priya Sharma',  salary: 25000, commissionPct: 15, paidLeaves: 2 },
+  { name: 'Anjali Reddy',  salary: 22000, commissionPct: 12, paidLeaves: 2 },
+  { name: 'Rohit Verma',   salary: 28000, commissionPct: 15, paidLeaves: 2 },
+  { name: 'Karthik Naik',  salary: 24000, commissionPct: 13, paidLeaves: 2 },
+  { name: 'Meera Iyer',    salary: 26000, commissionPct: 14, paidLeaves: 2 },
+  { name: 'Sandhya Rao',   salary: 20000, commissionPct: 10, paidLeaves: 2 },
+];
+const _SEED_SERVICES = [
+  { name: 'Haircut (Adult)', price: 200, mins: 30 },
+  { name: 'Beard Trim / Styling', price: 100, mins: 15 },
+  { name: 'Hair Wash (Normal)', price: 150, mins: 15 },
+  { name: 'Hair Spa', price: 1000, mins: 45 },
+  { name: 'Hair Colour — Global (Full Head)', price: 2000, mins: 90 },
+  { name: 'Facial — Vitamin C', price: 600, mins: 45 },
+  { name: 'Facial — Premium / Gold', price: 1000, mins: 60 },
+  { name: 'O3 Facial', price: 1500, mins: 75 },
+  { name: 'Clean Up (Basic)', price: 400, mins: 30 },
+  { name: 'Threading (Eyebrows)', price: 50, mins: 10 },
+  { name: 'Threading (Full Face)', price: 200, mins: 20 },
+  { name: 'Manicure', price: 400, mins: 30 },
+  { name: 'Pedicure', price: 500, mins: 40 },
+  { name: 'Head & Shoulder Massage (20 min)', price: 250, mins: 20 },
+  { name: 'Full Body Massage (45 min)', price: 700, mins: 45 },
+  { name: 'Hair Smoothening', price: 4500, mins: 150 },
+  { name: 'Bridal Makeup', price: 5000, mins: 120 },
+  { name: 'Highlights — Full Head', price: 1200, mins: 90 },
+];
+const _SEED_CUSTOMERS = [
+  ['Aarav Kumar','9876512345'],['Diya Patel','9876523456'],['Ishaan Singh','9876534567'],
+  ['Ananya Gupta','9876545678'],['Vivaan Desai','9876556789'],['Aadhya Nair','9876567890'],
+  ['Reyansh Joshi','9876578901'],['Saanvi Menon','9876589012'],['Atharv Rao','9876590123'],
+  ['Myra Shetty','9876601234'],['Arjun Bhat','9876612345'],['Kiara Pillai','9876623456'],
+  ['Vihaan Hegde','9876634567'],['Anika Kamath','9876645678'],['Aditya Prabhu','9876656789'],
+  ['Pari Acharya','9876667890'],['Krishna Murthy','9876678901'],['Aaradhya Bhandari','9876689012'],
+  ['Shaurya Kulkarni','9876690123'],['Navya Deshmukh','9876701234'],['Kabir Chowdhury','9876712345'],
+  ['Sara Bhattacharya','9876723456'],['Yuvraj Sen','9876734567'],['Avani Das','9876745678'],
+  ['Rudra Mukherjee','9876756789'],['Tara Banerjee','9876767890'],['Aryan Roy','9876778901'],
+  ['Zara Khan','9876789012'],['Ayaan Sheikh','9876790123'],['Mira Pathak','9876801234'],
+];
+const _SEED_PAYMENT_MODES = ['UPI','UPI','UPI','Cash','Cash','Card'];
+const _SEED_FIXED_EXPENSES = [
+  { description: 'Salon Rent',                category: 'Rent & Facility',              amount: 65000, dayOfMonth: 5  },
+  { description: 'Electricity (Avg)',         category: 'Utilities (Power, Water, Internet)', amount: 8500,  dayOfMonth: 10 },
+  { description: 'Internet & WiFi',           category: 'Utilities (Power, Water, Internet)', amount: 1200,  dayOfMonth: 7  },
+  { description: 'Water & Sewage',            category: 'Utilities (Power, Water, Internet)', amount: 1500,  dayOfMonth: 12 },
+  { description: 'Software Subscription',     category: 'Software & Subscriptions',     amount: 2500,  dayOfMonth: 1  },
+  { description: 'Insurance Premium',         category: 'Software & Subscriptions',     amount: 3500,  dayOfMonth: 15 },
+  { description: 'Laundry (Towels/Aprons)',   category: 'Laundry & Cleaning',           amount: 4200,  dayOfMonth: 8  },
+  { description: 'Security & Housekeeping',   category: 'Repairs & Maintenance',        amount: 6000,  dayOfMonth: 3  },
+];
+const _SEED_EMI = [
+  { description: 'Salon Chair Set (6 chairs)', monthlyAmount: 8500,  tenureMonths: 24, monthsPaid: 11, startMonth: '2025-06' },
+  { description: 'Hair Steamer & O3 Machine', monthlyAmount: 4200,  tenureMonths: 18, monthsPaid: 8,  startMonth: '2025-09' },
+  { description: 'AC Units (2-ton × 2)',       monthlyAmount: 3800,  tenureMonths: 12, monthsPaid: 4,  startMonth: '2026-01' },
+];
+const _SEED_EXPENSE_CATEGORIES = [
+  { cat: 'Product Purchase - Hair Care',           range: [1200, 6500] },
+  { cat: 'Product Purchase - Skin/Facial',         range: [1800, 8000] },
+  { cat: 'Color/Chemical Stock',                   range: [2200, 9500] },
+  { cat: 'Consumables (Gloves, Towels, Foils)',    range: [450, 2200] },
+  { cat: 'Marketing & Ads',                        range: [800, 3500] },
+  { cat: 'Tea/Snacks & Pantry',                    range: [350, 1100] },
+  { cat: 'Repairs & Maintenance',                  range: [500, 4500] },
+];
+
+function _seedRand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function _seedPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function _seedDateStr(daysAgo) {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return d.toISOString().slice(0, 10);
+}
+function _seedTimeStr() {
+  const h24 = _seedRand(10, 20);
+  const m = _seedPick(['00','15','30','45']);
+  const ampm = h24 >= 12 ? 'pm' : 'am';
+  const h = h24 % 12 || 12;
+  return `${String(h).padStart(2,'0')}:${m} ${ampm}`;
+}
+
+async function seedDemoDataIfNeeded() {
+  if (!DEMO_MODE || !db) return;
+  if (window.__demoSeedRunning) return;
+  window.__demoSeedRunning = true;
+
+  // 1) Atomic claim — only ONE user (across all anonymous demo guests) seeds.
+  let claimed = false;
+  try {
+    await db.runTransaction(async (tx) => {
+      const ref = db.collection(COL.CONFIG).doc('shop');
+      const snap = await tx.get(ref);
+      const cur = snap.exists ? snap.data() : {};
+      if (cur.demoSeeded) { claimed = false; return; }
+      tx.set(ref, {
+        demoSeeded: true,
+        demoSeededAt: new Date().toISOString(),
+        demoSeededVersion: 'v1-3mo-sample',
+      }, { merge: true });
+      claimed = true;
+    });
+  } catch (e) {
+    console.warn('Demo seed lock failed (perhaps already seeded):', e.message || e);
+    window.__demoSeedRunning = false;
+    return;
+  }
+  if (!claimed) {
+    console.log('Demo data already seeded — skipping.');
+    window.__demoSeedRunning = false;
+    return;
+  }
+
+  toast('Loading 2–3 months of demo data… (one-time, ~15 s)');
+  console.log('🌱 Seeding demo data…');
+
+  try {
+    // ── STAFF ──
+    const staffRows = _SEED_STAFF.map(s => ({
+      id: 'staff_' + s.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''),
+      attendance: [],
+      ...s,
+    }));
+    {
+      const b = db.batch();
+      staffRows.forEach(s => b.set(db.collection(COL.STAFF).doc(s.id), s));
+      await b.commit();
+    }
+
+    // ── FIXED EXPENSES ──
+    {
+      const b = db.batch();
+      _SEED_FIXED_EXPENSES.forEach(fx => {
+        const id = 'fx_' + fx.description.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+        b.set(db.collection(COL.FIXED).doc(id), { id, ...fx });
+      });
+      await b.commit();
+    }
+
+    // ── EMI ──
+    {
+      const b = db.batch();
+      _SEED_EMI.forEach((e, i) => {
+        const id = 'emi_' + (i + 1);
+        b.set(db.collection(COL.EMI).doc(id), { id, ...e });
+      });
+      await b.commit();
+    }
+
+    // ── TRANSACTIONS — 75 days × 6-14/day = ~700 rows.
+    // Batched in chunks of 400 to stay under Firestore's 500-op batch limit.
+    const custAgg = {}; // phoneLast5 -> { visits, totalSpend, firstVisit, lastVisit, name, phone, lastTotal, lastServices }
+    const days = 75;
+    const txBatches = [];
+    let curBatch = db.batch();
+    let curCount = 0;
+    const flushTx = async () => {
+      if (curCount === 0) return;
+      txBatches.push(curBatch.commit());
+      curBatch = db.batch();
+      curCount = 0;
+    };
+
+    for (let d = days - 1; d >= 0; d--) {
+      const dateStr = _seedDateStr(d);
+      const dow = new Date(dateStr + 'T00:00:00').getDay(); // 0 = Sun
+      // Sat/Sun busy, Tue/Wed slow
+      let txCount;
+      if (dow === 0 || dow === 6) txCount = _seedRand(11, 16);
+      else if (dow === 2 || dow === 3) txCount = _seedRand(5, 8);
+      else txCount = _seedRand(7, 11);
+
+      for (let i = 0; i < txCount; i++) {
+        const cust = _seedPick(_SEED_CUSTOMERS);
+        const phone = cust[1];
+        const custId = phone.slice(-5);
+        const numItems = Math.random() < 0.7 ? 1 : (Math.random() < 0.8 ? 2 : 3);
+        const items = [];
+        const usedNames = new Set();
+        for (let k = 0; k < numItems; k++) {
+          let svc = _seedPick(_SEED_SERVICES);
+          let guard = 0;
+          while (usedNames.has(svc.name) && guard++ < 8) svc = _seedPick(_SEED_SERVICES);
+          usedNames.add(svc.name);
+          const qty = Math.random() < 0.92 ? 1 : 2;
+          const staff = _seedPick(staffRows);
+          items.push({ name: svc.name, qty, price: svc.price, staffName: staff.name });
+        }
+        const subtotal = items.reduce((s, it) => s + it.price * it.qty, 0);
+        // 25% chance of a small discount
+        const discount = Math.random() < 0.25 ? Math.round(subtotal * (0.05 + Math.random() * 0.10)) : 0;
+        const gst = 0;
+        const total = subtotal - discount + gst;
+        const primary = items[0];
+        const primaryStaff = staffRows.find(s => s.name === primary.staffName);
+        const commissionPct = primaryStaff.commissionPct;
+        const commissionAmount = Math.round(total * commissionPct / 100);
+        const staffSplits = items.reduce((acc, it) => {
+          const exists = acc.find(x => x.staffName === it.staffName);
+          const itTotal = it.price * it.qty;
+          if (exists) {
+            exists.amount += itTotal;
+            exists.commissionAmount += Math.round(itTotal * exists.commissionPct / 100);
+          } else {
+            const sr = staffRows.find(s => s.name === it.staffName);
+            acc.push({
+              staffId: sr.id, staffName: sr.name,
+              commissionPct: sr.commissionPct,
+              amount: itTotal,
+              commissionAmount: Math.round(itTotal * sr.commissionPct / 100),
+            });
+          }
+          return acc;
+        }, []);
+        const pm = _seedPick(_SEED_PAYMENT_MODES);
+        const timeStr = _seedTimeStr();
+        const txId = db.collection(COL.TRANSACTIONS).doc().id;
+        const epochMs = new Date(dateStr + 'T12:00:00').getTime() + _seedRand(0, 8 * 3600 * 1000);
+        const txRow = {
+          id: txId,
+          date: dateStr,
+          time: timeStr,
+          services: items.map(it => `${it.name}${it.qty > 1 ? ' ×' + it.qty : ''}`).join(', '),
+          items,
+          subtotal,
+          discount,
+          discountLabel: discount > 0 ? 'Festive offer' : '',
+          gst,
+          total,
+          paymentMethod: pm,
+          paymentSplits: null,
+          staffId:   primaryStaff.id,
+          staffName: primaryStaff.name,
+          commissionPct,
+          commissionAmount,
+          staffSplits,
+          durationMins: items.reduce((s, it) => {
+            const meta = _SEED_SERVICES.find(x => x.name === it.name);
+            return s + ((meta && meta.mins) || 30) * it.qty;
+          }, 0),
+          customerId: custId,
+          customerName: cust[0],
+          customerPhone: phone,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAtMs: epochMs,
+          createdBy: 'demo-seeder',
+        };
+        curBatch.set(db.collection(COL.TRANSACTIONS).doc(txId), txRow);
+        curCount++;
+        if (curCount >= 400) await flushTx();
+
+        // Customer aggregation
+        const c = custAgg[custId] || {
+          id: custId, phone, name: cust[0],
+          visits: 0, totalSpend: 0,
+          firstVisit: dateStr, lastVisit: dateStr,
+          lastTotal: 0, lastServices: '',
+        };
+        c.visits += 1;
+        c.totalSpend += total;
+        c.lastVisit = dateStr;
+        c.lastTotal = total;
+        c.lastServices = txRow.services;
+        if (new Date(dateStr) < new Date(c.firstVisit)) c.firstVisit = dateStr;
+        custAgg[custId] = c;
+      }
+
+      // Footfall + attendance for each day
+      curBatch.set(db.collection(COL.FOOTFALL).doc(dateStr), {
+        id: dateStr, date: dateStr,
+        count: txCount + _seedRand(2, 8),  // walk-ins exceed billed
+      });
+      curCount++;
+      if (curCount >= 400) await flushTx();
+    }
+    await flushTx();
+    await Promise.all(txBatches);
+
+    // ── CUSTOMERS (aggregated from transactions) ──
+    {
+      const entries = Object.values(custAgg);
+      for (let i = 0; i < entries.length; i += 400) {
+        const b = db.batch();
+        entries.slice(i, i + 400).forEach(c => {
+          b.set(db.collection(COL.CUSTOMERS).doc(c.id), {
+            ...c, updatedAt: new Date().toISOString(),
+          });
+        });
+        await b.commit();
+      }
+    }
+
+    // ── EXPENSES — ~1-2 per day across 75 days ──
+    {
+      let eb = db.batch();
+      let eCount = 0;
+      for (let d = days - 1; d >= 0; d--) {
+        const dateStr = _seedDateStr(d);
+        const count = Math.random() < 0.7 ? 1 : 2;
+        for (let i = 0; i < count; i++) {
+          const ec = _seedPick(_SEED_EXPENSE_CATEGORIES);
+          const amount = _seedRand(ec.range[0], ec.range[1]);
+          const expId = db.collection(COL.EXPENSES).doc().id;
+          eb.set(db.collection(COL.EXPENSES).doc(expId), {
+            id: expId,
+            date: dateStr,
+            category: ec.cat,
+            description: ec.cat,
+            amount,
+            paymentMode: _seedPick(['UPI','Cash','Card','Bank Transfer']),
+            isInventory: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAtMs: new Date(dateStr + 'T14:00:00').getTime(),
+            createdBy: 'demo-seeder',
+          });
+          eCount++;
+          if (eCount >= 400) { await eb.commit(); eb = db.batch(); eCount = 0; }
+        }
+      }
+      if (eCount > 0) await eb.commit();
+    }
+
+    console.log('✅ Demo seed complete.');
+    toast('Demo data loaded — explore the dashboard ✓');
+  } catch (e) {
+    console.error('Demo seed failed mid-way:', e);
+    toast('⚠️ Some demo data could not be loaded. Refresh to retry.');
+    // Best-effort: clear the flag so a future visitor can re-attempt.
+    try {
+      await db.collection(COL.CONFIG).doc('shop').set({ demoSeeded: false }, { merge: true });
+    } catch (_) {}
+  } finally {
+    window.__demoSeedRunning = false;
+  }
+}
+
 async function signInWithGoogle() {
   if (!fbAuth) {
     if (!initFirebase()) {
@@ -4338,6 +4678,13 @@ async function handleAuthStateChange(user) {
 
   // Subscribe to real-time collection updates now that the user is authorized.
   subscribeLiveCollections();
+
+  // DEMO MODE: seed 2-3 months of sample data on the very first sign-in
+  // across this Firebase project. Atomic flag in config doc prevents
+  // duplicate seeds when multiple anonymous guests arrive simultaneously.
+  if (DEMO_MODE) {
+    seedDemoDataIfNeeded().catch(e => console.warn('Seed error:', e));
+  }
 
   // Menu migration: if cloud has older menu version, the admin signs in once
   // and we push the new menu to Firestore. This auto-updates every device.
