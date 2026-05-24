@@ -1,7 +1,7 @@
 {
-  "name": "Ozone Salon & Spa — ERP",
-  "short_name": "Ozone ERP",
-  "description": "Billing, attendance, expenses and P&L for Ozone Salon & Spa",
+  "name": "Salon POS Demo — Plate Pixel",
+  "short_name": "Salon POS",
+  "description": "Salon POS demo by Plate Pixel — billing, attendance, expenses and P&L for salon & spa businesses.",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",

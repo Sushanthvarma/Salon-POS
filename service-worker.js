@@ -1,6 +1,6 @@
-// Ozone Salon & Spa — ERP Service Worker (Firebase edition)
+// Salon POS Demo — Plate Pixel · Service Worker (Firebase edition)
 // Bump the cache version on every release so installed PWAs auto-update.
-const CACHE = 'ozone-erp-v72-customer-hero-titlecase';
+const CACHE = 'platepixel-salon-pos-v1-plate-pixel-rebrand';
 const ASSETS = ['./index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
