@@ -1,7 +1,7 @@
 # Salon POS — Live Demo by **Plate Pixel**
 
 A production-grade Point of Sale + ERP for salons & spas, built as a portfolio
-piece by **[Plate Pixel](mailto:sumanth.g1111@gmail.com)**.
+piece by **[Plate Pixel](https://www.instagram.com/platepixelstudio/)**.
 
 > **Live demo:** https://sushanthvarma.github.io/Salon-POS/
 > Anyone can sign up with email + password and explore the full admin panel.
@@ -67,7 +67,8 @@ No backend server. No build step. Open `index.html` and it runs.
 POS systems, ERPs, customer portals, dashboards. This Salon POS is one of
 several portfolio pieces showcasing what we can ship end-to-end.
 
-**Get in touch — Sumanth · [sumanth.g1111@gmail.com](mailto:sumanth.g1111@gmail.com)**
+**Follow / DM us on Instagram — [@platepixelstudio](https://www.instagram.com/platepixelstudio/)**  
+Founder: Sumanth · [sumanth.g1111@gmail.com](mailto:sumanth.g1111@gmail.com)
 
 ---
 

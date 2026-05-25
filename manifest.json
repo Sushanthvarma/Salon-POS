@@ -1,7 +1,9 @@
 {
   "name": "Salon POS Demo — Plate Pixel",
   "short_name": "Salon POS",
-  "description": "Salon POS demo by Plate Pixel — billing, attendance, expenses and P&L for salon & spa businesses.",
+  "description": "Salon POS demo by Plate Pixel Studio (@platepixelstudio) — billing, attendance, expenses and P&L for salon & spa businesses.",
+  "id": "platepixel.salon-pos",
+  "scope": "./",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",
