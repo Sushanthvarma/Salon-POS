@@ -1,6 +1,6 @@
 // Salon POS Demo — Plate Pixel · Service Worker (Firebase edition)
 // Bump the cache version on every release so installed PWAs auto-update.
-const CACHE = 'platepixel-salon-pos-v6-ig-link';
+const CACHE = 'platepixel-salon-pos-v7-ig-profile';
 const ASSETS = ['./index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
